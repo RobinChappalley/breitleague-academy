@@ -130,5 +130,41 @@
     "lesson_id": 1,
     "content": "In 2017, Georges Kern became CEO and refocused the brand.\nBreitling returned to its roots:\nheritage, elegance, and storytelling.\n\nCollections were simplified, design was refined, and new markets were explored.\nThe goal? Preserve legacy while modernizing the brand.",
     "position_order": 22
+  },
+    {
+    "id": 23,
+    "lesson_id": 2,
+    "content": "Breitling’s vision is to be a top 5 Swiss watch brand and the leader of neo-luxury. We aim to inspire dreams of a casual, uplifting life through tasteful and sustainable products. Our brand offers a relaxed yet luxurious alternative to traditional watchmakers. Everything—from product design to communication—should reflect this unique positioning.",
+    "position_order": 1
+  },
+  {
+    "id": 24,
+    "lesson_id": 2,
+    "content": "Breitling’s mission is to redefine Swiss watchmaking by offering casual, inclusive, and sustainable luxury. We represent 'conscious luxury with purpose and a touch of fun.' We stand out with an informal, inclusive attitude that appeals to modern, style-conscious consumers.",
+    "position_order": 2
+  },
+  {
+    "id": 25,
+    "lesson_id": 2,
+    "content": "Breitling’s identity is based on six values: Heritage, Quality, Performance, Style, Inclusivity, and Responsibility. These guide everything we do—from watch design to the way we welcome customers.",
+    "position_order": 3
+  },
+  {
+    "id": 26,
+    "lesson_id": 2,
+    "content": "Style is rooted in our 'Modern Retro' approach: combining design elegance with technical boldness. Our watches reflect everyday elegance—never flashy, always authentic. Inclusivity is core to our communication, boutique design, and product accessibility.",
+    "position_order": 4
+  },
+  {
+    "id": 27,
+    "lesson_id": 2,
+    "content": "Breitling champions sustainability and ethics. We collaborate with partners like Outerknown, SUGi, and Qhubeka. Our lab-grown diamonds and sustainable watch boxes reflect this commitment. We were even awarded by the Solar Impulse Foundation for eco-efficient solutions.",
+    "position_order": 5
+  },
+  {
+    "id": 28,
+    "lesson_id": 2,
+    "content": "Breitling evolved from a tech-driven toolwatch brand to an emotional, style-focused one. From the 1884 roots of Léon Breitling to Georges Kern’s repositioning in 2017, we’ve adapted to each era without losing our identity. Today, we blend storytelling, innovation, and heritage into one bold direction.",
+    "position_order": 6
   }
 ]
