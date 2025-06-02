@@ -9,7 +9,7 @@ class ModuleSeeder extends Seeder
 {
     public function run()
     {
-        $modules = json_decode(file_get_contents(database_path('seeders/modules.json')), true);
+        $modules = json_decode(file_get_contents(database_path('seeders/data/modules.json')), true);
 
         foreach ($modules as $module) {
             DB::table('modules')->insert([
