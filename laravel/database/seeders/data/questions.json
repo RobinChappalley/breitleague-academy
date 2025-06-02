@@ -1,310 +1,394 @@
 [
-  {
-    "id": 1,
-    "content_default": "What shapes the perception of a brand like Breitling over time?",
-    "content_if_TF": "The perception of Breitling is shaped mostly by its aviation history during the quartz crisis.",
-    "content_if_blank": "The perception of Breitling is shaped mostly by its __________ history during the quartz crisis.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 1,
-    "position_order": 1,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 2
-    }
-  },
-  {
-    "id": 2,
-    "content_default": "Who founded Breitling in 1884?",
-    "content_if_TF": "Willy Breitling founded the company in 1884.",
-    "content_if_blank": "__________ Breitling founded the company in 1884.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 2,
-    "position_order": 2,
-    "correct_answer_text": {
-      "true_false": false,
-      "correct_choice_id": 3
-    }
-  },
-  {
-    "id": 3,
-    "content_default": "Who introduced the second independent pusher in 1934?",
-    "content_if_TF": "Gaston Breitling introduced the second independent pusher in 1934.",
-    "content_if_blank": "__________ Breitling introduced the second independent pusher in 1934.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 3,
-    "position_order": 3,
-    "correct_answer_text": {
-      "true_false": false,
-      "correct_choice_id": 2
-    }
-  },
-  {
-    "id": 4,
-    "content_default": "What innovation did Willy Breitling introduce in the 1930s?",
-    "content_if_TF": "Willy Breitling introduced onboard chronographs for planes and cars in the 1930s.",
-    "content_if_blank": "Willy Breitling introduced __________ chronographs for planes and cars in the 1930s.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 4,
-    "position_order": 4,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 1
-    }
-  },
-  {
-    "id": 5,
-    "content_default": "Which department was created to support military aviation?",
-    "content_if_TF": "The Premier Department supported military aviation during WWII.",
-    "content_if_blank": "The __________ Department supported military aviation during WWII.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 5,
-    "position_order": 5,
-    "correct_answer_text": {
-      "true_false": false,
-      "correct_choice_id": 4
-    }
-  },
-  {
-    "id": 6,
-    "content_default": "What feature did the Chronomat offer?",
-    "content_if_TF": "The Chronomat featured a slide rule.",
-    "content_if_blank": "The Chronomat featured a __________ rule.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 6,
-    "position_order": 6,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 1
-    }
-  },
-  {
-    "id": 7,
-    "content_default": "What did the Datora watch include?",
-    "content_if_TF": "The Datora watch included a complete calendar with moon phases.",
-    "content_if_blank": "The Datora watch included a complete calendar with __________ phases.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 7,
-    "position_order": 7,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 2
-    }
-  },
-  {
-    "id": 8,
-    "content_default": "Which Breitling models are linked to Air, Land, and Sea?",
-    "content_if_TF": "Navitimer, Chronomat, and SuperOcean represent Air, Land, and Sea respectively.",
-    "content_if_blank": "Navitimer, Chronomat, and __________ represent Air, Land, and Sea respectively.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 8,
-    "position_order": 8,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 3
-    }
-  },
-  {
-    "id": 9,
-    "content_default": "What was the key innovation of the Navitimer?",
-    "content_if_TF": "The Navitimer featured a built-in slide rule for flight calculations.",
-    "content_if_blank": "The Navitimer featured a built-in __________ rule for flight calculations.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 9,
-    "position_order": 9,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 1
-    }
-  },
-  {
-    "id": 10,
-    "content_default": "Who was the Top Time collection originally designed for?",
-    "content_if_TF": "The Top Time collection was originally designed for young professionals.",
-    "content_if_blank": "The Top Time collection was originally designed for __________ professionals.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 10,
-    "position_order": 10,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 3
-    }
-  },
     {
-    "id": 11,
-    "content_default": "What major innovation was introduced in 1969?",
-    "content_if_TF": "In 1969, Breitling helped launch one of the first automatic chronograph movements.",
-    "content_if_blank": "In 1969, Breitling helped launch one of the first __________ chronograph movements.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 11,
-    "position_order": 11,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 1
+        "id": 1,
+        "content_default": "What shapes the perception of a brand like Breitling over time?",
+        "content_if_TF": "The perception of Breitling is shaped mostly by its aviation history during the quartz crisis.",
+        "content_if_blank": "The perception of Breitling is shaped mostly by its __________ history during the quartz crisis.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 1,
+        "position_order": 1,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 2
+        }
+    },
+    {
+        "id": 2,
+        "content_default": "Who founded Breitling in 1884?",
+        "content_if_TF": "Willy Breitling founded the company in 1884.",
+        "content_if_blank": "__________ Breitling founded the company in 1884.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 2,
+        "position_order": 2,
+        "correct_answer_text": {
+            "true_false": false,
+            "correct_choice_id": 3
+        }
+    },
+    {
+        "id": 3,
+        "content_default": "Who introduced the second independent pusher in 1934?",
+        "content_if_TF": "Gaston Breitling introduced the second independent pusher in 1934.",
+        "content_if_blank": "__________ Breitling introduced the second independent pusher in 1934.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 3,
+        "position_order": 3,
+        "correct_answer_text": {
+            "true_false": false,
+            "correct_choice_id": 2
+        }
+    },
+    {
+        "id": 4,
+        "content_default": "What innovation did Willy Breitling introduce in the 1930s?",
+        "content_if_TF": "Willy Breitling introduced onboard chronographs for planes and cars in the 1930s.",
+        "content_if_blank": "Willy Breitling introduced __________ chronographs for planes and cars in the 1930s.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 4,
+        "position_order": 4,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 1
+        }
+    },
+    {
+        "id": 5,
+        "content_default": "Which department was created to support military aviation?",
+        "content_if_TF": "The Premier Department supported military aviation during WWII.",
+        "content_if_blank": "The __________ Department supported military aviation during WWII.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 5,
+        "position_order": 5,
+        "correct_answer_text": {
+            "true_false": false,
+            "correct_choice_id": 4
+        }
+    },
+    {
+        "id": 6,
+        "content_default": "What feature did the Chronomat offer?",
+        "content_if_TF": "The Chronomat featured a slide rule.",
+        "content_if_blank": "The Chronomat featured a __________ rule.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 6,
+        "position_order": 6,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 1
+        }
+    },
+    {
+        "id": 7,
+        "content_default": "What did the Datora watch include?",
+        "content_if_TF": "The Datora watch included a complete calendar with moon phases.",
+        "content_if_blank": "The Datora watch included a complete calendar with __________ phases.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 7,
+        "position_order": 7,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 2
+        }
+    },
+    {
+        "id": 8,
+        "content_default": "Which Breitling models are linked to Air, Land, and Sea?",
+        "content_if_TF": "Navitimer, Chronomat, and SuperOcean represent Air, Land, and Sea respectively.",
+        "content_if_blank": "Navitimer, Chronomat, and __________ represent Air, Land, and Sea respectively.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 8,
+        "position_order": 8,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 3
+        }
+    },
+    {
+        "id": 9,
+        "content_default": "What was the key innovation of the Navitimer?",
+        "content_if_TF": "The Navitimer featured a built-in slide rule for flight calculations.",
+        "content_if_blank": "The Navitimer featured a built-in __________ rule for flight calculations.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 9,
+        "position_order": 9,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 1
+        }
+    },
+    {
+        "id": 10,
+        "content_default": "Who was the Top Time collection originally designed for?",
+        "content_if_TF": "The Top Time collection was originally designed for young professionals.",
+        "content_if_blank": "The Top Time collection was originally designed for __________ professionals.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 10,
+        "position_order": 10,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 3
+        }
+    },
+    {
+        "id": 11,
+        "content_default": "What major innovation was introduced in 1969?",
+        "content_if_TF": "In 1969, Breitling helped launch one of the first automatic chronograph movements.",
+        "content_if_blank": "In 1969, Breitling helped launch one of the first __________ chronograph movements.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 11,
+        "position_order": 11,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 1
+        }
+    },
+    {
+        "id": 12,
+        "content_default": "What design trends characterized Breitling in the 60s and 70s?",
+        "content_if_TF": "The 60s and 70s featured bold, creative, and colorful Breitling designs.",
+        "content_if_blank": "The 60s and 70s featured bold, __________, and colorful Breitling designs.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 12,
+        "position_order": 12,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 4
+        }
+    },
+    {
+        "id": 13,
+        "content_default": "What caused the quartz crisis?",
+        "content_if_TF": "Quartz watches were cheaper, more accurate, and disrupted the traditional industry.",
+        "content_if_blank": "__________ watches were cheaper, more accurate, and disrupted the traditional industry.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 13,
+        "position_order": 13,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 2
+        }
+    },
+    {
+        "id": 14,
+        "content_default": "Who took over Breitling in 1979?",
+        "content_if_TF": "Ernest Schneider took over Breitling in 1979.",
+        "content_if_blank": "__________ Schneider took over Breitling in 1979.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 14,
+        "position_order": 14,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 3
+        }
+    },
+    {
+        "id": 15,
+        "content_default": "What was Breitling’s motto under Ernest Schneider?",
+        "content_if_TF": "Under Ernest Schneider, Breitling’s motto was 'Instruments for professionals'.",
+        "content_if_blank": "Under Ernest Schneider, Breitling’s motto was 'Instruments for __________'.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 15,
+        "position_order": 15,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 1
+        }
+    },
+    {
+        "id": 16,
+        "content_default": "Which model marked the comeback of mechanical watches in 1984?",
+        "content_if_TF": "The Chronomat marked the comeback of mechanical watches in 1984.",
+        "content_if_blank": "The __________ marked the comeback of mechanical watches in 1984.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 16,
+        "position_order": 16,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 2
+        }
+    },
+    {
+        "id": 17,
+        "content_default": "What technology made Breitling’s quartz watches 10x more accurate?",
+        "content_if_TF": "SuperQuartz™ made Breitling’s quartz watches 10x more accurate.",
+        "content_if_blank": "__________ made Breitling’s quartz watches 10x more accurate.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 17,
+        "position_order": 17,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 4
+        }
+    },
+    {
+        "id": 18,
+        "content_default": "What certification did all Breitling watches get from 1999 onward?",
+        "content_if_TF": "All Breitling watches have been COSC-certified since 1999.",
+        "content_if_blank": "All Breitling watches have been __________-certified since 1999.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 18,
+        "position_order": 18,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 3
+        }
+    },
+    {
+        "id": 19,
+        "content_default": "What in-house movement did Breitling launch in 2009?",
+        "content_if_TF": "Breitling launched the B01 movement in 2009.",
+        "content_if_blank": "Breitling launched the __________ movement in 2009.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 19,
+        "position_order": 19,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 2
+        }
+    },
+    {
+        "id": 20,
+        "content_default": "What heritage line was revived in 2007?",
+        "content_if_TF": "The SuperOcean Heritage line was revived in 2007.",
+        "content_if_blank": "The __________ Heritage line was revived in 2007.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 20,
+        "position_order": 20,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 1
+        }
+    },
+    {
+        "id": 21,
+        "content_default": "Which feature distinguishes the Emergency II watch?",
+        "content_if_TF": "The Emergency II includes a rescue beacon meeting global standards.",
+        "content_if_blank": "The Emergency II includes a __________ beacon meeting global standards.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 21,
+        "position_order": 21,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 2
+        }
+    },
+    {
+        "id": 22,
+        "content_default": "Who became CEO of Breitling in 2017?",
+        "content_if_TF": "Georges Kern became CEO of Breitling in 2017.",
+        "content_if_blank": "__________ Kern became CEO of Breitling in 2017.",
+        "isMatchable": false,
+        "checkpoint_id": 1,
+        "theory_id": 22,
+        "position_order": 22,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 1
+        }
+    },
+    {
+        "id": 23,
+        "content_default": "What is Breitling’s vision in the modern watch industry?",
+        "content_if_TF": "Breitling’s vision is to become a top 5 Swiss watch brand and leader in neo-luxury.",
+        "content_if_blank": "Breitling’s vision is to become a top ___ Swiss watch brand and leader in neo-luxury.",
+        "isMatchable": false,
+        "checkpoint_id": 2,
+        "theory_id": 23,
+        "position_order": 1,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 89
+        }
+    },
+    {
+        "id": 24,
+        "content_default": "What is Breitling’s mission?",
+        "content_if_TF": "Breitling’s mission is to redefine Swiss watchmaking with casual, inclusive, and sustainable luxury.",
+        "content_if_blank": "Breitling’s mission is to redefine Swiss watchmaking with _______, inclusive, and sustainable luxury.",
+        "isMatchable": false,
+        "checkpoint_id": 2,
+        "theory_id": 24,
+        "position_order": 2,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 93
+        }
+    },
+    {
+        "id": 25,
+        "content_default": "Which value is not one of Breitling’s six core values?",
+        "content_if_TF": "Responsibility is one of Breitling’s six values.",
+        "content_if_blank": "__________ is one of Breitling’s six values.",
+        "isMatchable": false,
+        "checkpoint_id": 2,
+        "theory_id": 25,
+        "position_order": 3,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 97
+        }
+    },
+    {
+        "id": 26,
+        "content_default": "What design philosophy defines Breitling’s style?",
+        "content_if_TF": "Breitling’s style combines design elegance with technical boldness in a 'Modern Retro' approach.",
+        "content_if_blank": "Breitling’s style combines design elegance with __________ boldness in a 'Modern Retro' approach.",
+        "isMatchable": false,
+        "checkpoint_id": 2,
+        "theory_id": 26,
+        "position_order": 4,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 101
+        }
+    },
+    {
+        "id": 27,
+        "content_default": "Which of the following is a sustainability partner of Breitling?",
+        "content_if_TF": "Outerknown is one of Breitling’s sustainability partners.",
+        "content_if_blank": "__________ is one of Breitling’s sustainability partners.",
+        "isMatchable": false,
+        "checkpoint_id": 2,
+        "theory_id": 27,
+        "position_order": 5,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 105
+        }
+    },
+    {
+        "id": 28,
+        "content_default": "How did Breitling evolve under Georges Kern?",
+        "content_if_TF": "Under Georges Kern, Breitling evolved from a tech-driven brand to an emotional, style-focused one.",
+        "content_if_blank": "Under Georges Kern, Breitling evolved from a tech-driven brand to a __________, style-focused one.",
+        "isMatchable": false,
+        "checkpoint_id": 2,
+        "theory_id": 28,
+        "position_order": 6,
+        "correct_answer_text": {
+            "true_false": true,
+            "correct_choice_id": 109
+        }
     }
-  },
-  {
-    "id": 12,
-    "content_default": "What design trends characterized Breitling in the 60s and 70s?",
-    "content_if_TF": "The 60s and 70s featured bold, creative, and colorful Breitling designs.",
-    "content_if_blank": "The 60s and 70s featured bold, __________, and colorful Breitling designs.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 12,
-    "position_order": 12,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 4
-    }
-  },
-  {
-    "id": 13,
-    "content_default": "What caused the quartz crisis?",
-    "content_if_TF": "Quartz watches were cheaper, more accurate, and disrupted the traditional industry.",
-    "content_if_blank": "__________ watches were cheaper, more accurate, and disrupted the traditional industry.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 13,
-    "position_order": 13,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 2
-    }
-  },
-  {
-    "id": 14,
-    "content_default": "Who took over Breitling in 1979?",
-    "content_if_TF": "Ernest Schneider took over Breitling in 1979.",
-    "content_if_blank": "__________ Schneider took over Breitling in 1979.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 14,
-    "position_order": 14,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 3
-    }
-  },
-  {
-    "id": 15,
-    "content_default": "What was Breitling’s motto under Ernest Schneider?",
-    "content_if_TF": "Under Ernest Schneider, Breitling’s motto was 'Instruments for professionals'.",
-    "content_if_blank": "Under Ernest Schneider, Breitling’s motto was 'Instruments for __________'.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 15,
-    "position_order": 15,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 1
-    }
-  },
-  {
-    "id": 16,
-    "content_default": "Which model marked the comeback of mechanical watches in 1984?",
-    "content_if_TF": "The Chronomat marked the comeback of mechanical watches in 1984.",
-    "content_if_blank": "The __________ marked the comeback of mechanical watches in 1984.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 16,
-    "position_order": 16,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 2
-    }
-  },
-  {
-    "id": 17,
-    "content_default": "What technology made Breitling’s quartz watches 10x more accurate?",
-    "content_if_TF": "SuperQuartz™ made Breitling’s quartz watches 10x more accurate.",
-    "content_if_blank": "__________ made Breitling’s quartz watches 10x more accurate.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 17,
-    "position_order": 17,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 4
-    }
-  },
-  {
-    "id": 18,
-    "content_default": "What certification did all Breitling watches get from 1999 onward?",
-    "content_if_TF": "All Breitling watches have been COSC-certified since 1999.",
-    "content_if_blank": "All Breitling watches have been __________-certified since 1999.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 18,
-    "position_order": 18,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 3
-    }
-  },
-  {
-    "id": 19,
-    "content_default": "What in-house movement did Breitling launch in 2009?",
-    "content_if_TF": "Breitling launched the B01 movement in 2009.",
-    "content_if_blank": "Breitling launched the __________ movement in 2009.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 19,
-    "position_order": 19,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 2
-    }
-  },
-  {
-    "id": 20,
-    "content_default": "What heritage line was revived in 2007?",
-    "content_if_TF": "The SuperOcean Heritage line was revived in 2007.",
-    "content_if_blank": "The __________ Heritage line was revived in 2007.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 20,
-    "position_order": 20,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 1
-    }
-  },
-  {
-    "id": 21,
-    "content_default": "Which feature distinguishes the Emergency II watch?",
-    "content_if_TF": "The Emergency II includes a rescue beacon meeting global standards.",
-    "content_if_blank": "The Emergency II includes a __________ beacon meeting global standards.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 21,
-    "position_order": 21,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 2
-    }
-  },
-  {
-    "id": 22,
-    "content_default": "Who became CEO of Breitling in 2017?",
-    "content_if_TF": "Georges Kern became CEO of Breitling in 2017.",
-    "content_if_blank": "__________ Kern became CEO of Breitling in 2017.",
-    "isMatchable": false,
-    "checkpoint_id": 1,
-    "theory_id": 22,
-    "position_order": 22,
-    "correct_answer_text": {
-      "true_false": true,
-      "correct_choice_id": 1
-    }
-  }
 ]
