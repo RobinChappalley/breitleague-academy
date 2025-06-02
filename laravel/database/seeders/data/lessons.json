@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "title": "History of Breitling",
+        "description": "Explore Breitling’s evolution through its key milestones, from its founding to its modern renaissance.",
+        "module_id": 1,
+        "order_position": 1
+    },
+    {
+        "id": 2,
+        "title": "Brand Identity & Vision",
+        "description": "Understand Breitling’s brand values, mission, and how it connects with today’s conscious consumers.",
+        "module_id": 1,
+        "order_position": 2
+    }
+]
