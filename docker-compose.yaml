@@ -1,0 +1,47 @@
+version: "3.9"
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: breitling-mysql
+    env_file:
+      - ./laravel/.env.docker
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: breitling
+      MYSQL_USER: breitling
+      MYSQL_PASSWORD: breitling
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./laravel
+    container_name: breitling-backend
+    depends_on:
+      - mysql
+    env_file:
+      - ./laravel/.env.docker
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./laravel:/var/www/
+      - ./laravel/.env.docker:/var/www/.env
+    command: sh -c "composer install && php artisan key:generate && php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: breitling-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm run dev -- --host"
+    environment:
+      - CHOKIDAR_USEPOLLING=true # étonnamment utile pour le hot reload sous Windows/macOS
+
+volumes:
+  db_data:
