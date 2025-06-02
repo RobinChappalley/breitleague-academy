@@ -1,0 +1,550 @@
+[
+  {
+    "id": 1,
+    "question_id": 1,
+    "text_answer": "Celebrity endorsements",
+    "img_answer": null
+  },
+  {
+    "id": 2,
+    "question_id": 1,
+    "text_answer": "Aviation history during key decades",
+    "img_answer": null
+  },
+  {
+    "id": 3,
+    "question_id": 1,
+    "text_answer": "Modern marketing campaigns",
+    "img_answer": null
+  },
+  {
+    "id": 4,
+    "question_id": 1,
+    "text_answer": "Social media trends",
+    "img_answer": null
+  },
+
+  {
+    "id": 5,
+    "question_id": 2,
+    "text_answer": "Willy Breitling",
+    "img_answer": null
+  },
+  {
+    "id": 6,
+    "question_id": 2,
+    "text_answer": "Gaston Breitling",
+    "img_answer": null
+  },
+  {
+    "id": 7,
+    "question_id": 2,
+    "text_answer": "Léon Breitling",
+    "img_answer": null
+  },
+  {
+    "id": 8,
+    "question_id": 2,
+    "text_answer": "Ernest Schneider",
+    "img_answer": null
+  },
+
+  {
+    "id": 9,
+    "question_id": 3,
+    "text_answer": "Léon Breitling",
+    "img_answer": null
+  },
+  {
+    "id": 10,
+    "question_id": 3,
+    "text_answer": "Willy Breitling",
+    "img_answer": null
+  },
+  {
+    "id": 11,
+    "question_id": 3,
+    "text_answer": "Gaston Breitling",
+    "img_answer": null
+  },
+  {
+    "id": 12,
+    "question_id": 3,
+    "text_answer": "Georges Kern",
+    "img_answer": null
+  },
+
+  {
+    "id": 13,
+    "question_id": 4,
+    "text_answer": "Onboard chronographs",
+    "img_answer": null
+  },
+  {
+    "id": 14,
+    "question_id": 4,
+    "text_answer": "Wrist GPS",
+    "img_answer": null
+  },
+  {
+    "id": 15,
+    "question_id": 4,
+    "text_answer": "Slide rule bezel",
+    "img_answer": null
+  },
+  {
+    "id": 16,
+    "question_id": 4,
+    "text_answer": "Automatic alarms",
+    "img_answer": null
+  },
+
+  {
+    "id": 17,
+    "question_id": 5,
+    "text_answer": "Premier Department",
+    "img_answer": null
+  },
+  {
+    "id": 18,
+    "question_id": 5,
+    "text_answer": "SuperChrono Unit",
+    "img_answer": null
+  },
+  {
+    "id": 19,
+    "question_id": 5,
+    "text_answer": "Ocean Division",
+    "img_answer": null
+  },
+  {
+    "id": 20,
+    "question_id": 5,
+    "text_answer": "Huit Aviation Department",
+    "img_answer": null
+  },
+
+  {
+    "id": 21,
+    "question_id": 6,
+    "text_answer": "Slide rule",
+    "img_answer": null
+  },
+  {
+    "id": 22,
+    "question_id": 6,
+    "text_answer": "GPS tracker",
+    "img_answer": null
+  },
+  {
+    "id": 23,
+    "question_id": 6,
+    "text_answer": "Tachymeter bezel",
+    "img_answer": null
+  },
+  {
+    "id": 24,
+    "question_id": 6,
+    "text_answer": "Altimeter",
+    "img_answer": null
+  },
+
+  {
+    "id": 25,
+    "question_id": 7,
+    "text_answer": "Tide chart",
+    "img_answer": null
+  },
+  {
+    "id": 26,
+    "question_id": 7,
+    "text_answer": "Moon phases",
+    "img_answer": null
+  },
+  {
+    "id": 27,
+    "question_id": 7,
+    "text_answer": "Altitude tracker",
+    "img_answer": null
+  },
+  {
+    "id": 28,
+    "question_id": 7,
+    "text_answer": "Heart rate sensor",
+    "img_answer": null
+  },
+
+  {
+    "id": 29,
+    "question_id": 8,
+    "text_answer": "SuperNav",
+    "img_answer": null
+  },
+  {
+    "id": 30,
+    "question_id": 8,
+    "text_answer": "Aviator Pro",
+    "img_answer": null
+  },
+  {
+    "id": 31,
+    "question_id": 8,
+    "text_answer": "SuperOcean",
+    "img_answer": null
+  },
+  {
+    "id": 32,
+    "question_id": 8,
+    "text_answer": "DeepSky",
+    "img_answer": null
+  },
+
+  {
+    "id": 33,
+    "question_id": 9,
+    "text_answer": "Slide rule",
+    "img_answer": null
+  },
+  {
+    "id": 34,
+    "question_id": 9,
+    "text_answer": "Chronograph reset",
+    "img_answer": null
+  },
+  {
+    "id": 35,
+    "question_id": 9,
+    "text_answer": "Water resistance",
+    "img_answer": null
+  },
+  {
+    "id": 36,
+    "question_id": 9,
+    "text_answer": "Dual time zone",
+    "img_answer": null
+  },
+
+  {
+    "id": 37,
+    "question_id": 10,
+    "text_answer": "Military officers",
+    "img_answer": null
+  },
+  {
+    "id": 38,
+    "question_id": 10,
+    "text_answer": "Business executives",
+    "img_answer": null
+  },
+  {
+    "id": 39,
+    "question_id": 10,
+    "text_answer": "Young professionals",
+    "img_answer": null
+  },
+  {
+    "id": 40,
+    "question_id": 10,
+    "text_answer": "Collectors only",
+    "img_answer": null
+  },
+    {
+    "id": 41,
+    "question_id": 11,
+    "text_answer": "Automatic chronograph movement",
+    "img_answer": null
+  },
+  {
+    "id": 42,
+    "question_id": 11,
+    "text_answer": "Digital LED display",
+    "img_answer": null
+  },
+  {
+    "id": 43,
+    "question_id": 11,
+    "text_answer": "Dual time feature",
+    "img_answer": null
+  },
+  {
+    "id": 44,
+    "question_id": 11,
+    "text_answer": "Compass bezel",
+    "img_answer": null
+  },
+
+  {
+    "id": 45,
+    "question_id": 12,
+    "text_answer": "Flat and monochrome",
+    "img_answer": null
+  },
+  {
+    "id": 46,
+    "question_id": 12,
+    "text_answer": "Neutral and minimal",
+    "img_answer": null
+  },
+  {
+    "id": 47,
+    "question_id": 12,
+    "text_answer": "Functional only",
+    "img_answer": null
+  },
+  {
+    "id": 48,
+    "question_id": 12,
+    "text_answer": "Bold and colorful",
+    "img_answer": null
+  },
+
+  {
+    "id": 49,
+    "question_id": 13,
+    "text_answer": "Mechanical",
+    "img_answer": null
+  },
+  {
+    "id": 50,
+    "question_id": 13,
+    "text_answer": "Quartz",
+    "img_answer": null
+  },
+  {
+    "id": 51,
+    "question_id": 13,
+    "text_answer": "Digital automatic",
+    "img_answer": null
+  },
+  {
+    "id": 52,
+    "question_id": 13,
+    "text_answer": "Hybrid smart",
+    "img_answer": null
+  },
+
+  {
+    "id": 53,
+    "question_id": 14,
+    "text_answer": "Léon Breitling",
+    "img_answer": null
+  },
+  {
+    "id": 54,
+    "question_id": 14,
+    "text_answer": "Willy Breitling",
+    "img_answer": null
+  },
+  {
+    "id": 55,
+    "question_id": 14,
+    "text_answer": "Ernest Schneider",
+    "img_answer": null
+  },
+  {
+    "id": 56,
+    "question_id": 14,
+    "text_answer": "Georges Kern",
+    "img_answer": null
+  },
+
+  {
+    "id": 57,
+    "question_id": 15,
+    "text_answer": "Instruments for professionals",
+    "img_answer": null
+  },
+  {
+    "id": 58,
+    "question_id": 15,
+    "text_answer": "Style over substance",
+    "img_answer": null
+  },
+  {
+    "id": 59,
+    "question_id": 15,
+    "text_answer": "Classic design only",
+    "img_answer": null
+  },
+  {
+    "id": 60,
+    "question_id": 15,
+    "text_answer": "Watches for all",
+    "img_answer": null
+  },
+
+  {
+    "id": 61,
+    "question_id": 16,
+    "text_answer": "Navitimer",
+    "img_answer": null
+  },
+  {
+    "id": 62,
+    "question_id": 16,
+    "text_answer": "Chronomat",
+    "img_answer": null
+  },
+  {
+    "id": 63,
+    "question_id": 16,
+    "text_answer": "Top Time",
+    "img_answer": null
+  },
+  {
+    "id": 64,
+    "question_id": 16,
+    "text_answer": "SuperOcean",
+    "img_answer": null
+  },
+
+  {
+    "id": 65,
+    "question_id": 17,
+    "text_answer": "RadioQuartz™",
+    "img_answer": null
+  },
+  {
+    "id": 66,
+    "question_id": 17,
+    "text_answer": "TurboQuartz™",
+    "img_answer": null
+  },
+  {
+    "id": 67,
+    "question_id": 17,
+    "text_answer": "NanoQuartz™",
+    "img_answer": null
+  },
+  {
+    "id": 68,
+    "question_id": 17,
+    "text_answer": "SuperQuartz™",
+    "img_answer": null
+  },
+
+  {
+    "id": 69,
+    "question_id": 18,
+    "text_answer": "ISO",
+    "img_answer": null
+  },
+  {
+    "id": 70,
+    "question_id": 18,
+    "text_answer": "CE",
+    "img_answer": null
+  },
+  {
+    "id": 71,
+    "question_id": 18,
+    "text_answer": "COSC",
+    "img_answer": null
+  },
+  {
+    "id": 72,
+    "question_id": 18,
+    "text_answer": "NASA",
+    "img_answer": null
+  },
+
+  {
+    "id": 73,
+    "question_id": 19,
+    "text_answer": "B02",
+    "img_answer": null
+  },
+  {
+    "id": 74,
+    "question_id": 19,
+    "text_answer": "B01",
+    "img_answer": null
+  },
+  {
+    "id": 75,
+    "question_id": 19,
+    "text_answer": "B17",
+    "img_answer": null
+  },
+  {
+    "id": 76,
+    "question_id": 19,
+    "text_answer": "Valjoux 7750",
+    "img_answer": null
+  },
+
+  {
+    "id": 77,
+    "question_id": 20,
+    "text_answer": "Chronomat",
+    "img_answer": null
+  },
+  {
+    "id": 78,
+    "question_id": 20,
+    "text_answer": "Navitimer",
+    "img_answer": null
+  },
+  {
+    "id": 79,
+    "question_id": 20,
+    "text_answer": "SuperOcean",
+    "img_answer": null
+  },
+  {
+    "id": 80,
+    "question_id": 20,
+    "text_answer": "SuperOcean Heritage",
+    "img_answer": null
+  },
+
+  {
+    "id": 81,
+    "question_id": 21,
+    "text_answer": "Barometer",
+    "img_answer": null
+  },
+  {
+    "id": 82,
+    "question_id": 21,
+    "text_answer": "Rescue beacon",
+    "img_answer": null
+  },
+  {
+    "id": 83,
+    "question_id": 21,
+    "text_answer": "Solar panel",
+    "img_answer": null
+  },
+  {
+    "id": 84,
+    "question_id": 21,
+    "text_answer": "Digital thermometer",
+    "img_answer": null
+  },
+
+  {
+    "id": 85,
+    "question_id": 22,
+    "text_answer": "Georges Kern",
+    "img_answer": null
+  },
+  {
+    "id": 86,
+    "question_id": 22,
+    "text_answer": "Ernest Schneider",
+    "img_answer": null
+  },
+  {
+    "id": 87,
+    "question_id": 22,
+    "text_answer": "Jean-Claude Biver",
+    "img_answer": null
+  },
+  {
+    "id": 88,
+    "question_id": 22,
+    "text_answer": "Thierry Stern",
+    "img_answer": null
+  }
+]
