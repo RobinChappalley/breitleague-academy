@@ -1,0 +1,82 @@
+[
+    {
+        "id": 1,
+        "address": "Lausanne, St. François",
+        "zipcode": "1003",
+        "country": "Switzerland",
+        "breitling_pin": true,
+        "country_flag": "🇨🇭"
+    },
+    {
+        "id": 2,
+        "address": "Berlin, Alexander Plätz",
+        "zipcode": "10178",
+        "country": "Germany",
+        "breitling_pin": true,
+        "country_flag": "🇩🇪"
+    },
+    {
+        "id": 3,
+        "address": "Lisbon, Chiado",
+        "zipcode": "1200-108",
+        "country": "Portugal",
+        "breitling_pin": true,
+        "country_flag": "🇵🇹"
+    },
+    {
+        "id": 4,
+        "address": "Yerevan, Northern Ave",
+        "zipcode": "0001",
+        "country": "Armenia",
+        "breitling_pin": false,
+        "country_flag": "🇦🇲"
+    },
+    {
+        "id": 5,
+        "address": "Seoul, Gangnam",
+        "zipcode": "06000",
+        "country": "South Korea",
+        "breitling_pin": true,
+        "country_flag": "🇰🇷"
+    },
+    {
+        "id": 6,
+        "address": "Brussels, Louise",
+        "zipcode": "1050",
+        "country": "Belgium",
+        "breitling_pin": true,
+        "country_flag": "🇧🇪"
+    },
+    {
+        "id": 7,
+        "address": "Tokyo, Shibuya",
+        "zipcode": "150-0002",
+        "country": "Japan",
+        "breitling_pin": true,
+        "country_flag": "🇯🇵"
+    },
+    {
+        "id": 8,
+        "address": "Paris, Champs-Élysées",
+        "zipcode": "75008",
+        "country": "France",
+        "breitling_pin": true,
+        "country_flag": "🇫🇷"
+    },
+    {
+        "id": 9,
+        "address": "New York, 5th Avenue",
+        "zipcode": "10001",
+        "country": "USA",
+        "breitling_pin": true,
+        "country_flag": "🇺🇸"
+    },
+    {
+        "id": 10,
+        "address": "Toronto, Eaton Centre",
+        "zipcode": "M5B 2H1",
+        "country": "Canada",
+        "breitling_pin": false,
+        "country_flag": "🇨🇦"
+    }
+]

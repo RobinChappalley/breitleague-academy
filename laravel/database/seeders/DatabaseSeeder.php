@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
             TheorySeeder::class,
             QuestionSeeder::class,
             ChoiceSeeder::class,
+            POSSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }
