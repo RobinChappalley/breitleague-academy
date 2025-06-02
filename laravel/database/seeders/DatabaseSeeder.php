@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
         // Appel des seeders personnalisés
         $this->call([
             ModuleSeeder::class,
-            LessonSeeder::class,
+            TheorySeeder::class,
             QuestionSeeder::class,
             ChoiceSeeder::class,
         ]);
