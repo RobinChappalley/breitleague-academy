@@ -1,21 +1,54 @@
 <template>
   <div class="formation-image-container">
-    <div ref="watchContainer" class="formation-watch-container" >
-      <img alt="watch aviators" src="/backgrounds/aviators-watch.png" class="lesson-watch">
+    <div ref="watchContainer" class="formation-watch-container">
+      <img alt="watch aviators" src="/backgrounds/aviators-watch.png" class="lesson-watch" @load="updateContainerDimensions" >
 
       <!-- Votre bouton existant (spécial) -->
       <button class="checkpoint-button special-button"></button>
 
-      <!-- Boutons de checkpoint générés dynamiquement -->
-      <button
-          v-for="(checkpoint, index) in checkpoints"
+      <!-- Boutons de checkpoint avec progression individuelle -->
+      <div
+          v-for="(lesson, index) in lessons"
           :key="index"
-          class="checkpoint-button dynamic-button"
+          class="lesson-container"
           :style="getButtonPosition(index)"
-          @click="handleCheckpointClick(index)"
+          @click="handleLessonClick(index)"
       >
-        {{ index + 1 }}
-      </button>
+        <!-- Cercle de progression pour chaque leçon -->
+        <svg class="lesson-progress-circle" width="50" height="50">
+          <!-- Cercle de fond -->
+          <circle
+              cx="25"
+              cy="25"
+              r="20"
+              fill="none"
+          />
+          <!-- Cercle de progression (seulement si en cours) -->
+          <!--I don't why it works with 28. but that's it! !-->
+          <circle
+              v-if="lesson.status === 'in-progress'"
+              cx="25"
+              cy="28"
+              r="20"
+              fill="none"
+              stroke="white"
+              stroke-width="3"
+              :stroke-dasharray="circumference"
+              :stroke-dashoffset="getLessonProgressOffset(lesson.progress)"
+              stroke-linecap="round"
+              class="progress-stroke"
+              transform="rotate(-90 25 25)"
+          />
+        </svg>
+
+        <!-- Bouton de la leçon -->
+        <button
+            class="checkpoint-button dynamic-button"
+            :class="getLessonClass(lesson.status)"
+        >
+          {{ index + 1 }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -25,65 +58,65 @@ export default {
   name: 'FormationView',
   data() {
     return {
-      checkpoints: [
-        { id: 1, completed: false },
-        { id: 2, completed: true },
-        { id: 3, completed: false },
-        { id: 4, completed: false },
-        ...(new Array(10)).fill({ id: 5, completed: false }),
+      lessons: [
+        { id: 1, status: 'completed', progress: 100 },
+        { id: 2, status: 'completed', progress: 100 },
+        { id: 3, status: 'in-progress', progress: 65 },
+        { id: 4, status: 'in-progress', progress: 30 },
+        { id: 5, status: 'not-started', progress: 0 },
+        { id: 6, status: 'not-started', progress: 0 },
+        { id: 7, status: 'in-progress', progress: 80 },
+        // ...(new Array(7)).fill({ id: 8, status: 'not-started', progress: 0 }),
       ],
-      containerWidth: 0, // Ajouter cette propriété
+      containerWidth: 0,
       containerHeight: 0
     }
   },
+
   computed: {
     numberOfButtons() {
-      return this.checkpoints.length;
-    }
-  },
-  mounted() {
-    // Récupérer les dimensions une fois le composant monté
-    this.updateContainerDimensions();
-
-    // Optionnel : écouter le redimensionnement de la fenêtre
-    window.addEventListener('resize', this.updateContainerDimensions);
-  },
-  beforeUnmount() {
-    // Nettoyer l'event listener
-    window.removeEventListener('resize', this.updateContainerDimensions);
-  },
-  methods: {
-    updateContainerDimensions() {
-      const container = this.$refs.watchContainer;
-      if (container) {
-        this.containerWidth = container.offsetWidth;
-        this.containerHeight = container.offsetHeight;
-      }
+      return this.lessons.length;
     },
 
+    // Circumférence du cercle (rayon = 20, cohérent avec le SVG)
+    circumference() {
+      return 2 * Math.PI * 20;
+    }
+  },
+
+  mounted() {
+    // Utilisation de nextTick pour s'assurer que le DOM est rendu
+    this.$nextTick(() => {
+      this.updateContainerDimensions();
+      // Garde le resize listener au cas où la fenêtre change
+      window.addEventListener('resize', this.updateContainerDimensions);
+    });
+  },
+
+  methods: {
+    updateContainerDimensions() {
+        const container = this.$refs.watchContainer;
+        if (container) {
+          this.containerWidth = container.offsetWidth;
+          this.containerHeight = container.offsetHeight;
+        }
+      },
+
     getButtonPosition(index) {
-      // Vérifier que les dimensions sont disponibles
       if (this.containerWidth === 0) {
-        return { display: 'none' }; // Cacher temporairement
+        return { display: 'none' };
       }
 
-      // Configuration de l'arc
-      const arcDegrees = 140;
-      const startAngle = -50
-
-      // Calcul de l'angle pour chaque bouton
-      const angleStep = arcDegrees / (this.numberOfButtons);
-      const currentAngle = startAngle + (index * angleStep);
+      const arcDegrees = 150;
+      const startAngle = 65;
+      const angleStep = arcDegrees / this.numberOfButtons;
+      const currentAngle = startAngle - (index * angleStep);
       const angleRad = (currentAngle * Math.PI) / 180;
 
-      // Utiliser les dimensions stockées
       const radiusPixels = this.containerWidth;
+      const centerX = 0;
+      const centerY = this.containerHeight / 2;
 
-      // Centre du conteneur
-      const centerX = 0
-      const centerY = this.containerHeight/2;
-
-      // Calcul des coordonnées du cercle parfait basé sur la largeur
       const x = centerX + radiusPixels * Math.cos(angleRad);
       const y = centerY + radiusPixels * Math.sin(angleRad);
 
@@ -95,8 +128,33 @@ export default {
       };
     },
 
-    handleCheckpointClick(index) {
-      console.log(`Checkpoint ${index + 1} clicked`);
+    getLessonProgressOffset(progress) {
+      const progressRatio = progress / 100;
+      return this.circumference * (1 - progressRatio);
+    },
+
+    getLessonClass(status) {
+      return {
+        'lesson-completed': status === 'completed',
+        'lesson-in-progress': status === 'in-progress',
+        'lesson-not-started': status === 'not-started'
+      };
+    },
+
+    handleLessonClick(index) {
+      const lesson = this.lessons[index];
+      console.log(`Leçon ${index + 1} cliquée - Statut: ${lesson.status}, Progrès: ${lesson.progress}%`);
+
+      if (lesson.status === 'not-started') {
+        lesson.status = 'in-progress';
+        lesson.progress = 25;
+      } else if (lesson.status === 'in-progress' && lesson.progress < 100) {
+        lesson.progress += 25;
+        if (lesson.progress >= 100) {
+          lesson.status = 'completed';
+          lesson.progress = 100;
+        }
+      }
     }
   }
 }
@@ -134,39 +192,73 @@ export default {
   max-height: 85vh;
 }
 
-/* Styles communs pour tous les boutons */
 .checkpoint-button {
-  height: 4em;
-  width: 4em;
+  height: 3.5em;
+  width: 3.5em;
   background-color: goldenrod;
   border-radius: 50%;
-  filter: drop-shadow(0 0 10px black);
   border: none;
   position: absolute;
   cursor: pointer;
   transition: all 0.3s ease;
+  top:-2%;
+  left: 8%;
+  filter: drop-shadow(0 0 4px #000000);
 }
 
-/* Votre bouton spécial existant */
 .special-button {
-  left: 4%;
-  /* Ajoutez des styles spécifiques si nécessaire */
+  left: 1%;
 }
 
-/* Boutons dynamiques de checkpoint */
+.lesson-container {
+  position: relative; /* Changé de absolute à relative */
+}
+
+.lesson-progress-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.progress-stroke {
+  transition: stroke-dashoffset 0.3s ease-in-out;
+}
+
+.lesson-not-started {
+  background-color: #808080;
+  border-color: #A9A9A9;
+  color: white;
+}
+
+.lesson-in-progress {
+  background-color: #4169E1;
+  border-color: white;
+  color: white;
+}
+
+.lesson-completed {
+  background-color: goldenrod;
+  border-color: #FFD700;
+  color: white;
+}
+
 .dynamic-button {
   height: 3em;
   width: 3em;
-  border: 2px solid white;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  color: white;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: -1;
+}
 
-  &:hover {
-    transform: translate(-50%, -50%) scale(2);
-    background-color: #DAA520;
-  }
+.lesson-container:hover .dynamic-button {
+  transform: scale(0.9);
 }
 </style>
