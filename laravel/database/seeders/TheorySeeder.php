@@ -1,15 +1,16 @@
 <?php
+
 namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-
 
 
 class TheorySeeder extends Seeder
 {
     public function run()
     {
-        $theories = json_decode(file_get_contents(database_path('seeders/theories.json')), true);
+        $theories = json_decode(file_get_contents(database_path('seeders/data/theories.json')), true);
 
         foreach ($theories as $theory) {
             DB::table('theories')->insert([

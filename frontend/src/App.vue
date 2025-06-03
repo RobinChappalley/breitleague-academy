@@ -2,13 +2,29 @@
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
 import RankingView from './views/rankings/RankingView.vue'
+import NavigationMenue from './components/NavigationMenue.vue'
 </script>
 
 <template>
   <main>
     <RankingView/>
   </main>
+
+</script>
+
+<template>
+  <div id="app-layout">
+  <div class="main-content">
+    <main>
+    </main>
+    <footer>
+      <NavigationMenue />
+    </footer>
+  </div>
+</div>
+
 </template>
+
 
 <style scoped>
 header {
