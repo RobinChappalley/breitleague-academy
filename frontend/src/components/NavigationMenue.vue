@@ -70,12 +70,6 @@ onUnmounted(() => {
   z-index: 1000;
 }
 
-@media (min-width: 1440px) {
-  .navigation-menu {
-    width: 300px;
-  }
-}
-
 .logo {
   display: flex;
   justify-content: center;
