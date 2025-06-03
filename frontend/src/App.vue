@@ -8,6 +8,7 @@ import LearningFlowView from './views/learning/LearningFlowView.vue'
 import HistoireView from './views/learning/HistoireView.vue'
 import BattleView from './views/battle/BattleView.vue'
 import ProfileView from './views/profile/ProfileView.vue'
+import MissionView from './views/missions/MissionsView.vue'
 </script>
 
 
@@ -17,7 +18,7 @@ import ProfileView from './views/profile/ProfileView.vue'
   <div id="app-layout">
     <div class="main-content">
       <main>
-        <ProfileView/>
+        <MissionView/>
       </main>
       <footer>
         <NavigationMenue />
