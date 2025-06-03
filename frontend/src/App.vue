@@ -15,10 +15,11 @@ import MissionView from './views/missions/MissionsView.vue'
 
 
 <template>
+  <router-view></router-view>
   <div id="app-layout">
     <div class="main-content">
       <main>
-        <MissionView/>
+
       </main>
 
       <footer>
