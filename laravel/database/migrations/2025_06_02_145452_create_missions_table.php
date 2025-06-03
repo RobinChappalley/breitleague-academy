@@ -11,10 +11,10 @@ return new class extends Migration
         Schema::create('missions', function (Blueprint $table) {
             $table->id();
             $table->string('description');
-            $table->string('reward_title');
-            $table->text('reward_description')->nullable();
-            $table->string('reward_image_url')->nullable();
+            $table->unsignedBigInteger('reward_id')->nullable();
             $table->timestamps();
+
+            $table->foreign('reward_id')->references('id')->on('rewards')->onDelete('set null');
         });
     }
 

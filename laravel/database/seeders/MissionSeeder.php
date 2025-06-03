@@ -15,9 +15,7 @@ class MissionSeeder extends Seeder
             DB::table('missions')->insert([
                 'id' => $mission['id'],
                 'description' => $mission['description'],
-                'reward_title' => $mission['reward_title'],
-                'reward_description' => $mission['reward_description'],
-                'reward_image_url' => $mission['reward_image_url'],
+                'reward_id' => $$mission['reward_id'],
                 'created_at' => now(),
                 'updated_at' => now()
             ]);

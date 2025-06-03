@@ -1,0 +1,102 @@
+[
+    {
+        "id": 1,
+        "photo_name": "rewards_photo/TTI1_CHOICE_1.png",
+        "model": "Breitling – Top Time Limited Edition",
+        "date": "2020",
+        "size": "41 mm",
+        "colors": ["Silver Opalin", "Bronze"],
+        "bracelet": "22/20mm",
+        "description": "The Breitling Top Time Limited Edition is a modern reinterpretation of an iconic 1960s chronograph..."
+    },
+    {
+        "id": 2,
+        "photo_name": "rewards_photo/NOVELTIES_Q4_23.png",
+        "model": "Breitling - Navitimer Automatic 36",
+        "date": "2022",
+        "size": "36mm",
+        "colors": ["white mother-of-pearl"],
+        "bracelet": "18/16mm",
+        "description": "The Breitling Navitimer Automatic 36 blends the iconic pilot's watch heritage with a refined..."
+    },
+    {
+        "id": 3,
+        "photo_name": "rewards_photo/NOVELTIES_Q1_2023_21_CHOICE_3.png",
+        "model": "Top Time Deus",
+        "date": "2021",
+        "size": "41mm",
+        "colors": ["White lacquered with sky-blue subdials"],
+        "bracelet": "20/18mm",
+        "description": "The Breitling Top Time Chronograph Deus Limited Edition celebrates vintage racing spirit..."
+    },
+    {
+        "id": 4,
+        "photo_name": "rewards_photo/NOVELTIES_1_2024_17.png",
+        "model": "Chronomat B01 42 Triumph",
+        "date": "2021",
+        "size": "41mm",
+        "colors": ["Anthracite grey (with black subdials)"],
+        "bracelet": "22/20mm",
+        "description": "The Breitling Top Time Chronograph Deus Limited Edition channels the vintage spirit of the 1960s..."
+    },
+    {
+        "id": 5,
+        "photo_name": "rewards_photo/AVI_REF_765_I2_CHOICE_2.png",
+        "model": "Classic AVI 1953 Edition",
+        "date": "2021",
+        "size": "41mm",
+        "colors": ["Full blue dial"],
+        "bracelet": "22/18 mm",
+        "description": "The Breitling Classic AVI 1953 Edition is a luxurious reinterpretation of the iconic Co-Pilot Ref. 765 AVI..."
+    },
+    {
+        "id": 6,
+        "photo_name": "rewards_photo/AVI_REF_765_04.png",
+        "model": "Classic AVI Ref. 765 1953 Re-Edition",
+        "date": "2020",
+        "size": "41mm",
+        "colors": ["Full black dial"],
+        "bracelet": "22/18mm",
+        "description": "The Breitling AVI Ref. 765 1953 Re-Edition is a faithful tribute to the legendary Co-Pilot..."
+    },
+    {
+        "id": 7,
+        "photo_name": "rewards_photo/CHRONOMAT_07.png",
+        "model": "Breitling Chronomat B01 42",
+        "date": "2020",
+        "size": "42mm",
+        "colors": ["Anthracite"],
+        "bracelet": "22/20mm",
+        "description": "The Breitling Chronomat B01 42 blends bold design with exceptional performance..."
+    },
+    {
+        "id": 8,
+        "photo_name": "rewards_photo/NAVITIMERAUTO_I2_CHOICE_1.png",
+        "model": "Breitling Navitimer B03 Chronograph Rattrapante 45",
+        "date": "2017",
+        "size": "45mm",
+        "colors": ["Dynamic silver"],
+        "bracelet": "24/20mm",
+        "description": "The Breitling Navitimer B03 Chronograph Rattrapante 45 showcases one of watchmaking's most sophisticated complications..."
+    },
+    {
+        "id": 9,
+        "photo_name": "rewards_photo/CHRONOMAT_08.png",
+        "model": "Chronomat B01 42 Frecce Tricolori",
+        "date": "2020",
+        "size": "42mm",
+        "colors": ["Blue"],
+        "bracelet": "22/20mm",
+        "description": "The Breitling Chronomat B01 42 Frecce Tricolori is a tribute to the iconic 1983 chronograph created for the famed Italian aerial squadron..."
+    },
+    {
+        "id": 10,
+        "photo_name": "rewards_photo/NAVITIMERAUTO_I1_CHOICE_1.png",
+        "model": "Breitling Superocean Automatic 44 Outerknown",
+        "date": "2019",
+        "size": "44mm",
+        "colors": ["Matte green"],
+        "bracelet": "22mm",
+        "description": "The Breitling Superocean Automatic 44 Outerknown is a bold, eco-conscious dive watch co-designed with Kelly Slater's surfwear brand..."
+    }
+]

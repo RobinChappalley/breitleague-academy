@@ -25,9 +25,4 @@ class Lesson extends Model
     {
         return $this->hasMany(Theory::class);
     }
-
-    public function checkpoints()
-    {
-        return $this->hasMany(Checkpoint::class);
-    }
 }
