@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('photo_name');
             $table->string('model');
-            $table->date('date')->nullable();
+            $table->year('date')->nullable();
             $table->string('size')->nullable();
             $table->string('colors')->nullable();
             $table->string('bracelet')->nullable();

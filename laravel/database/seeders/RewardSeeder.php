@@ -18,7 +18,7 @@ class RewardSeeder extends Seeder
                 'model' => $reward['model'],
                 'date' => $reward['date'],
                 'size' => $reward['size'],
-                'colors' => $reward['colors'],
+                'colors' => implode(', ', $reward['colors']),
                 'bracelet' => $reward['bracelet'],
                 'description' => $reward['description'],
                 'created_at' => now(),
