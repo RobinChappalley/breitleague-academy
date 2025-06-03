@@ -20,13 +20,13 @@ import MissionView from './views/missions/MissionsView.vue'
       <main>
         <MissionView/>
       </main>
+
       <footer>
         <NavigationMenue />
       </footer>
     </div>
   </div>
 </template>
-
 
 <style scoped>
 header {
