@@ -4,6 +4,7 @@ import TheWelcome from './components/TheWelcome.vue'
 import RankingView from './views/rankings/RankingView.vue'
 import NavigationMenue from './components/NavigationMenue.vue'
 import LessonsListView from './views/learning/LessonsListView.vue'
+import LearningFlowView from './views/learning/LearningFlowView.vue'
 </script>
 
 
@@ -11,18 +12,15 @@ import LessonsListView from './views/learning/LessonsListView.vue'
 
 <template>
   <div id="app-layout">
-  <div class="main-content">
-    <main>
-    <LessonsListView/>
-
-
-    </main>
-    <footer>
-      <NavigationMenue />
-    </footer>
+    <div class="main-content">
+      <main>
+        <LearningFlowView/>
+      </main>
+      <footer>
+        <NavigationMenue />
+      </footer>
+    </div>
   </div>
-</div>
-
 </template>
 
 
