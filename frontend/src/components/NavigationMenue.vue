@@ -118,7 +118,6 @@ import profileIcon from '/public/images/icones/profile.svg'
   width: 28px;
   height: 28px;
   filter: brightness(0) saturate(100%) invert(48%) sepia(59%) saturate(1326%) hue-rotate(181deg) brightness(95%) contrast(95%);
-  transition: filter 0.3s;
 }
 
 .nav-list li.active {
@@ -126,7 +125,7 @@ import profileIcon from '/public/images/icones/profile.svg'
 }
 
 .nav-list li.active img {
-  filter: brightness(0) saturate(100%) invert(86%) sepia(79%) saturate(415%) hue-rotate(8deg) brightness(100%) contrast(102%);
+  filter: brightness(0) saturate(100%) invert(79%) sepia(79%) saturate(415%) hue-rotate(340deg) brightness(100%) contrast(102%);
 }
 
 .active-bar {

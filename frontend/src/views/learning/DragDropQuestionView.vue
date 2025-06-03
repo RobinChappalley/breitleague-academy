@@ -10,33 +10,35 @@
     <!-- Quiz Content -->
     <div class="quiz-content">
       <div class="quiz-container">
+        <!-- Watch Options -->
+        <div class="watches-section">
+          <div 
+            v-for="(watch, index) in watchOptions" 
+            :key="index"
+            class="watch-option"
+            :class="{ 
+              'selected': selectedWatch === index,
+              'correct': showResult && index === correctAnswer,
+              'incorrect': showResult && selectedWatch === index && index !== correctAnswer
+            }"
+            @click="selectWatch(index)"
+          >
+            <div class="watch-image">
+              <img :src="watch.image" :alt="watch.name" />
+            </div>
+          </div>
+        </div>
+
         <!-- Question -->
         <div class="question-section">
           <p class="question-text">{{ currentQuestion.question }}</p>
-        </div>
-
-        <!-- Answer Options -->
-        <div class="answers-section">
-          <div 
-            v-for="(answer, index) in currentQuestion.answers" 
-            :key="index"
-            class="answer-option"
-            :class="{ 
-              'selected': selectedAnswer === index,
-              'correct': showResult && answer.correct,
-              'incorrect': showResult && selectedAnswer === index && !answer.correct
-            }"
-            @click="selectAnswer(index)"
-          >
-            {{ answer.text }}
-          </div>
         </div>
 
         <!-- Validation Button -->
         <div class="button-section">
           <!-- Cancel/Close Button -->
           <button 
-            v-if="showResult && !currentQuestion.answers[selectedAnswer]?.correct" 
+            v-if="showResult && selectedWatch !== correctAnswer" 
             class="cancel-btn"
             @click="resetQuestion"
           >
@@ -46,9 +48,9 @@
           <!-- Next Button -->
           <button 
             class="next-btn"
-            :class="{ 'disabled': selectedAnswer === null && !showResult }"
+            :class="{ 'disabled': selectedWatch === null && !showResult }"
             @click="handleNext"
-            :disabled="selectedAnswer === null && !showResult"
+            :disabled="selectedWatch === null && !showResult"
           >
             NEXT
           </button>
@@ -66,13 +68,14 @@ const props = defineProps({
   questionData: {
     type: Object,
     default: () => ({
-      question: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
-      answers: [
-        { text: "youhou", correct: false },
-        { text: "youhou", correct: true },
-        { text: "youhou", correct: false },
-        { text: "youhou", correct: false }
-      ]
+      question: "Quel modèle possède un calibre Breitling B23 ?",
+      watches: [
+        { name: "Premier", image: "/images/watches/premier.jpg" },
+        { name: "Navitimer", image: "/images/watches/navitimer.jpg" },
+        { name: "Superocean", image: "/images/watches/superocean.jpg" },
+        { name: "Avenger", image: "/images/watches/avenger.jpg" }
+      ],
+      correctAnswer: 1 // Index de la bonne réponse
     })
   },
   currentStep: {
@@ -87,40 +90,41 @@ const props = defineProps({
 
 // Reactive data
 const currentQuestion = ref(props.questionData)
-const selectedAnswer = ref(null)
+const selectedWatch = ref(null)
 const showResult = ref(false)
 const progress = computed(() => (props.currentStep / props.totalSteps) * 100)
+
+// Watch options avec images
+const watchOptions = ref(currentQuestion.value.watches)
+const correctAnswer = ref(currentQuestion.value.correctAnswer)
 
 // Emit events
 const emit = defineEmits(['next-step', 'answer-selected'])
 
 // Methods
-const selectAnswer = (index) => {
+const selectWatch = (index) => {
   if (showResult.value) return
   
-  selectedAnswer.value = index
+  selectedWatch.value = index
   showResult.value = true
   
   emit('answer-selected', {
     questionIndex: props.currentStep - 1,
-    answerIndex: index,
-    correct: currentQuestion.value.answers[index].correct
+    selectedWatch: index,
+    correct: index === correctAnswer.value
   })
 }
 
 const handleNext = () => {
-  if (selectedAnswer.value === null && !showResult.value) return
+  if (selectedWatch.value === null && !showResult.value) return
   
   emit('next-step')
-  console.log('Going to next step')
 }
 
 const resetQuestion = () => {
-  selectedAnswer.value = null
+  selectedWatch.value = null
   showResult.value = false
 }
-
-console.log('QuizView component loaded')
 </script>
 
 <style scoped>
@@ -171,67 +175,91 @@ console.log('QuizView component loaded')
   max-width: 600px;
 }
 
+/* WATCHES SECTION */
+.watches-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.watch-option {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 3px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+}
+
+.watch-option:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.watch-option.selected {
+  border-color: #F7C72C;
+  background: rgba(247, 199, 44, 0.1);
+}
+
+.watch-option.correct {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.watch-option.incorrect {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.watch-image {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.watch-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* Fallback si pas d'image */
+.watch-image:not(:has(img)) {
+  background: #f0f0f0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  color: #666;
+}
+
+.watch-image:not(:has(img))::before {
+  content: "⌚";
+}
+
 /* QUESTION SECTION */
 .question-section {
   margin-bottom: 3rem;
+  text-align: center;
 }
 
 .question-text {
   font-size: 1.2rem;
   line-height: 1.6;
   color: white;
-  text-align: center;
   margin: 0;
   padding: 0 1rem;
-}
-
-/* ANSWERS SECTION */
-.answers-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 3rem;
-}
-
-.answer-option {
-  background: rgba(255, 255, 255, 0.9);
-  color: #072C54;
-  padding: 1.2rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-  border: 3px solid transparent;
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.answer-option:hover {
-  background: rgba(255, 255, 255, 0.95);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-.answer-option.selected {
-  border-color: #F7C72C;
-  background: rgba(247, 199, 44, 0.2);
-  color: white;
-}
-
-.answer-option.correct {
-  border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.2);
-  color: white;
-}
-
-.answer-option.incorrect {
-  border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.2);
-  color: white;
 }
 
 /* BUTTON SECTION */
@@ -289,120 +317,30 @@ console.log('QuizView component loaded')
   cursor: not-allowed;
 }
 
-/* RESPONSIVE - TABLET */
-@media (min-width: 768px) and (max-width: 1199px) {
-  .progress-container {
-    padding: 1.5rem 3rem 0 3rem;
-  }
-  
-  .quiz-content {
-    padding: 3rem;
-  }
-  
-  .quiz-container {
-    max-width: 700px;
-  }
-  
-  .question-text {
-    font-size: 1.3rem;
-    padding: 0 2rem;
-  }
-  
-  .answer-option {
-    padding: 1.5rem;
-    font-size: 1.1rem;
-    min-height: 70px;
-  }
-}
-
-/* RESPONSIVE - DESKTOP */
-@media (min-width: 1200px) {
-  .progress-container {
-    padding: 2rem 4rem 0 4rem;
-  }
-  
-  .quiz-content {
-    padding: 4rem;
-  }
-  
-  .quiz-container {
-    max-width: 800px;
-  }
-  
-  .question-section {
-    margin-bottom: 4rem;
-  }
-  
-  .question-text {
-    font-size: 1.4rem;
-    line-height: 1.7;
-    padding: 0 3rem;
-  }
-  
-  .answers-section {
-    gap: 1.5rem;
-    margin-bottom: 4rem;
-  }
-  
-  .answer-option {
-    padding: 2rem;
-    font-size: 1.2rem;
-    min-height: 80px;
-  }
-  
-  .next-btn {
-    padding: 1.2rem 4rem;
-    font-size: 1.1rem;
-    max-width: 400px;
-  }
-  
-  .cancel-btn {
-    width: 60px;
-    height: 60px;
-    font-size: 1.4rem;
-  }
-}
-
-/* RESPONSIVE - MOBILE */
+/* RESPONSIVE */
 @media (max-width: 767px) {
-  .progress-container {
-    padding: 1rem 1rem 0 1rem;
+  .watches-section {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
-  .quiz-content {
-    padding: 1.5rem 1rem;
+  .watch-option {
+    padding: 1rem;
+    min-height: 120px;
   }
   
-  .question-section {
-    margin-bottom: 2rem;
+  .watch-image {
+    height: 100px;
   }
   
   .question-text {
     font-size: 1rem;
-    padding: 0 0.5rem;
   }
-  
-  .answers-section {
-    grid-template-columns: 1fr;
-    gap: 0.8rem;
-    margin-bottom: 2rem;
-  }
-  
-  .answer-option {
-    padding: 1rem;
-    font-size: 0.9rem;
-    min-height: 50px;
-  }
-  
-  .next-btn {
-    padding: 0.8rem 2rem;
-    font-size: 0.9rem;
-  }
-  
-  .cancel-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .watch-image {
+    height: 140px;
   }
 }
 </style>

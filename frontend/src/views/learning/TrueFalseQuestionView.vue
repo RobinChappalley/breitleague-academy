@@ -15,20 +15,30 @@
           <p class="question-text">{{ currentQuestion.question }}</p>
         </div>
 
-        <!-- Answer Options -->
+        <!-- True/False Options -->
         <div class="answers-section">
           <div 
-            v-for="(answer, index) in currentQuestion.answers" 
-            :key="index"
-            class="answer-option"
+            class="answer-option true-false-option"
             :class="{ 
-              'selected': selectedAnswer === index,
-              'correct': showResult && answer.correct,
-              'incorrect': showResult && selectedAnswer === index && !answer.correct
+              'selected': selectedAnswer === 'true',
+              'correct': showResult && currentQuestion.correctAnswer === 'true',
+              'incorrect': showResult && selectedAnswer === 'true' && currentQuestion.correctAnswer !== 'true'
             }"
-            @click="selectAnswer(index)"
+            @click="selectAnswer('true')"
           >
-            {{ answer.text }}
+            Vrai
+          </div>
+          
+          <div 
+            class="answer-option true-false-option"
+            :class="{ 
+              'selected': selectedAnswer === 'false',
+              'correct': showResult && currentQuestion.correctAnswer === 'false',
+              'incorrect': showResult && selectedAnswer === 'false' && currentQuestion.correctAnswer !== 'false'
+            }"
+            @click="selectAnswer('false')"
+          >
+            Faux
           </div>
         </div>
 
@@ -36,7 +46,7 @@
         <div class="button-section">
           <!-- Cancel/Close Button -->
           <button 
-            v-if="showResult && !currentQuestion.answers[selectedAnswer]?.correct" 
+            v-if="showResult && selectedAnswer !== currentQuestion.correctAnswer" 
             class="cancel-btn"
             @click="resetQuestion"
           >
@@ -67,12 +77,7 @@ const props = defineProps({
     type: Object,
     default: () => ({
       question: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
-      answers: [
-        { text: "youhou", correct: false },
-        { text: "youhou", correct: true },
-        { text: "youhou", correct: false },
-        { text: "youhou", correct: false }
-      ]
+      correctAnswer: "true" // "true" ou "false"
     })
   },
   currentStep: {
@@ -95,16 +100,16 @@ const progress = computed(() => (props.currentStep / props.totalSteps) * 100)
 const emit = defineEmits(['next-step', 'answer-selected'])
 
 // Methods
-const selectAnswer = (index) => {
+const selectAnswer = (answer) => {
   if (showResult.value) return
   
-  selectedAnswer.value = index
+  selectedAnswer.value = answer
   showResult.value = true
   
   emit('answer-selected', {
     questionIndex: props.currentStep - 1,
-    answerIndex: index,
-    correct: currentQuestion.value.answers[index].correct
+    answer: answer,
+    correct: answer === currentQuestion.value.correctAnswer
   })
 }
 
@@ -112,15 +117,12 @@ const handleNext = () => {
   if (selectedAnswer.value === null && !showResult.value) return
   
   emit('next-step')
-  console.log('Going to next step')
 }
 
 const resetQuestion = () => {
   selectedAnswer.value = null
   showResult.value = false
 }
-
-console.log('QuizView component loaded')
 </script>
 
 <style scoped>
@@ -189,22 +191,22 @@ console.log('QuizView component loaded')
 .answers-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 1.5rem;
   margin-bottom: 3rem;
 }
 
-.answer-option {
+.true-false-option {
   background: rgba(255, 255, 255, 0.9);
   color: #072C54;
-  padding: 1.2rem;
+  padding: 2rem;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: center;
   border: 3px solid transparent;
-  min-height: 60px;
+  min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -289,120 +291,17 @@ console.log('QuizView component loaded')
   cursor: not-allowed;
 }
 
-/* RESPONSIVE - TABLET */
-@media (min-width: 768px) and (max-width: 1199px) {
-  .progress-container {
-    padding: 1.5rem 3rem 0 3rem;
-  }
-  
-  .quiz-content {
-    padding: 3rem;
-  }
-  
-  .quiz-container {
-    max-width: 700px;
-  }
-  
-  .question-text {
-    font-size: 1.3rem;
-    padding: 0 2rem;
-  }
-  
-  .answer-option {
-    padding: 1.5rem;
-    font-size: 1.1rem;
-    min-height: 70px;
-  }
-}
-
-/* RESPONSIVE - DESKTOP */
-@media (min-width: 1200px) {
-  .progress-container {
-    padding: 2rem 4rem 0 4rem;
-  }
-  
-  .quiz-content {
-    padding: 4rem;
-  }
-  
-  .quiz-container {
-    max-width: 800px;
-  }
-  
-  .question-section {
-    margin-bottom: 4rem;
-  }
-  
-  .question-text {
-    font-size: 1.4rem;
-    line-height: 1.7;
-    padding: 0 3rem;
-  }
-  
-  .answers-section {
-    gap: 1.5rem;
-    margin-bottom: 4rem;
-  }
-  
-  .answer-option {
-    padding: 2rem;
-    font-size: 1.2rem;
-    min-height: 80px;
-  }
-  
-  .next-btn {
-    padding: 1.2rem 4rem;
-    font-size: 1.1rem;
-    max-width: 400px;
-  }
-  
-  .cancel-btn {
-    width: 60px;
-    height: 60px;
-    font-size: 1.4rem;
-  }
-}
-
-/* RESPONSIVE - MOBILE */
+/* RESPONSIVE */
 @media (max-width: 767px) {
-  .progress-container {
-    padding: 1rem 1rem 0 1rem;
-  }
-  
-  .quiz-content {
-    padding: 1.5rem 1rem;
-  }
-  
-  .question-section {
-    margin-bottom: 2rem;
-  }
-  
-  .question-text {
-    font-size: 1rem;
-    padding: 0 0.5rem;
-  }
-  
   .answers-section {
     grid-template-columns: 1fr;
-    gap: 0.8rem;
-    margin-bottom: 2rem;
+    gap: 1rem;
   }
   
-  .answer-option {
-    padding: 1rem;
-    font-size: 0.9rem;
-    min-height: 50px;
-  }
-  
-  .next-btn {
-    padding: 0.8rem 2rem;
-    font-size: 0.9rem;
-  }
-  
-  .cancel-btn {
-    width: 40px;
-    height: 40px;
+  .true-false-option {
+    padding: 1.5rem;
     font-size: 1rem;
+    min-height: 60px;
   }
 }
 </style>
