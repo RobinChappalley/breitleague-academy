@@ -125,7 +125,7 @@ import profileIcon from '/public/images/icones/profile.svg'
 }
 
 .nav-list li.active img {
-  filter: brightness(0) saturate(100%) invert(86%) sepia(79%) saturate(415%) hue-rotate(340deg) brightness(100%) contrast(102%);
+  filter: brightness(0) saturate(100%) invert(79%) sepia(79%) saturate(415%) hue-rotate(340deg) brightness(100%) contrast(102%);
 }
 
 .active-bar {
