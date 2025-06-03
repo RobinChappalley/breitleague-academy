@@ -3,19 +3,19 @@ import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
 import RankingView from './views/rankings/RankingView.vue'
 import NavigationMenue from './components/NavigationMenue.vue'
+import LessonsListView from './views/learning/LessonsListView.vue'
 </script>
 
-<template>
-  <main>
-    <RankingView/>
-  </main>
 
-</script>
+
 
 <template>
   <div id="app-layout">
   <div class="main-content">
     <main>
+    <LessonsListView/>
+
+
     </main>
     <footer>
       <NavigationMenue />
