@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
             POSSeeder::class,
             UserSeeder::class,
             MissionSeeder::class,
+            RewardSeeder::class,
+
         ]);
     }
 }
