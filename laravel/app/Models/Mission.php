@@ -11,9 +11,7 @@ class Mission extends Model
 
     protected $fillable = [
         'description',
-        'reward_title',
-        'reward_description',
-        'reward_image_url',
+        'reward_id'
     ];
 
     public function users()
@@ -26,5 +24,10 @@ class Mission extends Model
     public function userMissions()
     {
         return $this->hasMany(UserMission::class);
+    }
+
+    public function reward()
+    {
+        return $this->belongsTo(Reward::class);
     }
 }
