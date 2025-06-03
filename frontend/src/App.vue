@@ -1,22 +1,21 @@
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
+import RankingView from './views/rankings/RankingView.vue'
 import NavigationMenue from './components/NavigationMenue.vue'
 </script>
 
 <template>
-  <div id="app-layout">
-  
-  <div class="main-content">
-    <header>
-      <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-      <div class="wrapper">
-        <HelloWorld msg="You did it!" />
-      </div>
-    </header>
-    <main>
-      <TheWelcome />
+  <main>
+    <RankingView/>
+  </main>
 
+</script>
+
+<template>
+  <div id="app-layout">
+  <div class="main-content">
+    <main>
     </main>
     <footer>
       <NavigationMenue />
