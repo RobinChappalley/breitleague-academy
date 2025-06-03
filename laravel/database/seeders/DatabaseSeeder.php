@@ -1,6 +1,7 @@
 <?php
 
 namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use App\Models\User;
 
@@ -19,9 +20,14 @@ class DatabaseSeeder extends Seeder
 
         // Appel des seeders personnalisés
         $this->call([
+            ModuleSeeder::class,
+            LessonSeeder::class,
             TheorySeeder::class,
             QuestionSeeder::class,
             ChoiceSeeder::class,
+            POSSeeder::class,
+            UserSeeder::class,
+            MissionSeeder::class,
         ]);
     }
 }

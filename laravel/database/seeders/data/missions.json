@@ -1,0 +1,51 @@
+[
+    {
+        "id": 1,
+        "description": "Complete the 'Understanding the Collection' module",
+        "reward_title": "Collection Explorer",
+        "reward_description": "Awarded for completing the first module of the academy.",
+        "reward_image_url": "missions/reward1.png"
+    },
+    {
+        "id": 2,
+        "description": "Score 100% on a quiz from the 'Main Collections' module",
+        "reward_title": "Quiz Master",
+        "reward_description": "Awarded for acing a quiz with a perfect score.",
+        "reward_image_url": "missions/reward2.png"
+    },
+    {
+        "id": 3,
+        "description": "Win a battle against another retailer",
+        "reward_title": "First Victory",
+        "reward_description": "Awarded for winning your first battle.",
+        "reward_image_url": "missions/reward3.png"
+    },
+    {
+        "id": 4,
+        "description": "Log in for 10 consecutive days",
+        "reward_title": "Daily Dedication",
+        "reward_description": "Awarded for your daily commitment to learning.",
+        "reward_image_url": "missions/reward4.png"
+    },
+    {
+        "id": 5,
+        "description": "Complete 3 training modules",
+        "reward_title": "Training Champion",
+        "reward_description": "Awarded for completing three modules.",
+        "reward_image_url": "missions/reward5.png"
+    },
+    {
+        "id": 6,
+        "description": "Answer 30 questions correctly this week",
+        "reward_title": "Sharp Mind",
+        "reward_description": "Awarded for answering 30 questions correctly.",
+        "reward_image_url": "missions/reward6.png"
+    },
+    {
+        "id": 7,
+        "description": "Win 5 battles in a row",
+        "reward_title": "Battle Streak",
+        "reward_description": "Awarded for five consecutive victories.",
+        "reward_image_url": "missions/reward7.png"
+    }
+]
