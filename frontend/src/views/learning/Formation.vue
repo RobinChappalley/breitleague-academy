@@ -48,6 +48,9 @@
         >
           {{ index + 1 }}
         </button>
+        <p class="lesson-label">
+          {{lesson.title}}
+        </p>
       </div>
     </div>
   </div>
@@ -59,9 +62,9 @@ export default {
   data() {
     return {
       lessons: [
-        { id: 1, status: 'completed', progress: 100 },
-        { id: 2, status: 'completed', progress: 100 },
-        { id: 3, status: 'in-progress', progress: 65 },
+        { id: 1, status: 'completed', progress: 100, title: 'Onboarding' },
+        { id: 2, status: 'completed', progress: 100, title: 'Onboarding' },
+        { id: 3, status: 'in-progress', progress: 65, title: 'Onboarding' },
         { id: 4, status: 'in-progress', progress: 30 },
         { id: 5, status: 'not-started', progress: 0 },
         { id: 6, status: 'not-started', progress: 0 },
@@ -260,5 +263,14 @@ export default {
 
 .lesson-container:hover .dynamic-button {
   transform: scale(0.9);
+}
+
+.lesson-label {
+  position: absolute;
+  left: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+color: whitesmoke;
+  font-weight: bold;
 }
 </style>
