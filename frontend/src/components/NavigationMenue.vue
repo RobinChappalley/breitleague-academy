@@ -1,7 +1,7 @@
 <template>
     <nav class="navigation-menu">
       <div class="logo" v-if="isDesktop">
-        <img src="/public/images/icones/logo.png" alt="Breitleague Academy Logo" />
+        <img src="/images/icones/logo.png" alt="Breitleague Academy Logo" />
       </div>
       <ul class="nav-list">
         <li
@@ -21,11 +21,11 @@
   <script setup>
   import { ref, onMounted, onUnmounted } from 'vue'
   
-  import learningIcon from '/public/images/icones/learning.svg'
-import battleIcon from '/public/images/icones/battle.svg'
-import collectionIcon from '/public/images/icones/collection.svg'
-import cupIcon from '/public/images/icones/cup.svg'
-import profileIcon from '/public/images/icones/profile.svg'
+  import learningIcon from '/images/icones/learning.svg'
+import battleIcon from '/images/icones/battle.svg'
+import collectionIcon from '/images/icones/collection.svg'
+import cupIcon from '/images/icones/cup.svg'
+import profileIcon from '/images/icones/profile.svg'
 
   
   const navItems = [
