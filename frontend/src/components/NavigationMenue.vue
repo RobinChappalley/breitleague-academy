@@ -1,63 +1,62 @@
 <template>
-    <nav class="navigation-menu">
-      <div class="logo" v-if="isDesktop">
-        <img src="/images/icones/logo.png" alt="Breitleague Academy Logo" />
-      </div>
-      <ul class="nav-list">
-        <li
+  <nav class="navigation-menu">
+    <div class="logo" v-if="isDesktop">
+      <img src="/images/icones/logo.png" alt="Breitleague Academy Logo"/>
+    </div>
+    <ul class="nav-list">
+      <li
           v-for="item in navItems"
           :key="item.name"
-          :class="{ active: activeItem === item.name }"
-          @click="setActive(item.name)"
-        >
-          <div class="active-bar" />
-          <img :src="item.icon" :alt="item.label" />
-          <span>{{ item.label }}</span>
-        </li>
-      </ul>
-    </nav>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted, onUnmounted } from 'vue'
-  
-  import learningIcon from '/images/icones/learning.svg'
+      >
+        <RouterLink :to="item.route" class="nav-link">
+        <div class="active-bar"/>
+        <img :src="item.icon" :alt="item.label"/>
+        <span>{{ item.label }}</span>
+        </RouterLink>
+      </li>
+    </ul>
+  </nav>
+</template>
+
+<script setup>
+import {ref, onMounted, onUnmounted} from 'vue'
+
+import learningIcon from '/images/icones/learning.svg'
 import battleIcon from '/images/icones/battle.svg'
 import collectionIcon from '/images/icones/collection.svg'
 import cupIcon from '/images/icones/cup.svg'
 import profileIcon from '/images/icones/profile.svg'
 
-  
-  const navItems = [
-    { name: 'learning', label: 'Learning', icon: learningIcon },
-    { name: 'battle', label: 'Battle', icon: battleIcon },
-    { name: 'collections', label: 'Collections', icon: collectionIcon },
-    { name: 'ranking', label: 'Ranking', icon: cupIcon },
-    { name: 'profile', label: 'Profile', icon: profileIcon }
-  ]
-  
-  const activeItem = ref('learning')
-  const isDesktop = ref(window.innerWidth >= 768)
-  
-  function setActive(itemName) {
-    activeItem.value = itemName
-  }
-  
-  function handleResize() {
-    isDesktop.value = window.innerWidth >= 768
-  }
-  
-  onMounted(() => {
-    window.addEventListener('resize', handleResize)
-  })
-  
-  onUnmounted(() => {
-    window.removeEventListener('resize', handleResize)
-  })
-  </script>
-  
-  <style scoped>
-.navigation-menu {
+
+const navItems = [
+  {name: 'learning', label: 'Learning', icon: learningIcon, route: '/'},
+  {name: 'battle', label: 'Battle', icon: battleIcon, route: '/battle'},
+  {name: 'collections', label: 'Collections', icon: collectionIcon, route: '/collection'},
+  {name: 'ranking', label: 'Ranking', icon: cupIcon, route: '/ranking'},
+  {name: 'profile', label: 'Profile', icon: profileIcon, route: '/profile'},
+]
+
+const activeItem = ref('learning')
+const isDesktop = ref(window.innerWidth >= 768)
+
+function setActive(itemName) {
+  activeItem.value = itemName
+}
+
+function handleResize() {
+  isDesktop.value = window.innerWidth >= 768
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
+</script>
+
+<style scoped>.navigation-menu {
   position: fixed;
   top: 0;
   left: 0;
@@ -92,39 +91,47 @@ import profileIcon from '/images/icones/profile.svg'
   display: flex;
   flex-direction: column;
   gap: 28px;
+  padding: 0;
+  margin: 0;
 }
 
 .nav-list li {
   position: relative;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.nav-link {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px 20px;
-  cursor: pointer;
   color: #3399ff;
   font-size: 18px;
+  text-decoration: none;
   transition: background-color 0.3s, color 0.3s;
 }
 
-.nav-list li span {
+.nav-link span {
   font-weight: bold;
 }
 
-.nav-list li:hover {
+.nav-link:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.nav-list li img {
+.nav-link img {
   width: 28px;
   height: 28px;
   filter: brightness(0) saturate(100%) invert(48%) sepia(59%) saturate(1326%) hue-rotate(181deg) brightness(95%) contrast(95%);
 }
 
-.nav-list li.active {
+.nav-link.router-link-exact-active {
   color: #F7C72C;
 }
 
-.nav-list li.active img {
+.nav-link.router-link-exact-active img {
   filter: brightness(0) saturate(100%) invert(79%) sepia(79%) saturate(415%) hue-rotate(340deg) brightness(100%) contrast(102%);
 }
 
@@ -143,8 +150,7 @@ import profileIcon from '/images/icones/profile.svg'
     height: 100%;
     transform: scaleY(0);
   }
-
-  .nav-list li.active .active-bar {
+  .nav-link.router-link-exact-active .active-bar {
     transform: scaleY(1);
   }
 }
@@ -181,20 +187,30 @@ import profileIcon from '/images/icones/profile.svg'
   }
 
   .nav-list li {
-    flex-direction: column;
-    gap: 4px;
-    padding: 8px 2px;
-    font-size: 12px;
     flex: 1;
     text-align: center;
     max-width: calc(100% / 5);
+    padding: 0;
+    margin: 0;
+    display: flex; /* nécessaire pour le centrage vertical si besoin */
   }
 
-  .nav-list li span {
+  .nav-link {
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 12px;
+    padding: 8px 2px;
+  }
+
+  .nav-link span {
     font-weight: bold;
   }
 
-  .nav-list li img {
+  .nav-link img {
     width: 24px;
     height: 24px;
   }
@@ -204,11 +220,11 @@ import profileIcon from '/images/icones/profile.svg'
     left: 0;
     width: 100%;
     height: 1.5px;
-    transform: scaleX(0);
     border-radius: 0;
+    transform: scaleX(0);
   }
 
-  .nav-list li.active .active-bar {
+  .nav-link.router-link-exact-active .active-bar {
     transform: scaleX(1);
   }
 }
@@ -218,49 +234,39 @@ import profileIcon from '/images/icones/profile.svg'
   .navigation-menu {
     padding: 0;
     height: 65px;
-
-  }
-
-  .nav-list {
-    margin: 0;
-    padding: 0;
   }
 
   .nav-list li {
-    padding: 6px 1px;
-    font-size: 9px;
-    gap: 2px;
     max-width: calc(100% / 5);
   }
-
-  .nav-list li span {
+  .nav-link {
+    font-size: 9px;
+    padding: 6px 1px;
+    gap: 2px;
+  }
+  .nav-link span {
     font-weight: 600;
     line-height: 1;
   }
-
-  .nav-list li img {
+  .nav-link img {
     width: 20px;
     height: 20px;
   }
 }
 
-/* Optimisation pour écrans très étroits (≤320px) */
 @media (max-width: 320px) {
   .navigation-menu {
     height: 60px;
   }
-
-  .nav-list li {
+  .nav-link {
     font-size: 9px;
     padding: 4px 0px;
   }
-
-  .nav-list li img {
+  .nav-link img {
     width: 18px;
     height: 18px;
   }
-
-  .nav-list li span {
+  .nav-link span {
     font-weight: 600;
   }
 }
