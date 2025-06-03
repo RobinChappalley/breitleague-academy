@@ -5,6 +5,9 @@ import RankingView from './views/rankings/RankingView.vue'
 import NavigationMenue from './components/NavigationMenue.vue'
 import LessonsListView from './views/learning/LessonsListView.vue'
 import LearningFlowView from './views/learning/LearningFlowView.vue'
+import HistoireView from './views/learning/HistoireView.vue'
+import BattleView from './views/battle/BattleView.vue'
+import ProfileView from './views/profile/ProfileView.vue'
 </script>
 
 
@@ -14,7 +17,7 @@ import LearningFlowView from './views/learning/LearningFlowView.vue'
   <div id="app-layout">
     <div class="main-content">
       <main>
-        <LearningFlowView/>
+        <ProfileView/>
       </main>
       <footer>
         <NavigationMenue />

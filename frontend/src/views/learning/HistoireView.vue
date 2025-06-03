@@ -148,19 +148,21 @@ console.log('HistoireView component loaded')
 
 <style scoped>
 .histoire-page {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   background: #000000;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
+  /* Ajouter padding pour la navbar mobile */
+  padding-bottom: 80px;
 }
 
 /* HERO SECTION */
 .hero-section {
   width: 100%;
-  height: 50vh;
+  height: 40vh; /* Réduire pour laisser place à la navbar */
   background: #000000;
   display: flex;
   align-items: center;
@@ -185,8 +187,8 @@ console.log('HistoireView component loaded')
 .onboarding-section {
   background: #072C54;
   flex: 1;
-  padding: 2rem 1.5rem;
-  min-height: 50vh;
+  padding: 1.5rem 1rem; /* Réduire padding mobile */
+  min-height: 60vh;
 }
 
 .onboarding-content {
@@ -195,38 +197,38 @@ console.log('HistoireView component loaded')
 }
 
 .section-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem; /* Réduire margin mobile */
 }
 
 .section-tag {
   display: inline-block;
   background: rgba(255, 255, 255, 0.2);
   color: #FFFFFF;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem; /* Réduire padding mobile */
   border-radius: 4px;
-  font-size: 0.8rem;
+  font-size: 0.7rem; /* Réduire taille mobile */
   font-weight: 600;
   letter-spacing: 1px;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
   text-transform: uppercase;
 }
 
 .section-title {
   color: #F7C72C;
-  font-size: 2.5rem;
+  font-size: 2rem; /* Réduire taille mobile */
   font-weight: 700;
   margin: 0;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   line-height: 1.1;
 }
 
 .content-block {
   background: rgba(255, 255, 255, 0.1);
-  padding: 2rem 1.5rem;
+  padding: 1.5rem 1rem; /* Réduire padding mobile */
   border-radius: 8px;
   backdrop-filter: blur(10px);
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .chapter-block {
@@ -388,14 +390,43 @@ console.log('HistoireView component loaded')
 }
 
 /* DESKTOP */
+@media (min-width: 768px) {
+  .histoire-page {
+    padding-bottom: 0;
+    padding-left: 120px; /* Espace pour navbar desktop */
+  }
+  
+  .hero-section {
+    height: 50vh;
+  }
+  
+  .onboarding-section {
+    padding: 3rem 4rem;
+    min-height: 50vh;
+  }
+  
+  .section-title {
+    font-size: 3rem;
+    letter-spacing: 2px;
+  }
+  
+  .section-tag {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  .content-block {
+    padding: 2.5rem 3rem;
+  }
+}
+
 @media (min-width: 1024px) {
   .hero-section {
     height: 60vh;
   }
   
   .onboarding-section {
-    padding: 4rem 8rem;
-    min-height: 40vh;
+    padding: 4rem 6rem;
   }
   
   .onboarding-content {

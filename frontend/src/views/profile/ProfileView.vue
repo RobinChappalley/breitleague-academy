@@ -89,10 +89,12 @@ console.log('ProfileView component loaded')
 <style scoped>
 .profile-page {
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   background: linear-gradient(135deg, #072C54 0%, #1e3a8a 100%);
   color: white;
-  padding: 2rem 1rem;
+  padding: 1rem;
+  padding-bottom: 100px; /* Espace pour navbar mobile */
+  box-sizing: border-box;
 }
 
 /* PROFILE HEADER */
@@ -324,37 +326,89 @@ console.log('ProfileView component loaded')
   font-size: 1.2rem;
 }
 
-/* RESPONSIVE - TABLET */
-@media (min-width: 768px) and (max-width: 1199px) {
+/* DESKTOP (768px et plus) - Alignement avec navbar */
+@media (min-width: 768px) {
   .profile-page {
-    padding: 3rem 2rem;
+    margin-left: 280px; /* Marge encore plus large pour la navbar */
+    width: calc(100% - 280px); /* Largeur ajustée */
+    padding: 2rem;
+    padding-bottom: 2rem;
+  }
+  
+  .profile-header {
+    margin-bottom: 3rem;
   }
   
   .profile-avatar {
-    width: 140px;
-    height: 140px;
+    width: 150px;
+    height: 150px;
   }
   
   .avatar-placeholder {
-    font-size: 3.5rem;
+    font-size: 4rem;
   }
   
   .edit-icon, .breitling-badge {
-    width: 38px;
-    height: 38px;
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+  }
+  
+  .breitling-badge {
+    font-size: 1.5rem;
   }
   
   .profile-name {
-    font-size: 2rem;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: 2px;
   }
   
   .profile-info {
-    max-width: 450px;
-    padding: 1.2rem;
+    max-width: 500px;
+    padding: 1.5rem;
+    font-size: 1.1rem;
+  }
+  
+  .country-info {
+    margin-bottom: 1rem;
+  }
+  
+  .flag {
+    font-size: 1.5rem;
+  }
+  
+  .store-info, .reseller-since {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .score-section {
+    padding: 2.5rem;
+    margin-bottom: 2.5rem;
+  }
+  
+  .score-label {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
   }
   
   .score-value {
-    font-size: 2.3rem;
+    font-size: 3rem;
+  }
+  
+  .watches-section {
+    padding: 2.5rem;
+    margin-bottom: 2.5rem;
+  }
+  
+  .watches-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .see-all-btn {
+    padding: 0.7rem 1.3rem;
+    font-size: 0.9rem;
   }
   
   .watches-grid {
@@ -363,23 +417,32 @@ console.log('ProfileView component loaded')
   
   .watch-item {
     min-height: 100px;
+    padding: 1.5rem;
+  }
+  
+  .watch-placeholder {
+    font-size: 2.5rem;
+  }
+  
+  .faq-section {
+    padding: 1.5rem 2rem;
+  }
+  
+  .faq-header {
+    font-size: 1.1rem;
+  }
+  
+  .arrow {
+    font-size: 1.4rem;
   }
 }
 
-/* RESPONSIVE - DESKTOP */
-@media (min-width: 1200px) {
+/* LARGE DESKTOP (1024px et plus) */
+@media (min-width: 1024px) {
   .profile-page {
-    padding: 4rem 6rem;
-    width: 100vw;
-  }
-  
-  .profile-header {
-    margin-bottom: 4rem;
-  }
-  
-  .content-container {
-    width: 100%;
-    max-width: none;
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 3rem;
   }
   
   .profile-avatar {
@@ -394,45 +457,19 @@ console.log('ProfileView component loaded')
   .edit-icon, .breitling-badge {
     width: 50px;
     height: 50px;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
   
   .breitling-badge {
-    font-size: 1.6rem;
+    font-size: 1.7rem;
   }
   
   .profile-name {
     font-size: 3rem;
-    margin-bottom: 2rem;
-  }
-  
-  .profile-info {
-    max-width: 500px;
-    padding: 2rem;
-    font-size: 1.1rem;
-  }
-  
-  .country-info {
-    margin-bottom: 1rem;
-  }
-  
-  .flag {
-    font-size: 1.6rem;
-  }
-  
-  .store-info, .reseller-since {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
   }
   
   .score-section {
     padding: 3rem;
-    margin-bottom: 3rem;
-  }
-  
-  .score-label {
-    font-size: 1.3rem;
-    margin-bottom: 1rem;
   }
   
   .score-value {
@@ -441,90 +478,24 @@ console.log('ProfileView component loaded')
   
   .watches-section {
     padding: 3rem;
-    margin-bottom: 3rem;
-  }
-  
-  .watches-header h2 {
-    font-size: 1.3rem;
-  }
-  
-  .see-all-btn {
-    padding: 0.8rem 1.5rem;
-    font-size: 1rem;
-  }
-  
-  .watches-grid {
-    gap: 2rem;
   }
   
   .watch-item {
-    min-height: 140px;
+    min-height: 120px;
     padding: 2rem;
   }
   
   .watch-placeholder {
     font-size: 3rem;
   }
-  
-  .faq-section {
-    padding: 2rem 3rem;
-    margin-bottom: 4rem;
-  }
-  
-  .faq-header {
-    font-size: 1.3rem;
-  }
-  
-  .arrow {
-    font-size: 1.6rem;
-  }
 }
 
-/* RESPONSIVE - LARGE DESKTOP */
-@media (min-width: 1600px) {
+/* MOBILE (moins de 768px) */
+@media (max-width: 767px) {
   .profile-page {
-    padding: 5rem 8rem;
-  }
-  
-  .profile-avatar {
-    width: 200px;
-    height: 200px;
-  }
-  
-  .avatar-placeholder {
-    font-size: 5rem;
-  }
-  
-  .profile-name {
-    font-size: 3.5rem;
-  }
-  
-  .score-section {
-    padding: 4rem;
-  }
-  
-  .score-value {
-    font-size: 4rem;
-  }
-  
-  .watches-section {
-    padding: 4rem;
-  }
-  
-  .watch-item {
-    min-height: 160px;
-    padding: 2.5rem;
-  }
-  
-  .watch-placeholder {
-    font-size: 3.5rem;
-  }
-}
-
-/* RESPONSIVE - MOBILE */
-@media (max-width: 480px) {
-  .profile-page {
-    padding: 1rem 0.5rem;
+    margin-left: 0; /* Pas de marge sur mobile */
+    width: 100%;
+    padding-bottom: 100px; /* Navbar en bas */
   }
   
   .profile-avatar {
@@ -551,7 +522,7 @@ console.log('ProfileView component loaded')
   }
   
   .profile-info {
-    max-width: 300px;
+    max-width: 320px;
     padding: 0.8rem;
   }
   
