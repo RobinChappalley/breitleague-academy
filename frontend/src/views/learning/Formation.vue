@@ -1,7 +1,5 @@
 <template>
-
   <div class="formation-image-container">
-
     <img alt="watch aviators" src="/backgrounds/aviators-watch.png" class="lesson-watch">
   </div>
 </template>
@@ -13,7 +11,6 @@
 :root {
   --aviators-vertical: url('/backgrounds/aviators-vertical.png');
   --aviators-horizontal: url('/backgrounds/aviators-horizontal.png');
-  --aviators-watch: url('/backgrounds/aviators-watch.png');
 }
 
 .formation-image-container {
