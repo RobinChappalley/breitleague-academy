@@ -6,25 +6,15 @@ import NavigationMenue from './components/NavigationMenue.vue'
 </script>
 
 <template>
-  <main>
-    <RankingView/>
-  </main>
-
-</script>
-
-<template>
   <div id="app-layout">
-  <div class="main-content">
-    <main>
-    </main>
-    <footer>
-      <NavigationMenue />
-    </footer>
+    <div class="main-content">
+      <main></main>
+      <footer>
+        <NavigationMenue />
+      </footer>
+    </div>
   </div>
-</div>
-
 </template>
-
 
 <style scoped>
 header {
