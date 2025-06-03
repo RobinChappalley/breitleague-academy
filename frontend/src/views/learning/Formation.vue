@@ -1,6 +1,7 @@
 <template>
 
   <div class="formation-image-container">
+
     <img alt="watch aviators" src="/backgrounds/aviators-watch.png" class="lesson-watch">
   </div>
 </template>
@@ -39,32 +40,4 @@
   max-height: 85vh;
 }
 
-
-.desktop-image,
-.mobile-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* L'image couvre tout l'espace disponible */
-  object-position: center; /* Centre l'image */
-}
-
-/* Afficher l'image horizontale sur desktop, cacher la verticale */
-.desktop-image {
-  display: block;
-}
-
-.mobile-image {
-  display: none;
-}
-
-/* Sur mobile, afficher l'image verticale, cacher l'horizontale */
-@media screen and (max-width: 768px) {
-  .desktop-image {
-    display: none;
-  }
-  
-  .mobile-image {
-    display: block;
-  }
-}
 </style>
