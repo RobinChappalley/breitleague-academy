@@ -849,7 +849,7 @@ console.log('RankingView component loaded')
   }
   
   .filter-btn {
-    border-radius: 8px !important;
+    border-radius: 8px 
   }
   
   .ranking-item {
