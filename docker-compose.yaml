@@ -28,7 +28,7 @@ services:
     volumes:
       - ./laravel:/var/www/
       - ./laravel/.env.docker:/var/www/.env
-    command: sh -c "composer install && php artisan key:generate && php artisan migrate && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=8000"
+    command: sh -c "composer install && php artisan key:generate && php artisan migrate:fresh && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=8000"
 
   frontend:
     build:
