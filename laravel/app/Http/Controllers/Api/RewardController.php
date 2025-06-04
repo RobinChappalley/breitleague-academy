@@ -29,4 +29,24 @@ class RewardController extends Controller
     {
         return new RewardResource($reward);
     }
+    public function store(Request $request)
+    {
+        return response()->json([
+            'message' => 'Creating rewards is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function update(Request $request, Reward $reward)
+    {
+        return response()->json([
+            'message' => 'Updating rewards is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function destroy(Reward $reward)
+    {
+        return response()->json([
+            'message' => 'Deleting rewards is not allowed on this endpoint.'
+        ], 405);
+    }
 }
