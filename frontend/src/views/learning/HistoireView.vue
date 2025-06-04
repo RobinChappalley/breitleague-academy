@@ -4,7 +4,7 @@
     <div class="hero-section">
       <div class="hero-image">
         <img 
-          src="/public/images/hero/breitling-vintage-watches.jpg" 
+          src="/images/hero/breitling-vintage-watches.jpg"
           alt="Montres Breitling vintage avec documentation historique"
           class="hero-img"
         />
@@ -392,8 +392,7 @@ console.log('HistoireView component loaded')
 /* DESKTOP (768px et plus) */
 @media (min-width: 768px) {
   .histoire-page {
-    margin-left: 280px;
-    width: calc(100% - 280px);
+    width: 100%;
     padding-bottom: 0;
   }
   
@@ -419,8 +418,7 @@ console.log('HistoireView component loaded')
 /* LARGE DESKTOP (1024px et plus) */
 @media (min-width: 1024px) {
   .histoire-page {
-    margin-left: 280px;
-    width: calc(100% - 280px);
+    width: 100% ;
   }
   
   .hero-section {
