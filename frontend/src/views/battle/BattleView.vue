@@ -481,13 +481,13 @@ console.log('BattleView component loaded')
   color: #F7C72C;
 }
 
-/* DESKTOP */
+/* DESKTOP (768px et plus) */
 @media (min-width: 768px) {
   .battle-page {
-    padding-left: 140px; /* Espace pour navbar desktop */
+    margin-left: 280px; /* Aligné avec navbar desktop */
+    width: calc(100% - 280px);
+    padding: 2rem;
     padding-bottom: 2rem;
-    padding-top: 2rem;
-    padding-right: 2rem;
   }
   
   .main-content {
@@ -498,10 +498,20 @@ console.log('BattleView component loaded')
   .battle-title {
     font-size: 3.5rem;
     letter-spacing: 3px;
+    margin-bottom: 1rem;
+  }
+  
+  .battle-header {
+    margin-bottom: 3rem;
+  }
+  
+  .section {
+    margin-bottom: 3rem;
   }
   
   .section-title {
     font-size: 1.8rem;
+    margin-bottom: 2rem;
   }
   
   .battle-grid {
@@ -514,6 +524,7 @@ console.log('BattleView component loaded')
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 1.5rem;
+    margin-top: 2rem;
   }
   
   .battle-card {
@@ -524,6 +535,20 @@ console.log('BattleView component loaded')
     width: 55px;
     height: 55px;
     font-size: 1.3rem;
+  }
+  
+  .player-name {
+    font-size: 1.1rem;
+  }
+  
+  .flag {
+    font-size: 0.9rem;
+  }
+  
+  .time-left,
+  .points {
+    font-size: 1rem;
+    min-width: 80px;
   }
   
   .btn-action,
@@ -539,9 +564,20 @@ console.log('BattleView component loaded')
     height: 35px;
     font-size: 1rem;
   }
+  
+  .invitation-label {
+    font-size: 0.8rem;
+  }
 }
 
+/* LARGE DESKTOP (1024px et plus) */
 @media (min-width: 1024px) {
+  .battle-page {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 3rem;
+  }
+  
   .main-content {
     max-width: 1200px;
     padding: 0 3rem;
@@ -551,7 +587,20 @@ console.log('BattleView component loaded')
     font-size: 4rem;
   }
   
+  .section {
+    margin-bottom: 4rem;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+  
   .battle-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+  
+  .invite-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
   }
@@ -565,16 +614,51 @@ console.log('BattleView component loaded')
     height: 60px;
     font-size: 1.4rem;
   }
+  
+  .player-name {
+    font-size: 1.2rem;
+  }
+  
+  .time-left,
+  .points {
+    font-size: 1.1rem;
+  }
+  
+  .btn-action,
+  .btn-view,
+  .btn-new {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
 }
 
-/* TABLET/MOBILE ADAPTATION */
-@media (max-width: 768px) {
+/* MOBILE (moins de 768px) */
+@media (max-width: 767px) {
+  .battle-page {
+    margin-left: 0;
+    width: 100%;
+    padding: 1rem;
+    padding-bottom: 80px; /* Navbar mobile */
+  }
+  
+  .battle-title {
+    font-size: 2rem;
+    letter-spacing: 1px;
+  }
+  
+  .section-title {
+    font-size: 1.1rem;
+  }
+  
   .battle-card {
     padding: 1.2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
   
   .player-info {
     gap: 0.8rem;
+    min-width: 200px;
   }
   
   .avatar {
@@ -587,10 +671,21 @@ console.log('BattleView component loaded')
     font-size: 0.9rem;
   }
   
+  .flag {
+    font-size: 0.7rem;
+  }
+  
+  .time-left,
+  .points {
+    font-size: 0.8rem;
+    min-width: 60px;
+  }
+  
   .action-buttons {
     flex-direction: column;
     gap: 0.3rem;
     align-items: flex-end;
+    min-width: 80px;
   }
   
   .btn-action,
@@ -598,6 +693,67 @@ console.log('BattleView component loaded')
   .btn-new {
     padding: 0.5rem 1rem;
     font-size: 0.7rem;
+  }
+  
+  .btn-accept,
+  .btn-decline {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+  
+  .invitation-label {
+    font-size: 0.6rem;
+  }
+  
+  .invite-card {
+    padding: 1.2rem;
+  }
+}
+
+/* TRÈS PETIT MOBILE (moins de 480px) */
+@media (max-width: 479px) {
+  .battle-page {
+    padding: 0.8rem;
+    padding-bottom: 80px;
+  }
+  
+  .battle-title {
+    font-size: 1.8rem;
+  }
+  
+  .section-title {
+    font-size: 1rem;
+  }
+  
+  .battle-card {
+    padding: 1rem;
+  }
+  
+  .player-info {
+    min-width: 150px;
+  }
+  
+  .avatar {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+  
+  .player-name {
+    font-size: 0.8rem;
+  }
+  
+  .time-left,
+  .points {
+    font-size: 0.7rem;
+  }
+  
+  .btn-action,
+  .btn-view,
+  .btn-new {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.6rem;
   }
 }
 </style>
