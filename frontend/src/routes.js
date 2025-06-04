@@ -3,6 +3,7 @@ import BattleView from "@/views/battle/BattleView.vue";
 import HomeView from "@/views/HomeView.vue";
 import RankingView from "@/views/rankings/RankingView.vue";
 import ProfileView from "@/views/profile/ProfileView.vue";
+import MissionsView from "@/views/missions/MissionsView.vue";
 
 export const routes = [
     {path: '/', component: FormationView},
@@ -10,6 +11,8 @@ export const routes = [
     {path: '/collection', component: HomeView},
     {path:'/ranking', component: RankingView},
     {path:'/profile', component: ProfileView},
+    {path:'/ressources', component: BattleView},
+    {path:'/missions', component: MissionsView},
 
 
 ]
