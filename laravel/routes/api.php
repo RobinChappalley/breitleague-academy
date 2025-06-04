@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ModuleController;
 use App\Http\Controllers\Api\CheckpointController;
 use App\Http\Controllers\Api\MissionController;
 use App\Http\Controllers\Api\LessonController;
+use App\Http\Controllers\Api\TheoryController;
 
 Route::apiResource('pos', PosController::class)->parameters([
     'pos' => 'pos',
@@ -35,6 +36,10 @@ Route::apiResource('missions', MissionController::class)->parameters([
 
 Route::apiResource('lessons', LessonController::class)->parameters([
     'lessons' => 'lesson'
+]);
+
+Route::apiResource('theories', TheoryController::class)->parameters([
+    'theories' => 'theory'
 ]);
 
 Route::get('/user', function (Request $request) {
