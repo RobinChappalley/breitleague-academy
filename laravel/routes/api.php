@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\TheoryController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\ChoiceController;
 use App\Http\Controllers\Api\ProgressionController;
+use App\Http\Controllers\Api\BattleController;
 
 Route::apiResource('pos', PosController::class)->parameters([
     'pos' => 'pos',
@@ -55,6 +56,9 @@ Route::apiResource('choices', ChoiceController::class)->parameters([
 
 Route::apiResource('progression', ProgressionController::class);
 
+Route::apiResource('battles', BattleController::class)->parameters([
+    'battles' => 'battle'
+]);
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
