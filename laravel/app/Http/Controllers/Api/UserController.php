@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 
 class UserController extends Controller
 {
@@ -12,23 +14,19 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $user = User::get();
+        if ($user->count() > 0) {
+            return UserResource::collection($user);
+        } else {
+            return response()->json(['message' => 'No users'], 200);
+        }
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $user)
     {
-        //
+        return new UserResource($user);
     }
 
     /**

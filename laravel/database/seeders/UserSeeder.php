@@ -26,7 +26,9 @@ class UserSeeder extends Seeder
                 'battle_won' => $user['battle_won'],
                 'battle_lost' => $user['battle_lost'],
                 'number_available_slots' => $user['number_available_slots'],
-                'is_BS' => $user['is_BS']
+                'is_BS' => $user['is_BS'],
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
     }
