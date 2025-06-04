@@ -317,7 +317,7 @@ const claimReward = (mission) => {
 /* DESKTOP (768px et plus) */
 @media (min-width: 768px) {
   .missions-page {
-    margin-left: 280px; /* Espace pour navbar desktop */
+    margin-left: 280px; /* Aligné avec la navbar */
     width: calc(100% - 280px);
     padding: 2rem;
     padding-bottom: 2rem;
@@ -373,7 +373,6 @@ const claimReward = (mission) => {
   .reward-watch {
     width: 90px;
     height: 90px;
-    border-width: 4px;
   }
   
   .watch-icon {
@@ -388,6 +387,8 @@ const claimReward = (mission) => {
 /* LARGE DESKTOP (1024px et plus) */
 @media (min-width: 1024px) {
   .missions-page {
+    margin-left: 280px;
+    width: calc(100% - 280px);
     padding: 3rem;
   }
   
@@ -433,7 +434,7 @@ const claimReward = (mission) => {
     margin-left: 0;
     width: 100%;
     padding: 1rem;
-    padding-bottom: 100px;
+    padding-bottom: 80px; /* Espace pour navbar mobile (70px + marge) */
   }
   
   .missions-title {
@@ -446,24 +447,24 @@ const claimReward = (mission) => {
   }
   
   .mission-content {
-    flex-direction: row; /* Changé de column à row */
+    flex-direction: row;
     align-items: center;
     gap: 1rem;
-    text-align: left; /* Changé de center à left */
+    text-align: left;
   }
   
   .mission-info {
-    flex: 1; /* Prend tout l'espace disponible */
+    flex: 1;
     order: 1;
   }
   
   .reward-button {
-    order: 2; /* Bouton à droite */
+    order: 2;
     align-self: center;
     padding: 0.8rem 1.2rem;
     min-width: 100px;
     gap: 0.6rem;
-    flex-shrink: 0; /* Empêche le bouton de rétrécir */
+    flex-shrink: 0;
   }
   
   .mission-title {
@@ -482,7 +483,6 @@ const claimReward = (mission) => {
   .reward-watch {
     width: 60px;
     height: 60px;
-    border-width: 2px;
   }
   
   .watch-icon {

@@ -77,12 +77,12 @@
 
         <!-- Invite Players -->
         <div class="invite-grid">
-          <div class="invite-card">
+          <div class="invite-card" @click="invitePlayer">
             <div class="invite-icon">👤</div>
             <span>Invite a Player</span>
             <button class="btn-new">New</button>
           </div>
-          <div class="invite-card">
+          <div class="invite-card" @click="invitePlayer">
             <div class="invite-icon">👤</div>
             <span>Invite a Player</span>
             <button class="btn-new">New</button>
@@ -119,11 +119,47 @@
         </div>
       </div>
     </div>
+
+    <!-- Invitation Sent Pop-up -->
+    <div class="modal-overlay" v-if="showInvitationModal" @click="closeInvitationModal">
+      <div class="invitation-modal" @click.stop>
+        <button class="close-btn" @click="closeInvitationModal">✕</button>
+        
+        <div class="modal-icon">
+          <div class="icon-circle">
+            <span class="check-icon">✓</span>
+          </div>
+        </div>
+        
+        <h2 class="modal-title">INVITATION SENT!</h2>
+        
+        <p class="modal-message">
+          Your invitation has been sent to the player. They will receive a notification and can accept when they're ready.
+        </p>
+        
+        <div class="modal-details">
+          <div class="invited-player">
+            <div class="player-avatar">{{ invitedPlayerName.charAt(0) }}</div>
+            <span class="player-name">{{ invitedPlayerName }}</span>
+          </div>
+        </div>
+        
+        <div class="modal-actions">
+          <button class="btn-ok" @click="closeInvitationModal">
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+
+// Modal state
+const showInvitationModal = ref(false)
+const invitedPlayerName = ref('')
 
 // Données simulées
 const incomingChallenges = ref([
@@ -209,6 +245,40 @@ const handleAction = (challenge) => {
 
 const viewBattle = (id) => {
   console.log('Viewing battle', id)
+}
+
+// Nouvelle méthode pour inviter un joueur
+const invitePlayer = () => {
+  // Simuler l'invitation d'un joueur aléatoire
+  const randomPlayers = ['M.GARCIA', 'T.SMITH', 'A.MILLER', 'S.JONES', 'C.WILSON']
+  const randomPlayer = randomPlayers[Math.floor(Math.random() * randomPlayers.length)]
+  
+  invitedPlayerName.value = randomPlayer
+  showInvitationModal.value = true
+  
+  // Ajouter automatiquement à la liste des défis envoyés après 2 secondes
+  setTimeout(() => {
+    if (showInvitationModal.value) {
+      const newChallenge = {
+        id: Date.now(),
+        name: randomPlayer,
+        country: 'US',
+        timeLeft: '24h left',
+        status: 'waiting'
+      }
+      outgoingChallenges.value.unshift(newChallenge)
+    }
+  }, 2000)
+}
+
+const closeInvitationModal = () => {
+  showInvitationModal.value = false
+}
+
+const cancelInvitation = () => {
+  showInvitationModal.value = false
+  // Ici on pourrait annuler l'invitation côté serveur
+  console.log('Invitation cancelled for', invitedPlayerName.value)
 }
 
 console.log('BattleView component loaded')
@@ -481,13 +551,221 @@ console.log('BattleView component loaded')
   color: #F7C72C;
 }
 
-/* DESKTOP */
+/* INVITATION MODAL */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(5px);
+}
+
+.invitation-modal {
+  background: linear-gradient(135deg, #1e3a8a 0%, #072C54 100%);
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+  color: white;
+  border: 2px solid #F7C72C;
+  text-align: center;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #F7C72C;
+  color: #072C54;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  background: #E6B625;
+  transform: scale(1.1);
+}
+
+.modal-icon {
+  margin-bottom: 1.5rem;
+}
+
+.icon-circle {
+  background: #4CAF50;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  animation: checkPulse 0.6s ease-out;
+}
+
+@keyframes checkPulse {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.check-icon {
+  font-size: 2.5rem;
+  color: white;
+  font-weight: bold;
+}
+
+.modal-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #F7C72C;
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.modal-message {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.modal-details {
+  margin-bottom: 2rem;
+}
+
+.invited-player {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.player-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #F7C72C;
+  color: #072C54;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.invited-player .player-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+}
+
+.waiting-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #F7C72C;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btn-cancel,
+.btn-ok {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-cancel {
+  background: rgba(244, 67, 54, 0.2);
+  color: #F44336;
+  border: 2px solid #F44336;
+}
+
+.btn-cancel:hover {
+  background: rgba(244, 67, 54, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-ok {
+  background: #F7C72C;
+  color: #072C54;
+}
+
+.btn-ok:hover {
+  background: #E6B625;
+  transform: translateY(-2px);
+}
+
+/* DESKTOP (768px et plus) */
 @media (min-width: 768px) {
   .battle-page {
-    padding-left: 140px; /* Espace pour navbar desktop */
+    margin-left: 280px; /* Aligné avec navbar desktop */
+    width: calc(100% - 280px);
+    padding: 2rem;
     padding-bottom: 2rem;
-    padding-top: 2rem;
-    padding-right: 2rem;
   }
   
   .main-content {
@@ -498,10 +776,20 @@ console.log('BattleView component loaded')
   .battle-title {
     font-size: 3.5rem;
     letter-spacing: 3px;
+    margin-bottom: 1rem;
+  }
+  
+  .battle-header {
+    margin-bottom: 3rem;
+  }
+  
+  .section {
+    margin-bottom: 3rem;
   }
   
   .section-title {
     font-size: 1.8rem;
+    margin-bottom: 2rem;
   }
   
   .battle-grid {
@@ -514,6 +802,7 @@ console.log('BattleView component loaded')
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 1.5rem;
+    margin-top: 2rem;
   }
   
   .battle-card {
@@ -524,6 +813,20 @@ console.log('BattleView component loaded')
     width: 55px;
     height: 55px;
     font-size: 1.3rem;
+  }
+  
+  .player-name {
+    font-size: 1.1rem;
+  }
+  
+  .flag {
+    font-size: 0.9rem;
+  }
+  
+  .time-left,
+  .points {
+    font-size: 1rem;
+    min-width: 80px;
   }
   
   .btn-action,
@@ -539,9 +842,20 @@ console.log('BattleView component loaded')
     height: 35px;
     font-size: 1rem;
   }
+  
+  .invitation-label {
+    font-size: 0.8rem;
+  }
 }
 
+/* LARGE DESKTOP (1024px et plus) */
 @media (min-width: 1024px) {
+  .battle-page {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 3rem;
+  }
+  
   .main-content {
     max-width: 1200px;
     padding: 0 3rem;
@@ -551,7 +865,20 @@ console.log('BattleView component loaded')
     font-size: 4rem;
   }
   
+  .section {
+    margin-bottom: 4rem;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+  
   .battle-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+  
+  .invite-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
   }
@@ -565,16 +892,51 @@ console.log('BattleView component loaded')
     height: 60px;
     font-size: 1.4rem;
   }
+  
+  .player-name {
+    font-size: 1.2rem;
+  }
+  
+  .time-left,
+  .points {
+    font-size: 1.1rem;
+  }
+  
+  .btn-action,
+  .btn-view,
+  .btn-new {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
 }
 
-/* TABLET/MOBILE ADAPTATION */
-@media (max-width: 768px) {
+/* MOBILE (moins de 768px) */
+@media (max-width: 767px) {
+  .battle-page {
+    margin-left: 0;
+    width: 100%;
+    padding: 1rem;
+    padding-bottom: 80px; /* Navbar mobile */
+  }
+  
+  .battle-title {
+    font-size: 2rem;
+    letter-spacing: 1px;
+  }
+  
+  .section-title {
+    font-size: 1.1rem;
+  }
+  
   .battle-card {
     padding: 1.2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
   
   .player-info {
     gap: 0.8rem;
+    min-width: 200px;
   }
   
   .avatar {
@@ -587,10 +949,21 @@ console.log('BattleView component loaded')
     font-size: 0.9rem;
   }
   
+  .flag {
+    font-size: 0.7rem;
+  }
+  
+  .time-left,
+  .points {
+    font-size: 0.8rem;
+    min-width: 60px;
+  }
+  
   .action-buttons {
     flex-direction: column;
     gap: 0.3rem;
     align-items: flex-end;
+    min-width: 80px;
   }
   
   .btn-action,
@@ -598,6 +971,67 @@ console.log('BattleView component loaded')
   .btn-new {
     padding: 0.5rem 1rem;
     font-size: 0.7rem;
+  }
+  
+  .btn-accept,
+  .btn-decline {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+  
+  .invitation-label {
+    font-size: 0.6rem;
+  }
+  
+  .invite-card {
+    padding: 1.2rem;
+  }
+}
+
+/* TRÈS PETIT MOBILE (moins de 480px) */
+@media (max-width: 479px) {
+  .battle-page {
+    padding: 0.8rem;
+    padding-bottom: 80px;
+  }
+  
+  .battle-title {
+    font-size: 1.8rem;
+  }
+  
+  .section-title {
+    font-size: 1rem;
+  }
+  
+  .battle-card {
+    padding: 1rem;
+  }
+  
+  .player-info {
+    min-width: 150px;
+  }
+  
+  .avatar {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+  
+  .player-name {
+    font-size: 0.8rem;
+  }
+  
+  .time-left,
+  .points {
+    font-size: 0.7rem;
+  }
+  
+  .btn-action,
+  .btn-view,
+  .btn-new {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.6rem;
   }
 }
 </style>
