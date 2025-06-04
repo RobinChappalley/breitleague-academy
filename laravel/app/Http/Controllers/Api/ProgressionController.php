@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Resources\ProgressionResource;
+use App\Models\Progression;
 
 class ProgressionController extends Controller
 {
@@ -12,38 +14,11 @@ class ProgressionController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $progression = Progression::get();
+        if ($progression->count() > 0) {
+            return ProgressionResource::collection($progression);
+        } else {
+            return response()->json(['message' => 'No progression'], 200);
+        }
     }
 }

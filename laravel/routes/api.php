@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\LessonController;
 use App\Http\Controllers\Api\TheoryController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\ChoiceController;
+use App\Http\Controllers\Api\ProgressionController;
 
 Route::apiResource('pos', PosController::class)->parameters([
     'pos' => 'pos',
@@ -51,6 +52,8 @@ Route::apiResource('questions', QuestionController::class)->parameters([
 Route::apiResource('choices', ChoiceController::class)->parameters([
     'choices' => 'choice'
 ]);
+
+Route::apiResource('progression', ProgressionController::class);
 
 Route::get('/user', function (Request $request) {
     return $request->user();
