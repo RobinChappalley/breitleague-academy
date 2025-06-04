@@ -389,11 +389,12 @@ console.log('HistoireView component loaded')
   opacity: 0.95;
 }
 
-/* DESKTOP */
+/* DESKTOP (768px et plus) */
 @media (min-width: 768px) {
   .histoire-page {
+    margin-left: 280px;
+    width: calc(100% - 280px);
     padding-bottom: 0;
-    padding-left: 120px; /* Espace pour navbar desktop */
   }
   
   .hero-section {
@@ -410,28 +411,24 @@ console.log('HistoireView component loaded')
     letter-spacing: 2px;
   }
   
-  .section-tag {
-    font-size: 0.8rem;
-    padding: 0.5rem 1rem;
-  }
-  
   .content-block {
     padding: 2.5rem 3rem;
   }
 }
 
+/* LARGE DESKTOP (1024px et plus) */
 @media (min-width: 1024px) {
+  .histoire-page {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+  }
+  
   .hero-section {
     height: 60vh;
   }
   
   .onboarding-section {
     padding: 4rem 6rem;
-  }
-  
-  .onboarding-content {
-    max-width: 1200px;
-    margin: 0 auto;
   }
   
   .section-title {
@@ -442,27 +439,30 @@ console.log('HistoireView component loaded')
   .content-block {
     padding: 3rem 4rem;
   }
-  
-  .content-subtitle {
-    font-size: 1.4rem;
+}
+
+/* MOBILE (moins de 768px) */
+@media (max-width: 767px) {
+  .histoire-page {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: 80px; /* Navbar mobile */
   }
   
-  .content-text {
-    font-size: 1.1rem;
-    line-height: 1.7;
+  .hero-section {
+    height: 40vh;
   }
   
-  .timeline-year {
-    font-size: 1.3rem;
-    min-width: 60px;
+  .onboarding-section {
+    padding: 1.5rem 1rem;
   }
   
-  .timeline-title {
-    font-size: 1rem;
+  .section-title {
+    font-size: 2rem;
   }
   
-  .timeline-text {
-    font-size: 1rem;
+  .content-block {
+    padding: 1.5rem 1rem;
   }
 }
 </style>
