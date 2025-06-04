@@ -194,9 +194,6 @@
 
     <!-- Actions -->
     <div class="battle-actions">
-      <button class="btn-rematch" @click="requestRematch">
-        Rematch
-      </button>
       <button class="btn-return" @click="returnToBattles">
         Return to Battles
       </button>
@@ -205,16 +202,19 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 
-// Mock Battle Data
+const battleId = route.params.id
+
+// Données par défaut
 const currentPlayer = ref({
   id: 1,
-  name: 'R.DUFUIS',
-  avatar: 'R',
+  name: 'YOU',
+  avatar: 'Y',
   flag: '🇨🇭'
 })
 
@@ -225,7 +225,7 @@ const opponent = ref({
   flag: '🇩🇪'
 })
 
-// Battle Results avec temps
+// Données de bataille par défaut
 const playerAnswers = ref([
   { correct: true, text: 'Navitimer', time: 8.5 },
   { correct: true, text: '1884', time: 12.3 },
@@ -242,7 +242,6 @@ const opponentAnswers = ref([
   { correct: true, text: 'Cosmonaute', time: 14.6 }
 ])
 
-// Questions Data
 const questionsData = ref([
   {
     text: 'Which Breitling collection is known for its aviation heritage?',
@@ -265,6 +264,41 @@ const questionsData = ref([
     correctAnswer: 'Cosmonaute'
   }
 ])
+
+// Charger les données depuis localStorage si disponibles
+onMounted(() => {
+  const savedResults = localStorage.getItem('lastBattleResults')
+  if (savedResults) {
+    const results = JSON.parse(savedResults)
+    
+    // Mettre à jour avec les vraies données si elles existent
+    if (results.battleId === parseInt(battleId)) {
+      opponent.value = results.opponent
+      if (results.playerAnswers?.length) {
+        playerAnswers.value = results.playerAnswers
+      }
+      if (results.opponentAnswers?.length) {
+        opponentAnswers.value = results.opponentAnswers
+      }
+      if (results.questionsData?.length) {
+        questionsData.value = results.questionsData
+      }
+    }
+  }
+})
+
+// Fonction helper pour obtenir le drapeau du pays
+function getCountryFlag(country) {
+  const flags = {
+    'DE': '🇩🇪',
+    'FR': '🇫🇷',
+    'RO': '🇷🇴',
+    'PT': '🇵🇹',
+    'US': '🇺🇸',
+    'CH': '🇨🇭'
+  }
+  return flags[country] || '🌍'
+}
 
 // Computed Properties
 const totalQuestions = computed(() => questionsData.value.length)
@@ -345,15 +379,15 @@ const getAvatarStyle = (player) => {
 }
 
 const closeBattleDetails = () => {
-  router.push('/battles')
-}
-
-const requestRematch = () => {
-  router.push('/battle-quiz')
+  // Nettoyer localStorage
+  localStorage.removeItem('lastBattleResults')
+  router.push('/battle')
 }
 
 const returnToBattles = () => {
-  router.push('/battles')
+  // Nettoyer localStorage
+  localStorage.removeItem('lastBattleResults')
+  router.push('/battle')
 }
 </script>
 
@@ -776,12 +810,10 @@ const returnToBattles = () => {
 /* BATTLE ACTIONS */
 .battle-actions {
   display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
+  justify-content: center;
   margin-top: 1.5rem;
 }
 
-.btn-rematch,
 .btn-return {
   padding: 0.9rem 1.5rem;
   border: none;
@@ -792,26 +824,12 @@ const returnToBattles = () => {
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-}
-
-.btn-rematch {
   background: #F7C72C;
   color: #072C54;
 }
 
-.btn-rematch:hover {
-  background: #E6B625;
-  transform: translateY(-2px);
-}
-
-.btn-return {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
 .btn-return:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #E6B625;
   transform: translateY(-2px);
 }
 
@@ -985,16 +1003,14 @@ const returnToBattles = () => {
   }
   
   .battle-actions {
-    flex-direction: row;
     justify-content: center;
-    max-width: 450px;
+    max-width: 300px;
     margin: 2rem auto 0 auto;
   }
   
-  .btn-rematch,
   .btn-return {
-    flex: 1;
     font-size: 1rem;
+    padding: 1rem 2rem;
   }
 }
 
