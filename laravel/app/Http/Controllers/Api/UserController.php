@@ -55,11 +55,15 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        abort(405, 'Not allowed');
+        return response()->json([
+            'message' => 'Not allowed on this endpoint.'
+        ], 405);
     }
 
     public function destroy(User $user)
     {
-        abort(405, 'Not allowed');
+        return response()->json([
+            'message' => 'Not allowed on this endpoint.'
+        ], 405);
     }
 }
