@@ -322,8 +322,7 @@ const claimReward = (mission) => {
 /* DESKTOP (768px et plus) */
 @media (min-width: 768px) {
   .missions-page {
-    margin-left: 280px; /* Aligné avec la navbar */
-    width: calc(100% - 280px);
+    width: 100%;
     padding: 2rem;
     padding-bottom: 2rem;
   }
@@ -392,8 +391,7 @@ const claimReward = (mission) => {
 /* LARGE DESKTOP (1024px et plus) */
 @media (min-width: 1024px) {
   .missions-page {
-    margin-left: 280px;
-    width: calc(100% - 280px);
+    width: 100%;
     padding: 3rem;
   }
   
