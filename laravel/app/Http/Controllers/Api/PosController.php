@@ -29,7 +29,9 @@ class PosController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return response()->json([
+            'message' => 'Creating POS entries is not allowed on this endpoint.'
+        ], 405);
     }
 
     /**
@@ -40,19 +42,17 @@ class PosController extends Controller
         return new PosResource($pos);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Pos $pos)
     {
-        //
+        return response()->json([
+            'message' => 'Updating POS entries is not allowed on this endpoint.'
+        ], 405);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Pos $pos)
     {
-        //
+        return response()->json([
+            'message' => 'Deleting POS entries is not allowed on this endpoint.'
+        ], 405);
     }
 }
