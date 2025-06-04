@@ -19,7 +19,9 @@ class POSSeeder extends Seeder
                 'zipcode' => $pos['zipcode'],
                 'country' => $pos['country'],
                 'breitling_pin' => $pos['breitling_pin'],
-                'country_flag' => $pos['country_flag']
+                'country_flag' => $pos['country_flag'],
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
     }

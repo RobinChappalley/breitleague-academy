@@ -14,14 +14,14 @@ class PosResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        //return parent::toArray($request);
-        return [
-            'id' => $this->id,
-            'address' => $this->address,
-            'zipcode' => $this->zipcode,
-            'country' => $this->country,
-            'breitling_pin' => $this->breitling_pin,
-            'country_flag' => $this->country_flag,
-        ];
+        return parent::toArray($request);
+        //return [
+        //    'id' => $this->id,
+        //    'address' => $this->address,
+        //    'zipcode' => $this->zipcode,
+        //    'country' => $this->country,
+        //    'breitling_pin' => $this->breitling_pin,
+        //    'country_flag' => $this->country_flag,
+        //];
     }
 }
