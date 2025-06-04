@@ -25,4 +25,24 @@ class MissionController extends Controller
     {
         return new MissionResource($mission);
     }
+    public function store(Request $request)
+    {
+        return response()->json([
+            'message' => 'Creating missions is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function update(Request $request, Mission $mission)
+    {
+        return response()->json([
+            'message' => 'Updating missions is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function destroy(Mission $mission)
+    {
+        return response()->json([
+            'message' => 'Deleting missions is not allowed on this endpoint.'
+        ], 405);
+    }
 }
