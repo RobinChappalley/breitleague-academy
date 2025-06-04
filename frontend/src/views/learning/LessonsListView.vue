@@ -206,8 +206,7 @@ console.log('LessonsListView component loaded')
 /* DESKTOP (768px et plus) */
 @media (min-width: 768px) {
   .lessons-page {
-    margin-left: 280px;
-    width: calc(100% - 280px);
+    width: 100% ;
     padding: 0;
   }
   
@@ -223,8 +222,7 @@ console.log('LessonsListView component loaded')
 /* LARGE DESKTOP (1024px et plus) */
 @media (min-width: 1024px) {
   .lessons-page {
-    margin-left: 280px;
-    width: calc(100% - 280px);
+    width: 100% ;
   }
   
   .lessons-content {
