@@ -26,4 +26,24 @@ class CheckpointController extends Controller
     {
         return new CheckpointResource($checkpoint);
     }
+    public function store(Request $request)
+    {
+        return response()->json([
+            'message' => 'Creating checkpoints is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function update(Request $request, Checkpoint $checkpoint)
+    {
+        return response()->json([
+            'message' => 'Updating checkpoints is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function destroy(Checkpoint $checkpoint)
+    {
+        return response()->json([
+            'message' => 'Deleting checkpoints is not allowed on this endpoint.'
+        ], 405);
+    }
 }
