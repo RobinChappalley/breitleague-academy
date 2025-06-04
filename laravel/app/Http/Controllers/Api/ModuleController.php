@@ -29,4 +29,24 @@ class ModuleController extends Controller
     {
         return new ModuleResource($module);
     }
+    public function store(Request $request)
+    {
+        return response()->json([
+            'message' => 'Creating modules is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function update(Request $request, Module $module)
+    {
+        return response()->json([
+            'message' => 'Updating modules is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function destroy(Module $module)
+    {
+        return response()->json([
+            'message' => 'Deleting modules is not allowed on this endpoint.'
+        ], 405);
+    }
 }
