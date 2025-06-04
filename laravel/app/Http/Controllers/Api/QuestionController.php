@@ -28,4 +28,24 @@ class QuestionController extends Controller
     {
         return new QuestionResource($question);
     }
+    public function store(Request $request)
+    {
+        return response()->json([
+            'message' => 'Creating questions is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function update(Request $request, Question $question)
+    {
+        return response()->json([
+            'message' => 'Updating questions is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function destroy(Question $question)
+    {
+        return response()->json([
+            'message' => 'Deleting questions is not allowed on this endpoint.'
+        ], 405);
+    }
 }
