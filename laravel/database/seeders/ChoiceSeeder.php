@@ -18,7 +18,9 @@ class ChoiceSeeder extends Seeder
                 'id' => $choice['id'],
                 'question_id' => $choice['question_id'],
                 'text_answer' => $choice['text_answer'],
-                'img_answer' => $choice['img_answer']
+                'img_answer' => $choice['img_answer'],
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
     }

@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\MissionController;
 use App\Http\Controllers\Api\LessonController;
 use App\Http\Controllers\Api\TheoryController;
 use App\Http\Controllers\Api\QuestionController;
+use App\Http\Controllers\Api\ChoiceController;
 
 Route::apiResource('pos', PosController::class)->parameters([
     'pos' => 'pos',
@@ -45,6 +46,10 @@ Route::apiResource('theories', TheoryController::class)->parameters([
 
 Route::apiResource('questions', QuestionController::class)->parameters([
     'questions' => 'question'
+]);
+
+Route::apiResource('choices', ChoiceController::class)->parameters([
+    'choices' => 'choice'
 ]);
 
 Route::get('/user', function (Request $request) {
