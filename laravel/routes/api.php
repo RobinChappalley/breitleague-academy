@@ -55,6 +55,9 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('user-rewards', UserRewardController::class)->parameters([
         'user-rewards' => 'userReward'
     ]);
+    Route::apiResource('user-missions', UserMissionController::class)->parameters([
+        'user-missions' => 'userMission'
+    ]);
 });
 
 // Exemple : authentification
