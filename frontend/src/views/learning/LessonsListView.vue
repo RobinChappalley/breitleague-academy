@@ -105,6 +105,7 @@ const goBack = () => {
 // Methods
 const openLesson = (lessonId) => {
   console.log(`Opening lesson: ${lessonId}`)
+  router.push(`/ressources/${lessonId}`)
   // Ici tu pourras ajouter la navigation vers la leçon spécifique
 }
 
