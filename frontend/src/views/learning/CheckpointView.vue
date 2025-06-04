@@ -1,57 +1,9 @@
 <template>
   <div class="checkpoint-page">
-    <div class="main-content">
-      <!-- Header -->
-      <div class="checkpoint-header">
-        <button class="back-btn" @click="goBack">
-          <span class="back-icon">←</span>
-        </button>
-        <h1 class="checkpoint-title">CHECKPOINT</h1>
-        <div class="progress-indicator">
-          <span class="progress-text">{{ currentModule }} / {{ totalModules }}</span>
-        </div>
-      </div>
-
-      <!-- Checkpoint Info -->
-      <div class="checkpoint-info">
-        <div class="checkpoint-card">
-          <div class="checkpoint-icon">
-            <span class="icon">🎯</span>
-          </div>
-          <h2 class="checkpoint-name">{{ checkpointData.title }}</h2>
-          <p class="checkpoint-description">{{ checkpointData.description }}</p>
-          
-          <div class="checkpoint-stats">
-            <div class="stat-item">
-              <span class="stat-label">Questions</span>
-              <span class="stat-value">{{ checkpointData.totalQuestions }}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">Time Limit</span>
-              <span class="stat-value">{{ checkpointData.timeLimit }}</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-label">Pass Score</span>
-              <span class="stat-value">{{ checkpointData.passScore }}%</span>
-            </div>
-          </div>
-
-          <div class="checkpoint-actions">
-            <button 
-              class="btn-start-checkpoint" 
-              @click="startCheckpoint"
-            >
-              START CHECKPOINT
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Checkpoint Start Modal -->
-    <div class="modal-overlay" v-if="showStartModal" @click="closeStartModal">
+    <!-- Checkpoint Start Modal - Affiché directement -->
+    <div class="modal-overlay" @click="closeModal">
       <div class="checkpoint-modal" @click.stop>
-        <button class="close-btn" @click="closeStartModal">✕</button>
+        <button class="close-btn" @click="closeModal">✕</button>
         
         <div class="modal-header">
           <h2 class="modal-title">CHECKPOINT</h2>
@@ -93,10 +45,6 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 // Data
-const currentModule = ref(1)
-const totalModules = ref(5)
-const showStartModal = ref(false)
-
 const checkpointData = ref({
   title: 'Breitling Heritage & Foundations',
   description: 'Test your knowledge of Breitling\'s history, founding principles, and core values that shaped the brand into what it is today.',
@@ -106,20 +54,12 @@ const checkpointData = ref({
 })
 
 // Methods
-const goBack = () => {
-  router.push('/learning')
-}
-
-const startCheckpoint = () => {
-  showStartModal.value = true
-}
-
-const closeStartModal = () => {
-  showStartModal.value = false
+const closeModal = () => {
+  // Retourner à la formation view
+  router.push('/')
 }
 
 const beginTest = () => {
-  showStartModal.value = false
   router.push('/checkpoint-quiz')
 }
 
@@ -130,169 +70,10 @@ console.log('CheckpointView component loaded')
 .checkpoint-page {
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, #072C54 0%, #1e3a8a 100%);
-  color: white;
-  padding: 1rem;
-  padding-bottom: 100px;
-  box-sizing: border-box;
-}
-
-/* HEADER */
-.checkpoint-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  padding: 1rem 0;
-}
-
-.back-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  color: white;
-  padding: 0.8rem 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1.2rem;
-}
-
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateX(-2px);
-}
-
-.checkpoint-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #F7C72C;
+  background: transparent; /* Plus besoin de background car le modal a le sien */
+  padding: 0;
   margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  text-align: center;
-  flex: 1;
-}
-
-.progress-indicator {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 0.5rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.progress-text {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #F7C72C;
-}
-
-/* CHECKPOINT INFO */
-.checkpoint-info {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-}
-
-.checkpoint-card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 3rem;
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  text-align: center;
-  max-width: 600px;
-  width: 100%;
-}
-
-.checkpoint-icon {
-  margin-bottom: 2rem;
-}
-
-.icon {
-  font-size: 5rem;
-  display: inline-block;
-  padding: 1.5rem;
-  background: #F7C72C;
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-  box-shadow: 0 8px 25px rgba(247, 199, 44, 0.3);
-}
-
-.checkpoint-name {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: white;
-  margin: 0 0 1.5rem 0;
-  line-height: 1.2;
-}
-
-.checkpoint-description {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.6;
-  margin-bottom: 3rem;
-}
-
-.checkpoint-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 3rem;
-}
-
-.stat-item {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 15px;
-  padding: 1.5rem;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.stat-label {
-  display: block;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.stat-value {
-  display: block;
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #F7C72C;
-}
-
-.checkpoint-actions {
-  margin-top: 2rem;
-}
-
-.btn-start-checkpoint {
-  background: #F7C72C;
-  color: #072C54;
-  border: none;
-  border-radius: 15px;
-  padding: 1.2rem 3rem;
-  font-size: 1.2rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(247, 199, 44, 0.3);
-}
-
-.btn-start-checkpoint:hover {
-  background: #E6B625;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(247, 199, 44, 0.4);
+  position: relative;
 }
 
 /* MODAL */
@@ -441,119 +222,10 @@ console.log('CheckpointView component loaded')
 }
 
 /* RESPONSIVE */
-@media (min-width: 768px) {
-  .checkpoint-page {
-    margin-left: 280px;
-    width: calc(100% - 280px);
-    padding: 2rem;
-    padding-bottom: 2rem;
-  }
-  
-  .checkpoint-title {
-    font-size: 2.5rem;
-  }
-  
-  .checkpoint-card {
-    padding: 4rem;
-  }
-  
-  .icon {
-    width: 140px;
-    height: 140px;
-    font-size: 5.5rem;
-  }
-  
-  .checkpoint-name {
-    font-size: 2.5rem;
-  }
-  
-  .checkpoint-description {
-    font-size: 1.2rem;
-  }
-  
-  .stat-item {
-    padding: 2rem;
-  }
-  
-  .stat-value {
-    font-size: 1.6rem;
-  }
-  
-  .btn-start-checkpoint {
-    font-size: 1.3rem;
-    padding: 1.4rem 4rem;
-  }
-}
-
 @media (max-width: 767px) {
-  .checkpoint-page {
-    margin-left: 0;
-    width: 100%;
-    padding: 1rem;
-    padding-bottom: 80px;
-  }
-  
-  .checkpoint-header {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-  
-  .checkpoint-title {
-    font-size: 1.8rem;
-  }
-  
-  .checkpoint-info {
-    min-height: auto;
-    margin-top: 2rem;
-  }
-  
-  .checkpoint-card {
-    padding: 2rem;
-  }
-  
-  .icon {
-    width: 100px;
-    height: 100px;
-    font-size: 4rem;
-  }
-  
-  .checkpoint-name {
-    font-size: 1.8rem;
-  }
-  
-  .checkpoint-description {
-    font-size: 1rem;
-  }
-  
-  .checkpoint-stats {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .stat-item {
-    padding: 1.2rem;
-  }
-  
-  .btn-start-checkpoint {
-    font-size: 1rem;
-    padding: 1rem 2rem;
-  }
-}
-
-@media (max-width: 479px) {
-  .checkpoint-card {
-    padding: 1.5rem;
-  }
-  
-  .checkpoint-name {
-    font-size: 1.5rem;
-  }
-  
-  .icon {
-    width: 80px;
-    height: 80px;
-    font-size: 3.5rem;
+  .checkpoint-modal {
+    width: 95%;
+    margin: 1rem;
   }
   
   .modal-content {
@@ -566,6 +238,25 @@ console.log('CheckpointView component loaded')
   
   .modal-title {
     font-size: 2rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .modal-title {
+    font-size: 1.8rem;
+  }
+  
+  .modal-subtitle {
+    font-size: 1rem;
+  }
+  
+  .modal-text {
+    font-size: 0.9rem;
+  }
+  
+  .btn-start-test {
+    padding: 1rem 2rem;
+    font-size: 1rem;
   }
 }
 </style>
