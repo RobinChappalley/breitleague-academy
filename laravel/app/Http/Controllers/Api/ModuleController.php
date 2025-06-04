@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Resources\ModuleResource;
+use App\Models\Module;
 
 class ModuleController extends Controller
 {
@@ -12,38 +14,19 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+        $module = Module::get();
+        if ($module->count() > 0) {
+            return moduleResource::collection($module);
+        } else {
+            return response()->json(['message' => 'No modules'], 200);
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Module $module)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return new ModuleResource($module);
     }
 }
