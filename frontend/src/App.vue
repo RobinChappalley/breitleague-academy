@@ -15,8 +15,9 @@ const showNavbar = computed(() => {
 
 
 <template>
-  <router-view></router-view>
   <div id="app-layout">
+    <router-view></router-view>
+
     <div class="main-content">
       <main>
 
