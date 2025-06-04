@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Resources\LessonResource;
+use App\Models\Lesson;
 
 class LessonController extends Controller
 {
@@ -12,38 +14,18 @@ class LessonController extends Controller
      */
     public function index()
     {
-        //
+        $lesson = Lesson::get();
+        if ($lesson->count() > 0) {
+            return LessonResource::collection($lesson);
+        } else {
+            return response()->json(['message' => 'No lessons'], 200);
+        }
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Lesson $lesson)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return new LessonResource($lesson);
     }
 }

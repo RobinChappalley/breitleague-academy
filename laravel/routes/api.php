@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\RewardController;
 use App\Http\Controllers\Api\ModuleController;
 use App\Http\Controllers\Api\CheckpointController;
 use App\Http\Controllers\Api\MissionController;
-use App\Models\Mission;
+use App\Http\Controllers\Api\LessonController;
 
 Route::apiResource('pos', PosController::class)->parameters([
     'pos' => 'pos',
@@ -33,6 +33,9 @@ Route::apiResource('missions', MissionController::class)->parameters([
     'missions' => 'mission'
 ]);
 
+Route::apiResource('lessons', LessonController::class)->parameters([
+    'lessons' => 'lesson'
+]);
 
 Route::get('/user', function (Request $request) {
     return $request->user();
