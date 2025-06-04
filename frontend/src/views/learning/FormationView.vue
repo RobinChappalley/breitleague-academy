@@ -1,7 +1,12 @@
 <template>
   <div class="formation-image-container">
+    <div class="top-action-buttons">
+      <RouterLink class="action-btn" to=/ressources>Read Ressources</RouterLink>
+      <RouterLink class="action-btn" to=/missions>Missions</RouterLink>
+    </div>
     <div ref="watchContainer" class="formation-watch-container">
-      <img alt="watch aviators" src="/backgrounds/aviators-watch.png" class="lesson-watch" @load="updateContainerDimensions" >
+      <img alt="watch aviators" src="/backgrounds/aviators-watch.png" class="lesson-watch"
+           @load="updateContainerDimensions">
 
       <!-- Votre bouton existant (spécial) -->
       <button class="checkpoint-button special-button"></button>
@@ -49,10 +54,11 @@
           {{ index + 1 }}
         </button>
         <p class="lesson-label">
-          {{lesson.title}}
+          {{ lesson.title }}
         </p>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -62,17 +68,17 @@ export default {
   data() {
     return {
       lessons: [
-        { id: 1, status: 'completed', progress: 100, title: 'Onboarding' },
-        { id: 2, status: 'completed', progress: 100, title: 'Onboarding' },
-        { id: 3, status: 'in-progress', progress: 65, title: 'Onboarding' },
-        { id: 4, status: 'in-progress', progress: 30 },
-        { id: 5, status: 'not-started', progress: 0 },
-        { id: 6, status: 'not-started', progress: 0 },
-        { id: 7, status: 'in-progress', progress: 80 },
+        {id: 1, status: 'completed', progress: 100, title: 'Onboarding'},
+        {id: 2, status: 'completed', progress: 100, title: 'Onboarding'},
+        {id: 3, status: 'in-progress', progress: 65, title: 'Onboarding'},
+        {id: 4, status: 'in-progress', progress: 30},
+        {id: 5, status: 'not-started', progress: 0},
+        {id: 6, status: 'not-started', progress: 0},
+        {id: 7, status: 'in-progress', progress: 80},
         // ...(new Array(7)).fill({ id: 8, status: 'not-started', progress: 0 }),
       ],
       containerWidth: 0,
-      containerHeight: 0
+      containerHeight: 0,
     }
   },
 
@@ -98,16 +104,16 @@ export default {
 
   methods: {
     updateContainerDimensions() {
-        const container = this.$refs.watchContainer;
-        if (container) {
-          this.containerWidth = container.offsetWidth;
-          this.containerHeight = container.offsetHeight;
-        }
-      },
+      const container = this.$refs.watchContainer;
+      if (container) {
+        this.containerWidth = container.offsetWidth;
+        this.containerHeight = container.offsetHeight;
+      }
+    },
 
     getButtonPosition(index) {
       if (this.containerWidth === 0) {
-        return { display: 'none' };
+        return {display: 'none'};
       }
 
       const arcDegrees = 150;
@@ -158,7 +164,7 @@ export default {
           lesson.progress = 100;
         }
       }
-    }
+    },
   }
 }
 </script>
@@ -189,7 +195,7 @@ export default {
 .formation-watch-container {
   position: relative;
   margin-left: 280px;
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 767px) {
     margin-left: 0
   }
 }
@@ -208,7 +214,7 @@ export default {
   position: absolute;
   cursor: pointer;
   transition: all 0.3s ease;
-  top:-2%;
+  top: -2%;
   left: 8%;
   filter: drop-shadow(0 0 4px #000000);
 }
@@ -274,7 +280,47 @@ export default {
   left: 60px;
   top: 50%;
   transform: translateY(-50%);
-color: whitesmoke;
+  color: whitesmoke;
   font-weight: bold;
+}
+
+.action-btn {
+  /* styles identiques */
+  background: #F7C72C;
+  color: #232323;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  outline: none;
+  border-radius: 16px;
+  padding: 12px 18px;
+  box-shadow: 0 3px 12px rgba(35, 35, 35, 0.16);
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none; /* Pour enlever le souligné de lien */
+  display: inline-block;
+  transition: background 0.2s, box-shadow 0.18s;
+}
+
+.action-btn:hover {
+  background: #FFD94A;
+  box-shadow: 0 6px 24px rgba(35, 35, 35, 0.21);
+}
+
+.top-action-buttons {
+  position: absolute;
+  top: 40px;
+  right: 30px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-end;
+  @media screen and (width>= 768px) {
+    gap: 18px;
+  }
+  @media screen and (max-width: 767px) {
+    gap: 10px
+  }
 }
 </style>
