@@ -28,4 +28,24 @@ class TheoryController extends Controller
     {
         return new TheoryResource($theory);
     }
+    public function store(Request $request)
+    {
+        return response()->json([
+            'message' => 'Creating theories is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function update(Request $request, Theory $theory)
+    {
+        return response()->json([
+            'message' => 'Updating theories is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function destroy(Theory $theory)
+    {
+        return response()->json([
+            'message' => 'Deleting theories is not allowed on this endpoint.'
+        ], 405);
+    }
 }
