@@ -4,46 +4,25 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Resources\MissionResource;
+use App\Models\Mission;
 
 class MissionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $mission = Mission::get();
+        if ($mission->count() > 0) {
+            return MissionResource::collection($mission);
+        } else {
+            return response()->json(['message' => 'No missions'], 200);
+        }
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Mission $mission)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return new MissionResource($mission);
     }
 }

@@ -7,7 +7,8 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RewardController;
 use App\Http\Controllers\Api\ModuleController;
 use App\Http\Controllers\Api\CheckpointController;
-use App\Http\Resources\CheckpointResource;
+use App\Http\Controllers\Api\MissionController;
+use App\Models\Mission;
 
 Route::apiResource('pos', PosController::class)->parameters([
     'pos' => 'pos',
@@ -27,6 +28,12 @@ Route::apiResource('modules', ModuleController::class)->parameters([
 Route::apiResource('checkpoints', CheckpointController::class)->parameters([
     'checkpoints' => 'checkpoint'
 ]);
+
+Route::apiResource('missions', MissionController::class)->parameters([
+    'missions' => 'mission'
+]);
+
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
