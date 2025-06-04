@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
+
+use App\Models\Pos;
+use App\Http\Resources\PosResource;
 
 class PosController extends Controller
 {
@@ -12,7 +16,12 @@ class PosController extends Controller
      */
     public function index()
     {
-        //
+        $pos = Pos::get();
+        if ($pos->count() > 0) {
+            return PosResource::collection($pos);
+        } else {
+            return response()->json(['message' => 'No point of sales available'], 200);
+        }
     }
 
     /**
@@ -26,9 +35,9 @@ class PosController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Pos $pos)
     {
-        //
+        return new PosResource($pos);
     }
 
     /**
