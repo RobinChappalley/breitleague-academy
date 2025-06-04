@@ -797,27 +797,29 @@ console.log('RankingView component loaded')
 
 /* RESPONSIVE */
 @media (min-width: 768px) {
+  .ranking-page {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding-bottom: 0; /* Pas de padding bottom sur desktop */
+  }
+  
   .main-content {
-    padding: 3rem 4rem;
-    padding-bottom: 140px;
+    padding-bottom: 120px; /* Espace pour le footer utilisateur */
   }
   
-  .ranking-title {
-    font-size: 4rem;
-  }
-  
-  .ranking-item {
+  .user-position-footer {
+    left: 280px; /* Aligné avec la navbar desktop */
     padding: 1.5rem 2rem;
-  }
-  
-  .avatar {
-    width: 60px;
-    height: 60px;
-    font-size: 1.4rem;
   }
   
   .user-ranking-item {
-    padding: 1.5rem 2rem;
+    max-width: 900px;
+    padding: 1.2rem 2rem;
+  }
+  
+  .user-ranking-item .rank {
+    font-size: 1.4rem;
+    min-width: 50px;
   }
   
   .user-ranking-item .avatar {
@@ -826,64 +828,173 @@ console.log('RankingView component loaded')
     font-size: 1.4rem;
   }
   
-  .popup-avatar {
-    width: 100px;
-    height: 100px;
-    font-size: 2.5rem;
+  .user-ranking-item .player-name {
+    font-size: 1.1rem;
   }
-}
-
-@media (max-width: 767px) {
-  .main-content {
-    padding: 1rem;
-    padding-bottom: 120px;
+  
+  .user-ranking-item .score {
+    font-size: 1.4rem;
   }
   
   .ranking-title {
-    font-size: 2rem;
+    font-size: 3.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ranking-page {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 3rem;
+    padding-bottom: 0;
   }
   
-  .filters {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .filter-btn {
-    border-radius: 8px 
-  }
-  
-  .ranking-item {
-    padding: 1rem;
-  }
-  
-  .rank {
-    min-width: 30px;
-    font-size: 1rem;
-  }
-  
-  .score {
-    font-size: 1rem;
+  .main-content {
+    padding-bottom: 140px; /* Plus d'espace sur large desktop */
   }
   
   .user-position-footer {
-    padding: 1rem;
+    left: 280px;
+    padding: 2rem 3rem;
   }
   
   .user-ranking-item {
-    padding: 1rem;
+    max-width: 1000px;
+    padding: 1.5rem 2.5rem;
   }
   
   .user-ranking-item .rank {
-    min-width: 30px;
+    font-size: 1.5rem;
+  }
+  
+  .user-ranking-item .avatar {
+    width: 70px;
+    height: 70px;
+    font-size: 1.6rem;
+  }
+  
+  .user-ranking-item .player-name {
+    font-size: 1.2rem;
+  }
+  
+  .user-ranking-item .score {
+    font-size: 1.5rem;
+  }
+  
+  .ranking-title {
+    font-size: 4rem;
+  }
+}
+
+/* MOBILE (moins de 768px) */
+@media (max-width: 767px) {
+  .ranking-page {
+    margin-left: 0;
+    width: 100%;
+    padding: 1rem;
+    padding-bottom: 0;
+  }
+  
+  .main-content {
+    padding: 1rem;
+    padding-bottom: 180px; /* Plus d'espace : footer fixe (100px) + navbar mobile (70px) + marge (10px) */
+  }
+  
+  .user-position-footer {
+    left: 0; /* Pleine largeur sur mobile */
+    padding: 0.8rem 1rem;
+    bottom: 70px; /* Au-dessus de la navbar mobile */
+  }
+  
+  .see-all-btn {
+    margin: 2rem 0 3rem 0; /* Plus de marge en bas */
+  }
+  
+  .user-ranking-item {
+    padding: 0.8rem 1rem;
+    gap: 0.8rem;
+  }
+  
+  .user-ranking-item .rank {
     font-size: 1rem;
+    min-width: 35px;
+  }
+  
+  .user-ranking-item .avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .user-ranking-item .player-name {
+    font-size: 0.9rem;
   }
   
   .user-ranking-item .score {
     font-size: 1rem;
   }
   
-  .player-popup {
-    padding: 1.5rem;
+  .ranking-title {
+    font-size: 2rem;
+  }
+  
+  .ranking-item {
+    padding: 0.8rem 1rem;
+    gap: 0.8rem;
+  }
+  
+  .ranking-item .rank {
+    font-size: 1rem;
+    min-width: 35px;
+  }
+  
+  .ranking-item .avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .ranking-item .player-name {
+    font-size: 0.9rem;
+  }
+  
+  .ranking-item .score {
+    font-size: 1rem;
+  }
+}
+
+/* TRÈS PETIT MOBILE (moins de 480px) */
+@media (max-width: 479px) {
+  .main-content {
+    padding: 1rem;
+    padding-bottom: 190px; /* Encore plus d'espace sur très petit mobile */
+  }
+  
+  .user-position-footer {
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .user-ranking-item {
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .user-ranking-item .rank {
+    font-size: 0.9rem;
+    min-width: 30px;
+  }
+  
+  .user-ranking-item .avatar {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+  
+  .user-ranking-item .player-name {
+    font-size: 0.8rem;
+  }
+  
+  .user-ranking-item .score {
+    font-size: 0.9rem;
   }
 }
 </style>

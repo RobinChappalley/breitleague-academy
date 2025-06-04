@@ -203,6 +203,39 @@ console.log('LessonsListView component loaded')
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+/* DESKTOP (768px et plus) */
+@media (min-width: 768px) {
+  .lessons-page {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 0;
+  }
+  
+  .lessons-content {
+    padding: 2.5rem 2rem;
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+  }
+}
+
+/* LARGE DESKTOP (1024px et plus) */
+@media (min-width: 1024px) {
+  .lessons-page {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+  }
+  
+  .lessons-content {
+    padding: 3.5rem 4rem;
+  }
+  
+  .section-title {
+    font-size: 3rem;
+  }
+}
+
 /* RESPONSIVE - LARGE DESKTOP */
 @media (min-width: 1400px) {
   .lessons-content {
@@ -276,6 +309,12 @@ console.log('LessonsListView component loaded')
 
 /* RESPONSIVE - MOBILE */
 @media (max-width: 767px) {
+  .lessons-page {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: 80px; /* Navbar mobile */
+  }
+  
   .lessons-content {
     padding: 1.5rem 1rem;
   }
