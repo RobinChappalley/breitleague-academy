@@ -43,6 +43,7 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Pos::class, 'POS_id');
     }
+
     public function missions()
     {
         return $this->belongsToMany(Mission::class, 'user_missions')
