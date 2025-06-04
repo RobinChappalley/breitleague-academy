@@ -28,4 +28,24 @@ class LessonController extends Controller
     {
         return new LessonResource($lesson);
     }
+    public function store(Request $request)
+    {
+        return response()->json([
+            'message' => 'Creating lessons is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function update(Request $request, Lesson $lesson)
+    {
+        return response()->json([
+            'message' => 'Updating lessons is not allowed on this endpoint.'
+        ], 405);
+    }
+
+    public function destroy(Lesson $lesson)
+    {
+        return response()->json([
+            'message' => 'Deleting lessons is not allowed on this endpoint.'
+        ], 405);
+    }
 }
