@@ -13,6 +13,11 @@ class UserReward extends Model
         'is_favourite',
         'acquired_at',
     ];
+    protected $casts = [
+        'is_favourite' => 'boolean',
+        'acquired_at' => 'datetime',
+    ];
+
 
     public function user(): BelongsTo
     {

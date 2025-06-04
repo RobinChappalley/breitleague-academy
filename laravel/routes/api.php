@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\ChoiceController;
 use App\Http\Controllers\Api\ProgressionController;
 use App\Http\Controllers\Api\BattleController;
+use App\Http\Controllers\Api\UserRewardController;
+use App\Http\Controllers\Api\UserMissionController;
 
 Route::prefix('v1')->group(function () {
     Route::apiResource('pos', PosController::class)->parameters([
@@ -49,6 +51,9 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('progression', ProgressionController::class);
     Route::apiResource('battles', BattleController::class)->parameters([
         'battles' => 'battle'
+    ]);
+    Route::apiResource('user-rewards', UserRewardController::class)->parameters([
+        'user-rewards' => 'userReward'
     ]);
 });
 
