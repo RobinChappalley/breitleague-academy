@@ -25,6 +25,6 @@ class Pos extends Model
 
     public function users()
     {
-        return $this->hasMany(User::class, 'POS_id');
+        return $this->hasMany(User::class, 'pos_id');
     }
 }

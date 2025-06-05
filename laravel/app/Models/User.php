@@ -15,7 +15,7 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
-        'POS_id',
+        'pos_id',
         'signup_year',
         'avatar',
         'elo_score',
@@ -41,8 +41,13 @@ class User extends Authenticatable
 
     public function pos()
     {
-        return $this->belongsTo(Pos::class, 'POS_id');
+        //$pos = Pos::find($this->pos_id);
+        //$this->pos = $pos;
+        //return $this;
+        return $this->belongsTo(Pos::class, 'pos_id'); //mettre en minuscule ? (!)/05.06.25
     }
+
+
     public function missions()
     {
         return $this->belongsToMany(Mission::class, 'user_missions')
