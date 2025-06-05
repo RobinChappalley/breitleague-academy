@@ -15,7 +15,9 @@ class ModuleSeeder extends Seeder
             DB::table('modules')->insert([
                 'id' => $module['id'],
                 'title' => $module['title'],
-                'order_position' => $module['order_position']
+                'order_position' => $module['order_position'],
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
     }

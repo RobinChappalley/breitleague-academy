@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Resources\TheoryResource;
+use App\Models\Theory;
 
 class TheoryController extends Controller
 {
@@ -12,38 +14,38 @@ class TheoryController extends Controller
      */
     public function index()
     {
-        //
+        $theory = Theory::get();
+        if ($theory->count() > 0) {
+            return TheoryResource::collection($theory);
+        } else {
+            return response()->json(['message' => 'No theories'], 200);
+        }
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Theory $theory)
     {
-        //
+        return new TheoryResource($theory);
+    }
+    public function store(Request $request)
+    {
+        return response()->json([
+            'message' => 'Creating theories is not allowed on this endpoint.'
+        ], 405);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Theory $theory)
     {
-        //
+        return response()->json([
+            'message' => 'Updating theories is not allowed on this endpoint.'
+        ], 405);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Theory $theory)
     {
-        //
+        return response()->json([
+            'message' => 'Deleting theories is not allowed on this endpoint.'
+        ], 405);
     }
 }

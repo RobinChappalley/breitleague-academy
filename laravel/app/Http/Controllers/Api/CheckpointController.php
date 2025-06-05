@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Resources\CheckpointResource;
+use App\Models\Checkpoint;
+use Laravel\Sanctum\Http\Middleware\CheckScopes;
 
 class CheckpointController extends Controller
 {
@@ -12,38 +15,35 @@ class CheckpointController extends Controller
      */
     public function index()
     {
-        //
+        $checkpoint = Checkpoint::get();
+        if ($checkpoint->count() > 0) {
+            return CheckpointResource::collection($checkpoint);
+        } else {
+            return response()->json(['message' => 'No checkpoints'], 200);
+        }
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function show(Checkpoint $checkpoint)
+    {
+        return new CheckpointResource($checkpoint);
+    }
     public function store(Request $request)
     {
-        //
+        return response()->json([
+            'message' => 'Creating checkpoints is not allowed on this endpoint.'
+        ], 405);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(Request $request, Checkpoint $checkpoint)
     {
-        //
+        return response()->json([
+            'message' => 'Updating checkpoints is not allowed on this endpoint.'
+        ], 405);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Checkpoint $checkpoint)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'message' => 'Deleting checkpoints is not allowed on this endpoint.'
+        ], 405);
     }
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Resources\QuestionResource;
+use App\Models\Question;
 
 class QuestionController extends Controller
 {
@@ -12,38 +14,38 @@ class QuestionController extends Controller
      */
     public function index()
     {
-        //
+        $question = Question::get();
+        if ($question->count() > 0) {
+            return QuestionResource::collection($question);
+        } else {
+            return response()->json(['message' => 'No questions'], 200);
+        }
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Question $question)
     {
-        //
+        return new QuestionResource($question);
+    }
+    public function store(Request $request)
+    {
+        return response()->json([
+            'message' => 'Creating questions is not allowed on this endpoint.'
+        ], 405);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Question $question)
     {
-        //
+        return response()->json([
+            'message' => 'Updating questions is not allowed on this endpoint.'
+        ], 405);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Question $question)
     {
-        //
+        return response()->json([
+            'message' => 'Deleting questions is not allowed on this endpoint.'
+        ], 405);
     }
 }

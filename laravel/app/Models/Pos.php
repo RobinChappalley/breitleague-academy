@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Pos extends Model
 {
     use HasFactory;
+    protected $table = 'pos';
+
 
     protected $fillable = [
         'address',

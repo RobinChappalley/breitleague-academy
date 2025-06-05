@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Resources\ChoiceResource;
+use App\Models\Choice;
 
 class ChoiceController extends Controller
 {
@@ -12,38 +14,38 @@ class ChoiceController extends Controller
      */
     public function index()
     {
-        //
+        $choice = Choice::get();
+        if ($choice->count() > 0) {
+            return ChoiceResource::collection($choice);
+        } else {
+            return response()->json(['message' => 'No choices'], 200);
+        }
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Choice $choice)
     {
-        //
+        return new ChoiceResource($choice);
+    }
+    public function store(Request $request)
+    {
+        return response()->json([
+            'message' => 'Creating choices is not allowed on this endpoint.'
+        ], 405);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Choice $choice)
     {
-        //
+        return response()->json([
+            'message' => 'Updating choices is not allowed on this endpoint.'
+        ], 405);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Choice $choice)
     {
-        //
+        return response()->json([
+            'message' => 'Deleting choices is not allowed on this endpoint.'
+        ], 405);
     }
 }

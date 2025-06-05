@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 
 class UserController extends Controller
 {
@@ -12,38 +14,56 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        $user = User::get();
+        if ($user->count() > 0) {
+            return UserResource::collection($user);
+        } else {
+            return response()->json(['message' => 'No users'], 200);
+        }
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $user)
     {
-        //
+        return new UserResource($user);
+    }
+    public function update(Request $request, User $user)
+    {
+        // (optionnel) s'assurer que l'utilisateur modifie son propre profil
+        //if ($request->user()->id !== $user->id) {
+        //    return response()->json(['message' => 'Unauthorized'], 403);
+        //}
+
+        $validated = $request->validate([
+            'avatar'   => ['nullable', 'string', 'max:255'],
+            'username' => ['nullable', 'string', 'max:255'],
+            'email'    => ['nullable', 'email', 'max:255'],
+            'password' => ['nullable', 'string', 'min:8'],
+        ]);
+
+        // Si le mot de passe est présent, le hasher
+        if (isset($validated['password'])) {
+            $validated['password'] = bcrypt($validated['password']);
+        }
+
+        $user->update($validated);
+
+        return new UserResource($user);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+
+    public function store(Request $request)
     {
-        //
+        return response()->json([
+            'message' => 'Not allowed on this endpoint.'
+        ], 405);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        //
+        return response()->json([
+            'message' => 'Not allowed on this endpoint.'
+        ], 405);
     }
 }

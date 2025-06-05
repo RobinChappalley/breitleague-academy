@@ -17,7 +17,9 @@ class TheorySeeder extends Seeder
                 'id' => $theory['id'],
                 'lesson_id' => $theory['lesson_id'],
                 'content' => $theory['content'],
-                'position_order' => $theory['position_order']
+                'position_order' => $theory['position_order'],
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
     }
