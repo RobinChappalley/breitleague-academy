@@ -20,7 +20,7 @@ export const routes = [
     {path: '/collection', component: CollectionView, meta: {hideNavBar: false}},
     {path: '/ranking', component: RankingView, meta: {hideNavBar: false}},
     {path: '/profile', component: ProfileView, meta: {hideNavBar: false}},
-    {path: '/ressources', component: LessonsListView, meta: {hideNavBar: false}},
+    {path: '/ressources', component: LessonsListView, meta: {hideNavBar: true}},
     {path: '/missions', component: MissionsView, meta: {hideNavBar: true}},
     {path: '/checkpoint', component: CheckpointView, meta: {hideNavBar: false}},
     {path: '/checkpoint-quiz', component: CheckpointQuizView, meta: {hideNavBar: true}},
