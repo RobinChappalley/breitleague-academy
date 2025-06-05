@@ -35,7 +35,7 @@ class UserController extends Controller
 
         //$test->pos;
         //return $user;
-        $user->load('missions');
+        $user->load('missions', 'rewards');
 
         return new UserResource($user);
     }

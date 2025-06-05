@@ -75,9 +75,16 @@ class User extends Authenticatable
         return $this->hasOne(Progression::class);
     }
 
-    public function userRewards()
+    //public function userRewards()
+    //{
+    //    return $this->hasMany(UserReward::class);
+    //}
+
+    public function rewards()
     {
-        return $this->hasMany(UserReward::class);
+        return $this->belongsToMany(Reward::class, 'user_rewards')
+            ->withPivot('is_favourite')
+            ->withTimestamps();
     }
 
     public function favouriteRewards()
