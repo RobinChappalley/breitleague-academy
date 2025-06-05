@@ -11,6 +11,8 @@ import LessonsListView from "@/views/learning/LessonsListView.vue";
 import CheckpointView from "@/views/learning/CheckpointView.vue";
 import CheckpointQuizView from "@/views/learning/CheckpointQuizView.vue";
 import CheckpointResultsView from "@/views/learning/CheckpointResultsView.vue";
+import HistoireView from "@/views/learning/HistoireView.vue";
+
 
 export const routes = [
     {path: '/', component: FormationView, meta: {hideNavBar: false}},
@@ -20,9 +22,11 @@ export const routes = [
     {path: '/collection', component: CollectionView, meta: {hideNavBar: false}},
     {path: '/ranking', component: RankingView, meta: {hideNavBar: false}},
     {path: '/profile', component: ProfileView, meta: {hideNavBar: false}},
-    {path: '/ressources', component: LessonsListView, meta: {hideNavBar: false}},
+    {path: '/ressources', component: LessonsListView, meta: {hideNavBar: true}},
     {path: '/missions', component: MissionsView, meta: {hideNavBar: true}},
     {path: '/checkpoint', component: CheckpointView, meta: {hideNavBar: false}},
     {path: '/checkpoint-quiz', component: CheckpointQuizView, meta: {hideNavBar: true}},
-    {path: '/checkpoint-results', name: 'CheckpointResults', component: CheckpointResultsView, meta: {hideNavBar: true}}
+    {path: '/checkpoint-results', name: 'CheckpointResults', component: CheckpointResultsView, meta: {hideNavBar: true}},
+    {path: '/ressources/history', component: HistoireView, meta: {hideNavBar: true}},
+    
 ]
