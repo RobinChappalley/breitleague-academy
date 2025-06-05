@@ -27,7 +27,8 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user->pos->users;
+        //Récupérer tous les pos de chaque user, et l'ajouter dans l'objet json retourné
+        $user->pos;
         //$test = User::find(1);
         //die($test->pos_id);
 
