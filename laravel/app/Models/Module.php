@@ -16,7 +16,7 @@ class Module extends Model
 
     public function lessons()
     {
-        return $this->hasMany(Lesson::class); // si tu as une relation de ce type plus tard
+        return $this->hasMany(Lesson::class);
     }
 
     public function checkpoints()
