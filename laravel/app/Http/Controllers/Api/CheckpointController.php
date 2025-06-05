@@ -15,7 +15,7 @@ class CheckpointController extends Controller
      */
     public function index()
     {
-        $checkpoint = Checkpoint::get();
+        $checkpoint = Checkpoint::with('questions')->get();
         if ($checkpoint->count() > 0) {
             return CheckpointResource::collection($checkpoint);
         } else {
@@ -24,23 +24,24 @@ class CheckpointController extends Controller
     }
     public function show(Checkpoint $checkpoint)
     {
+        $checkpoint->questions;
         return new CheckpointResource($checkpoint);
     }
-    public function store(Request $request)
+    public function store()
     {
         return response()->json([
             'message' => 'Creating checkpoints is not allowed on this endpoint.'
         ], 405);
     }
 
-    public function update(Request $request, Checkpoint $checkpoint)
+    public function update()
     {
         return response()->json([
             'message' => 'Updating checkpoints is not allowed on this endpoint.'
         ], 405);
     }
 
-    public function destroy(Checkpoint $checkpoint)
+    public function destroy()
     {
         return response()->json([
             'message' => 'Deleting checkpoints is not allowed on this endpoint.'
