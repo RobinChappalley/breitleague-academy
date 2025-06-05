@@ -7,17 +7,17 @@
         "size": "41 mm",
         "colors": ["Silver Opalin", "Bronze"],
         "bracelet": "22/20mm",
-        "description": "The Breitling Top Time Limited Edition is a modern reinterpretation of an iconic 1960s chronograph..."
+        "description": "The Breitling Top Time Limited Edition is a modern reinterpretation of an iconic 1960s chronograph, nicknamed the \"Zorro\" for its bold dial design. Limited to 2,000 pieces, it combines retro styling, COSC-certified performance, and digital innovation with a blockchain-backed passport guaranteeing authenticity."
     },
     {
         "id": 2,
         "photo_name": "rewards_photo/NOVELTIES_Q4_23.png",
-        "model": "Breitling - Navitimer Automatic 36",
+        "model": "Navitimer Automatic 36",
         "date": "2022",
         "size": "36mm",
         "colors": ["white mother-of-pearl"],
         "bracelet": "18/16mm",
-        "description": "The Breitling Navitimer Automatic 36 blends the iconic pilot's watch heritage with a refined..."
+        "description": "The Breitling Navitimer Automatic 36 blends the iconic pilot's watch heritage with a refined, compact design. Crafted in stainless steel and 18K red gold, it features a white mother-of-pearl dial, diamond indexes and the signature slide rule bezel, offering elegance and functionality for everyday journeys. This model is available with two strap options: a two-tone stainless steel and 18K red gold metal bracelet or a classic brown alligator leather strap, giving owners versatile style choices."
     },
     {
         "id": 3,
@@ -27,17 +27,17 @@
         "size": "41mm",
         "colors": ["White lacquered with sky-blue subdials"],
         "bracelet": "20/18mm",
-        "description": "The Breitling Top Time Chronograph Deus Limited Edition celebrates vintage racing spirit..."
+        "description": "The Breitling Top Time Chronograph Deus Limited Edition celebrates vintage racing spirit with a bold, adventurous design. Crafted in stainless steel, it features a white lacquered dial with sky-blue subdials, orange accents, and a red lightning bolt chronograph hand, capturing the energy of the open road. This model comes with a brown racing-themed calfskin leather strap, combining rugged style and comfort for both watch enthusiasts and motorcycle culture lovers."
     },
     {
         "id": 4,
-        "photo_name": "rewards_photo/NOVELTIES_1_2024_17.png",
+        "photo_name": "/storage/rewards_photo/NOVELTIES_1_2024_17.png",
         "model": "Chronomat B01 42 Triumph",
         "date": "2021",
         "size": "41mm",
         "colors": ["Anthracite grey (with black subdials)"],
         "bracelet": "22/20mm",
-        "description": "The Breitling Top Time Chronograph Deus Limited Edition channels the vintage spirit of the 1960s..."
+        "description": "The Breitling Top Time Chronograph Deus Limited Edition channels the vintage spirit of the 1960s with bold design and adventure-driven details. Crafted in stainless steel, it features a white lacquered dial with yellow and orange accents, squircle-shaped subdials, and a red lightning-bolt chronograph hand, celebrating the freedom of the open road. This limited-edition model is paired with a brown racing-themed calfskin leather strap, offering a rugged yet stylish look for bikers, boarders, and explorers alike."
     },
     {
         "id": 5,
@@ -47,7 +47,7 @@
         "size": "41mm",
         "colors": ["Full blue dial"],
         "bracelet": "22/18 mm",
-        "description": "The Breitling Classic AVI 1953 Edition is a luxurious reinterpretation of the iconic Co-Pilot Ref. 765 AVI..."
+        "description": "The Breitling Classic AVI 1953 Edition is a luxurious reinterpretation of the iconic Co-Pilot Ref. 765 AVI, combining vintage charm with modern craftsmanship. Crafted in platinum, it features a full blue dial with ton-sur-ton chronograph counters, luminescent vintage-style numerals, and a domed hesalite crystal. This limited-edition model comes with a golden brown calfskin leather strap and an 18K white gold pin buckle, offering timeless elegance for collectors and aviation enthusiasts alike."
     },
     {
         "id": 6,
@@ -57,7 +57,7 @@
         "size": "41mm",
         "colors": ["Full black dial"],
         "bracelet": "22/18mm",
-        "description": "The Breitling AVI Ref. 765 1953 Re-Edition is a faithful tribute to the legendary Co-Pilot..."
+        "description": "The Breitling AVI Ref. 765 1953 Re-Edition is a faithful tribute to the legendary Co-Pilot, capturing vintage charm with precise modern craftsmanship. Crafted in stainless steel, it features a full black dial with tone-on-tone chronograph counters, vintage-style luminescent numerals, and a domed hesalite crystal. This limited-edition model comes with a black vintage-style calfskin leather strap and a stainless steel pin buckle, offering timeless appeal for aviation enthusiasts and collectors alike."
     },
     {
         "id": 7,
@@ -67,7 +67,7 @@
         "size": "42mm",
         "colors": ["Anthracite"],
         "bracelet": "22/20mm",
-        "description": "The Breitling Chronomat B01 42 blends bold design with exceptional performance..."
+        "description": "The Breitling Chronomat B01 42 blends bold design with exceptional performance, celebrating the brand's mechanical chronograph heritage. Crafted in 18K red gold, it features an anthracite dial with the iconic four-rider bezel and a robust 200 m water resistance, powered by the in-house Breitling 01 chronometer-certified movement. This model comes with either a sleek black rubber rouleaux strap or a luxurious 18K red gold metal bracelet, offering owners versatile options for style and functionality on any adventure."
     },
     {
         "id": 8,
@@ -77,7 +77,7 @@
         "size": "45mm",
         "colors": ["Dynamic silver"],
         "bracelet": "24/20mm",
-        "description": "The Breitling Navitimer B03 Chronograph Rattrapante 45 showcases one of watchmaking's most sophisticated complications..."
+        "description": "The Breitling Navitimer B03 Chronograph Rattrapante 45 showcases one of watchmaking's most sophisticated complications — the split-seconds chronograph. Crafted in stainless steel, it features a striking silver dial, dual superimposed chronograph hands, and the signature Navitimer slide rule bezel, combining technical mastery with iconic design. This model is available with a black alligator leather strap or a stainless steel bracelet, offering both elegance and versatility for aviation enthusiasts and collectors."
     },
     {
         "id": 9,
@@ -87,16 +87,126 @@
         "size": "42mm",
         "colors": ["Blue"],
         "bracelet": "22/20mm",
-        "description": "The Breitling Chronomat B01 42 Frecce Tricolori is a tribute to the iconic 1983 chronograph created for the famed Italian aerial squadron..."
+        "description": "The Breitling Chronomat B01 42 Frecce Tricolori is a tribute to the iconic 1983 chronograph created for the famed Italian aerial squadron. Crafted in stainless steel, it features a striking blue dial with the squadron's logo, the signature four-rider bezel, and a robust 200 m water resistance, powered by the in-house Breitling 01 chronometer-certified movement. This limited-edition model (250 pieces) comes with a stainless steel rouleaux bracelet or optional rubber strap, offering bold design and aviation heritage for passionate collectors."
     },
     {
         "id": 10,
         "photo_name": "rewards_photo/NAVITIMERAUTO_I1_CHOICE_1.png",
-        "model": "Breitling Superocean Automatic 44 Outerknown",
+        "model": "Superocean Automatic 44 Outerknown",
         "date": "2019",
         "size": "44mm",
         "colors": ["Matte green"],
         "bracelet": "22mm",
-        "description": "The Breitling Superocean Automatic 44 Outerknown is a bold, eco-conscious dive watch co-designed with Kelly Slater's surfwear brand..."
+        "description": "The Breitling Superocean Automatic 44 Outerknown is a bold, eco-conscious dive watch co-designed with Kelly Slater's surfwear brand. Crafted in stainless steel, it features a matte green dial and a durable khaki green ECONYL® yarn strap, made from repurposed ocean nylon waste. With its impressive 1,000 m water resistance and sporty design, this watch is built for adventures both in the deep sea and along the shore, reflecting a commitment to sustainability and performance."
+    },
+    {
+        "id": 11,
+        "photo_name": "rewards_photo/NOVELTIES_1_2024_01.png",
+        "model": "Superocean 46 Titanium",
+        "date": "2022",
+        "size": "46mm",
+        "colors": ["Grey camouflage"],
+        "bracelet": "24mm",
+        "description": "The Breitling Superocean Automatic 46 Titanium is a bold, ultra-durable diver's watch designed for extreme adventures. Crafted in lightweight brushed and polished titanium, it features a distinctive grey camouflage dial with luminous markers and a striking yellow-tipped seconds hand, ensuring visibility in all conditions. This model comes with a robust black rubber strap and is powered by the Breitling Calibre 10 automatic movement, offering a 42-hour power reserve, combining cutting-edge performance with rugged, modern style."
+    },
+    {
+        "id": 12,
+        "photo_name": "rewards_photo/NOVELTIES_02_2024_23_CHOICE_1.png",
+        "model": "Super Chronomat B19 44 Perpetual Calendar 140th Anniversary",
+        "date": "2024",
+        "size": "44mm",
+        "colors": ["black with gold-tone accents"],
+        "bracelet": "22/20mm",
+        "description": "The Breitling Super Chronomat B19 44 Perpetual Calendar 140th Anniversary is a bold celebration of craftsmanship, combining a striking skeletonized dial, perpetual calendar, moonphase, and chronograph in a robust 18K red gold case. With a 44 mm diameter and black rubber strap, it blends luxurious materials with technical mastery, offering precision and style for collectors and watch enthusiasts alike."
+    },
+    {
+        "id": 13,
+        "photo_name": "rewards_photo/NOVELTIES_1_2024_27_CHOICE_1.png",
+        "model": "Chronomat Automatic GMT 40 Giannis Antetokounmpo",
+        "date": "Limited Edition released in 2024",
+        "size": "40mm",
+        "colors": ["Green dial"],
+        "bracelet": "20/18mm",
+        "description": "The Breitling Chronomat Automatic GMT 40 Giannis Antetokounmpo Limited Edition combines timeless Swiss craftsmanship with the bold, casual style of basketball star Giannis Antetokounmpo. Limited to 1750 pieces, it features a 40 mm stainless steel case, striking green tones selected by Giannis, and the iconic rouleaux bracelet, offering dual time zone functionality and a 42-hour power reserve, perfect for those who value power, precision, and performance."
+    },
+    {
+        "id": 14,
+        "photo_name": "rewards_photo/NOVELTIES_Q1_2023_6_CHOICE_2.png",
+        "model": "Chronomat Automatic 36",
+        "date": "2024",
+        "size": "36mm",
+        "colors": ["Ice-blue"],
+        "bracelet": "18/16mm",
+        "description": "The Breitling Chronomat Automatic 36 is a refined, versatile sport-chic watch designed for any occasion. Crafted in stainless steel and 18K white gold, it features a shimmering gem-set bezel, a striking ice-blue dial, and a sleek black rubber strap. Powered by the COSC-certified Breitling Caliber 10 with a 42-hour power reserve, this elegant 36 mm timepiece blends timeless craftsmanship with modern sophistication."
+    },
+    {
+        "id": 15,
+        "photo_name": "rewards_photo/NOVELTIES_Q2_2023_9_CHOICE_6.png",
+        "model": "Navitimer Automatic 41",
+        "date": "2022",
+        "size": "41mm",
+        "colors": ["Black", "anthracite", "blue", "silver"],
+        "bracelet": "22/20mm",
+        "description": "The Breitling Navitimer Automatic 41 blends historic charm with modern sophistication, offering a 41 mm stainless steel case paired with a distinctive beaded bezel and a choice of elegant black, anthracite, blue, or silver dials. Powered by the COSC-certified Breitling Caliber 17, this timepiece delivers reliable precision and is available with a classic black alligator leather strap or a matching metal bracelet, making it a refined companion for every occasion."
+    },
+    {
+        "id": 16,
+        "photo_name": "rewards_photo/NOVELTIES_Q3_2023_3.png",
+        "model": "Avenger B01 Chronograph 44 Night Mission",
+        "date": "2023",
+        "size": "44mm",
+        "colors": ["Bright yellow"],
+        "bracelet": "22/20mm",
+        "description": "The Breitling Avenger B01 Chronograph 44 Night Mission is a bold and high-performance timepiece inspired by modern aviation. Crafted in black ceramic, it features a striking yellow dial with black chronograph counters, luminescent markers, and a robust unidirectional ratcheted bezel. This model offers two strap options: a yellow military calfskin leather strap or an anthracite military calfskin strap, both paired with a titanium folding clasp for maximum durability and adventure-ready style."
+    },
+    {
+        "id": 17,
+        "photo_name": "rewards_photo/NOVELTIES_Q4_2023_5_CHOICE_1.png",
+        "model": "Top Time B21 Chevrolet Corvette",
+        "date": "2023",
+        "size": "44mm",
+        "colors": ["Wood-pattern brown"],
+        "bracelet": "22/18mm",
+        "description": "The Breitling Top Time B21 Chevrolet Corvette is a daring tribute to the legendary 1960s Sting Ray, blending motorsport heritage with high horology. Crafted in black ceramic, it features a distinctive wood-pattern dial inspired by the Corvette's classic steering wheel, contrasted squircle subdials, and a visible tourbillon under sapphire crystal. This exclusive model comes with a brown perforated racing-style calfskin leather strap and a titanium folding clasp, delivering a bold fusion of automotive spirit and Swiss watchmaking mastery."
+    },
+    {
+        "id": 18,
+        "photo_name": "rewards_photo/NOVELTIES_Q4_2022_37_CHOICE_4.png",
+        "model": "Top Time Deus",
+        "date": "2022",
+        "size": "41mm",
+        "colors": ["Cream with light blue squircle subdials"],
+        "bracelet": "20/18mm",
+        "description": "The Breitling Top Time Deus is a bold, retro-inspired chronograph celebrating the spirit of adventure and freedom. Crafted in stainless steel, it features a cream dial with light blue squircle subdials, yellow and orange accents, and a lightning-bolt chronograph hand, paired with a brown racing-themed calfskin leather strap. This limited-edition timepiece (only 2000 pieces) combines vintage design with modern craftsmanship, powered by the COSC-certified Breitling Caliber 23 for reliable performance on every journey."
+    },
+    {
+        "id": 19,
+        "photo_name": "rewards_photo/NOVELTIES_Q4_2023_6_CHOICE_3.png",
+        "model": "Top Time B21 Ford Mustang",
+        "date": "2023",
+        "size": "43mm",
+        "colors": ["Green"],
+        "bracelet": "22/18mm",
+        "description": "The Breitling Top Time B21 Ford Mustang blends vintage automotive flair with Swiss watchmaking excellence. Crafted in bronze and titanium, it showcases a striking green dial with contrasting squircle subdials and a tachymeter scale, evoking the spirit of the iconic 1960s Mustang. This model is paired with a brown perforated racing-style calfskin leather strap and powered by the exceptional B21 Chronograph Tourbillon movement from La Joux-Perret, delivering precision and bold character for collectors and enthusiasts alike."
+    },
+    {
+        "id": 20,
+        "photo_name": "rewards_photo/NOVELTIES_Q4_2023_23_CHOICE_3.png",
+        "model": "Superocean Heritage '57 Pastel Paradise",
+        "date": "2023",
+        "size": "38mm",
+        "colors": ["Aquamarine"],
+        "bracelet": "18/16mm",
+        "description": "The Breitling Superocean Heritage '57 Pastel Paradise is a vibrant reinterpretation of the iconic 1957 SuperOcean, blending vintage charm with playful modern style. Featuring a 38 mm stainless steel case, aquamarine dial, and matching ceramic bezel, it's paired with an aquamarine Saffiano calfskin leather strap for a fresh, summery vibe. This capsule collection offers a carefree, confident aesthetic inspired by retro seaside glamour, while the COSC-certified Breitling Caliber 10 ensures reliable performance and precision. Perfect for those who want both color and substance on their wrist."
+    },
+    {
+        "id": 21,
+        "photo_name": "rewards_photo/NOVELTIES_Q5_2022_4_CHOICE_2.png",
+        "model": "Navitimer B01 Chronograph 43 Pan Am Edition",
+        "date": "2019",
+        "size": "43mm",
+        "colors": ["Blue with silver subdials"],
+        "bracelet": "22/20mm",
+        "description": "The Breitling Navitimer B01 Chronograph 43 Pan Am Edition pays tribute to one of the most iconic names in aviation history. Crafted in stainless steel, it features a vivid blue dial with contrasting silver subdials, complemented by the choice of a vintage-style brown calfskin leather strap or a sleek stainless-steel bracelet. Powered by the in-house Breitling 01 chronometer-certified movement, it offers a 70-hour power reserve and showcases the legendary Pan Am logo on the transparent sapphire caseback, celebrating the golden age of air travel with timeless style and precision."
     }
 ]
