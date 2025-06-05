@@ -150,7 +150,7 @@ onUnmounted(() => {
 }
 
 /* Mobile standard (<768px) → barre fixée en bas */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .navigation-menu {
     position: fixed;
     bottom: 0;

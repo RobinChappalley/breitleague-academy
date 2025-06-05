@@ -1,29 +1,30 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
-import RankingView from './views/rankings/RankingView.vue'
 import NavigationMenue from './components/NavigationMenue.vue'
-import LessonsListView from './views/learning/LessonsListView.vue'
-import LearningFlowView from './views/learning/LearningFlowView.vue'
-import HistoireView from './views/learning/HistoireView.vue'
-import BattleView from './views/battle/BattleView.vue'
-import ProfileView from './views/profile/ProfileView.vue'
-import MissionView from './views/missions/MissionsView.vue'
+import { computed } from 'vue'
+import {useRoute} from "vue-router";
+const route = useRoute()
+
+const showNavbar = computed(() => {
+  // Par défaut affichée, sauf si meta.hideNavbar == true
+  return !route.meta.hideNavBar
+})
+
 </script>
 
 
 
 
 <template>
-  <router-view></router-view>
   <div id="app-layout">
+    <router-view></router-view>
+
     <div class="main-content">
       <main>
 
       </main>
 
       <footer>
-        <NavigationMenue />
+        <NavigationMenue v-if="showNavbar" />
       </footer>
     </div>
   </div>

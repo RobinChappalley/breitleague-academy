@@ -22,7 +22,7 @@ cp laravel/.env.docker.example laravel/.env.docker
 4. Run the following command to build and start the containers:
 
 ```bash
-docker-compose up -d
+docker-compose up --build
 ```
 
 This will start three containers:

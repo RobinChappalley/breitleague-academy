@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
+use App\Models\Pos;
 use App\Models\User;
 
 class UserController extends Controller
@@ -26,6 +27,13 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
+        $user->pos->users;
+        //$test = User::find(1);
+        //die($test->pos_id);
+
+        //$test->pos;
+        //return $user;
+
         return new UserResource($user);
     }
     public function update(Request $request, User $user)

@@ -1,5 +1,10 @@
 <template>
   <div class="lessons-page">
+    <button class="back-arrow" @click="goBack" aria-label="Go back">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+        <path d="M15 19l-7-7 7-7" stroke="#F7C72C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
     <!-- Main Content -->
     <div class="lessons-content">
       <div class="lessons-container">
@@ -91,9 +96,16 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+const goBack = () => {
+  router.back()
+}
 // Methods
 const openLesson = (lessonId) => {
   console.log(`Opening lesson: ${lessonId}`)
+  router.push(`/ressources/history`)
   // Ici tu pourras ajouter la navigation vers la leçon spécifique
 }
 
@@ -203,6 +215,37 @@ console.log('LessonsListView component loaded')
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+/* DESKTOP (768px et plus) */
+@media (min-width: 768px) {
+  .lessons-page {
+    width: 100% ;
+    padding: 0;
+  }
+  
+  .lessons-content {
+    padding: 2.5rem 2rem;
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+  }
+}
+
+/* LARGE DESKTOP (1024px et plus) */
+@media (min-width: 1024px) {
+  .lessons-page {
+    width: 100% ;
+  }
+  
+  .lessons-content {
+    padding: 3.5rem 4rem;
+  }
+  
+  .section-title {
+    font-size: 3rem;
+  }
+}
+
 /* RESPONSIVE - LARGE DESKTOP */
 @media (min-width: 1400px) {
   .lessons-content {
@@ -276,6 +319,12 @@ console.log('LessonsListView component loaded')
 
 /* RESPONSIVE - MOBILE */
 @media (max-width: 767px) {
+  .lessons-page {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: 80px; /* Navbar mobile */
+  }
+  
   .lessons-content {
     padding: 1.5rem 1rem;
   }
@@ -309,6 +358,28 @@ console.log('LessonsListView component loaded')
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
     width: 100%;
+  }
+}
+.back-arrow {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 20;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 50%;
+  transition: background 0.18s, box-shadow 0.18s;
+}
+.back-arrow:hover {
+  background: rgba(247, 199, 44, 0.1);
+  box-shadow: 0 1px 4px rgba(33,40,80,0.15);
+}
+@media (max-width: 767px) {
+  .back-arrow {
+    top: 1rem;
+    left: 1rem;
   }
 }
 </style>

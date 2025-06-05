@@ -1,6 +1,12 @@
 <template>
   <div class="missions-page">
     <div class="main-content">
+      <!-- Back Arrow -->
+      <button class="back-arrow" @click="goBack" aria-label="Go back">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+          <path d="M15 19l-7-7 7-7" stroke="#F7C72C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
       <!-- Header -->
       <div class="missions-header">
         <h1 class="missions-title">MISSIONS</h1>
@@ -48,6 +54,12 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+const goBack = () => {
+  router.back()
+}
 
 const missions = ref([
   {
@@ -265,13 +277,6 @@ const claimReward = (mission) => {
   transition: all 0.3s ease;
 }
 
-.reward-button.locked .reward-watch {
-  /* Pas de style spécifique */
-}
-
-.reward-button.claimable .reward-watch {
-  /* Pas de style spécifique */
-}
 
 .watch-icon {
   font-size: 2.5rem;
@@ -317,8 +322,7 @@ const claimReward = (mission) => {
 /* DESKTOP (768px et plus) */
 @media (min-width: 768px) {
   .missions-page {
-    margin-left: 280px; /* Espace pour navbar desktop */
-    width: calc(100% - 280px);
+    width: 100%;
     padding: 2rem;
     padding-bottom: 2rem;
   }
@@ -373,7 +377,6 @@ const claimReward = (mission) => {
   .reward-watch {
     width: 90px;
     height: 90px;
-    border-width: 4px;
   }
   
   .watch-icon {
@@ -388,6 +391,7 @@ const claimReward = (mission) => {
 /* LARGE DESKTOP (1024px et plus) */
 @media (min-width: 1024px) {
   .missions-page {
+    width: 100%;
     padding: 3rem;
   }
   
@@ -433,7 +437,7 @@ const claimReward = (mission) => {
     margin-left: 0;
     width: 100%;
     padding: 1rem;
-    padding-bottom: 100px;
+    padding-bottom: 80px; /* Espace pour navbar mobile (70px + marge) */
   }
   
   .missions-title {
@@ -446,24 +450,24 @@ const claimReward = (mission) => {
   }
   
   .mission-content {
-    flex-direction: row; /* Changé de column à row */
+    flex-direction: row;
     align-items: center;
     gap: 1rem;
-    text-align: left; /* Changé de center à left */
+    text-align: left;
   }
   
   .mission-info {
-    flex: 1; /* Prend tout l'espace disponible */
+    flex: 1;
     order: 1;
   }
   
   .reward-button {
-    order: 2; /* Bouton à droite */
+    order: 2;
     align-self: center;
     padding: 0.8rem 1.2rem;
     min-width: 100px;
     gap: 0.6rem;
-    flex-shrink: 0; /* Empêche le bouton de rétrécir */
+    flex-shrink: 0;
   }
   
   .mission-title {
@@ -482,7 +486,6 @@ const claimReward = (mission) => {
   .reward-watch {
     width: 60px;
     height: 60px;
-    border-width: 2px;
   }
   
   .watch-icon {
@@ -513,4 +516,28 @@ const claimReward = (mission) => {
     font-size: 0.8rem;
   }
 }
+
+.back-arrow {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 20;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 50%;
+  transition: background 0.18s, box-shadow 0.18s;
+}
+.back-arrow:hover {
+  background: rgba(247, 199, 44, 0.1);
+  box-shadow: 0 1px 4px rgba(33,40,80,0.15);
+}
+@media (max-width: 767px) {
+  .back-arrow {
+    top: 1rem;
+    left: 1rem;
+  }
+}
+
 </style>
