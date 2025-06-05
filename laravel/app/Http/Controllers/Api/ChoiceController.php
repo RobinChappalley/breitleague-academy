@@ -28,7 +28,7 @@ class ChoiceController extends Controller
     {
         return new ChoiceResource($choice);
     }
-    public function store(Request $request)
+    public function store()
     {
         return response()->json([
             'message' => 'Creating choices is not allowed on this endpoint.'
@@ -42,7 +42,7 @@ class ChoiceController extends Controller
         ], 405);
     }
 
-    public function destroy(Choice $choice)
+    public function destroy()
     {
         return response()->json([
             'message' => 'Deleting choices is not allowed on this endpoint.'

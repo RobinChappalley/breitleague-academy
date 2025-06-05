@@ -44,7 +44,7 @@ class User extends Authenticatable
         //$pos = Pos::find($this->pos_id);
         //$this->pos = $pos;
         //return $this;
-        return $this->belongsTo(Pos::class, 'pos_id'); //mettre en minuscule ? (!)/05.06.25
+        return $this->belongsTo(Pos::class, 'pos_id');
     }
 
 

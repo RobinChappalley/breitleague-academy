@@ -15,9 +15,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::get();
-        if ($user->count() > 0) {
-            return UserResource::collection($user);
+        $users = User::with('pos')->get();
+
+        if ($users->count() > 0) {
+            return UserResource::collection($users);
         } else {
             return response()->json(['message' => 'No users'], 200);
         }
