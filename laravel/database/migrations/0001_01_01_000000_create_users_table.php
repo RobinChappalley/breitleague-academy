@@ -15,7 +15,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 
-            $table->unsignedBigInteger('POS_id')->nullable();
+            $table->unsignedBigInteger('pos_id')->nullable();
             $table->integer('signup_year')->nullable();
             $table->string('avatar')->nullable();
             $table->integer('elo_score')->default(0);
