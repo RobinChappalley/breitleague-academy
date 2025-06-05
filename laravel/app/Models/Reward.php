@@ -21,9 +21,4 @@ class Reward extends Model
     {
         return $this->hasMany(Mission::class);
     }
-
-    public function userRewards(): HasMany
-    {
-        return $this->hasMany(UserReward::class);
-    }
 }

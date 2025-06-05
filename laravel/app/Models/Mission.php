@@ -21,10 +21,6 @@ class Mission extends Model
             ->withTimestamps();
     }
 
-    public function userMissions()
-    {
-        return $this->hasMany(UserMission::class);
-    }
 
     public function reward()
     {
