@@ -43,7 +43,7 @@ class QuestionController extends Controller
         ], 405);
     }
 
-    public function destroy(Question $question)
+    public function destroy()
     {
         return response()->json([
             'message' => 'Deleting questions is not allowed on this endpoint.'
