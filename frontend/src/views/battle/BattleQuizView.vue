@@ -61,57 +61,6 @@
         </button>
       </div>
     </div>
-
-    <!-- Battle Complete Modal -->
-    <div class="modal-overlay" v-if="showResults" @click="closeResults">
-      <div class="results-modal" @click.stop>
-        <button class="close-btn" @click="closeResults">✕</button>
-        
-        <div class="results-header">
-          <h2>Battle Complete!</h2>
-        </div>
-
-        <div class="results-comparison">
-          <div class="player-result">
-            <div class="avatar" :style="getAvatarStyle(currentPlayer)">
-              {{ currentPlayer.avatar }}
-            </div>
-            <h3>{{ currentPlayer.name }}</h3>
-            <div class="score">{{ playerScore }}/{{ totalQuestions }}</div>
-            <div class="time">{{ playerTime }}s</div>
-          </div>
-
-          <div class="vs">VS</div>
-
-          <div class="opponent-result">
-            <div class="avatar" :style="getAvatarStyle(opponent)">
-              {{ opponent.avatar }}
-            </div>
-            <h3>{{ opponent.name }}</h3>
-            <div class="score">{{ opponentScore }}/{{ totalQuestions }}</div>
-            <div class="time">{{ opponentTime }}s</div>
-          </div>
-        </div>
-
-        <div class="winner-announcement" :class="winnerClass">
-          {{ winnerText }}
-        </div>
-
-        <div class="points-earned">
-          <div class="points-label">Points Earned</div>
-          <div class="points-value">+{{ pointsEarned }}</div>
-        </div>
-
-        <div class="results-actions">
-          <button class="btn-rematch" @click="requestRematch">
-            Rematch
-          </button>
-          <button class="btn-return" @click="returnToBattles">
-            Return to Battles
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -121,7 +70,10 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-// Battle Data
+// Timer
+let timerInterval = null
+
+// Battle Data - données mockées simples
 const opponent = ref({
   id: 2,
   name: 'M.OVSANNA',
@@ -142,63 +94,63 @@ const totalQuestions = ref(5)
 const timeLeft = ref(30)
 const hasAnswered = ref(false)
 const selectedAnswer = ref(null)
-const showResults = ref(false)
 
 // Results
 const playerScore = ref(0)
 const opponentScore = ref(0)
 const playerTime = ref(0)
 const opponentTime = ref(0)
-const pointsEarned = ref(0)
 
-// Timer
-let timer = null
-
-// Mock Questions
+// Questions mockées
 const questions = ref([
   {
-    text: "Which Breitling collection is known for its aviation heritage?",
+    id: 1,
+    text: 'Which Breitling collection is known for its aviation heritage?',
     answers: [
-      { text: "Navitimer", correct: true },
-      { text: "Superocean", correct: false },
-      { text: "Premier", correct: false },
-      { text: "Chronomat", correct: false }
+      { text: 'Navitimer', correct: true },
+      { text: 'Superocean', correct: false },
+      { text: 'Premier', correct: false },
+      { text: 'Endurance Pro', correct: false }
     ]
   },
   {
-    text: "What year was Breitling founded?",
+    id: 2,
+    text: 'What year was Breitling founded?',
     answers: [
-      { text: "1884", correct: true },
-      { text: "1905", correct: false },
-      { text: "1892", correct: false },
-      { text: "1876", correct: false }
+      { text: '1884', correct: true },
+      { text: '1905', correct: false },
+      { text: '1860', correct: false },
+      { text: '1920', correct: false }
     ]
   },
   {
-    text: "Which movement powers the Breitling B01?",
+    id: 3,
+    text: 'Which movement powers the Breitling B01?',
     answers: [
-      { text: "In-house chronograph", correct: true },
-      { text: "ETA 2824", correct: false },
-      { text: "Sellita SW200", correct: false },
-      { text: "Valjoux 7750", correct: false }
+      { text: 'In-house chronograph', correct: true },
+      { text: 'ETA 2824', correct: false },
+      { text: 'Sellita SW200', correct: false },
+      { text: 'Valjoux 7750', correct: false }
     ]
   },
   {
-    text: "What is the water resistance of the Superocean?",
+    id: 4,
+    text: 'What is the water resistance of the Superocean?',
     answers: [
-      { text: "200m", correct: false },
-      { text: "300m", correct: false },
-      { text: "500m", correct: true },
-      { text: "1000m", correct: false }
+      { text: '200m', correct: false },
+      { text: '300m', correct: false },
+      { text: '500m', correct: true },
+      { text: '1000m', correct: false }
     ]
   },
   {
-    text: "Which Breitling watch was worn by astronauts?",
+    id: 5,
+    text: 'Which Breitling watch was worn by astronauts?',
     answers: [
-      { text: "Cosmonaute", correct: true },
-      { text: "Navitimer", correct: false },
-      { text: "Chronomat", correct: false },
-      { text: "Premier", correct: false }
+      { text: 'Cosmonaute', correct: true },
+      { text: 'Navitimer', correct: false },
+      { text: 'Chronomat', correct: false },
+      { text: 'Premier', correct: false }
     ]
   }
 ])
@@ -207,33 +159,22 @@ const questions = ref([
 const currentQuestion = computed(() => questions.value[currentQuestionIndex.value])
 const progressPercentage = computed(() => (currentQuestionIndex.value / totalQuestions.value) * 100)
 
-const winnerClass = computed(() => {
-  if (playerScore.value > opponentScore.value) return 'winner'
-  if (playerScore.value < opponentScore.value) return 'loser'
-  return 'tie'
-})
-
-const winnerText = computed(() => {
-  if (playerScore.value > opponentScore.value) return 'You Win! 🎉'
-  if (playerScore.value < opponentScore.value) return 'You Lose 😔'
-  return 'It\'s a Tie! 🤝'
-})
-
 // Methods
 const startTimer = () => {
-  timeLeft.value = 30
-  timer = setInterval(() => {
-    timeLeft.value--
-    if (timeLeft.value <= 0) {
-      autoAnswer()
+  timerInterval = setInterval(() => {
+    if (timeLeft.value > 0) {
+      timeLeft.value--
+    } else {
+      // Temps écoulé, passer à la question suivante
+      nextQuestion()
     }
   }, 1000)
 }
 
 const stopTimer = () => {
-  if (timer) {
-    clearInterval(timer)
-    timer = null
+  if (timerInterval) {
+    clearInterval(timerInterval)
+    timerInterval = null
   }
 }
 
@@ -244,59 +185,55 @@ const selectAnswer = (index) => {
   hasAnswered.value = true
   stopTimer()
 
-  // Add to score if correct
-  if (currentQuestion.value.answers[index].correct) {
+  // Calculer le temps pris pour répondre
+  const timeTaken = 30 - timeLeft.value
+  playerTime.value += timeTaken
+
+  // Vérifier si la réponse est correcte - CORRECTION ICI
+  const currentQuestionData = questions.value[currentQuestionIndex.value]
+  if (currentQuestionData.answers[index].correct) {
     playerScore.value++
   }
-
-  // Add time bonus
-  const timeBonus = Math.max(0, timeLeft.value)
-  playerTime.value += (30 - timeLeft.value)
-
-  // Wait 2 seconds then go to next question
-  setTimeout(() => {
-    nextQuestion()
-  }, 2000)
-}
-
-const autoAnswer = () => {
-  if (hasAnswered.value) return
   
-  hasAnswered.value = true
-  stopTimer()
-  playerTime.value += 30
-
+  // Attendre un peu avant de passer à la question suivante
   setTimeout(() => {
     nextQuestion()
-  }, 1000)
+  }, 1500)
 }
 
 const nextQuestion = () => {
   if (currentQuestionIndex.value < totalQuestions.value - 1) {
     currentQuestionIndex.value++
+    timeLeft.value = 30
     hasAnswered.value = false
     selectedAnswer.value = null
     startTimer()
   } else {
+    // Quiz terminé - rediriger directement vers BattleDetailsView
     finishBattle()
   }
 }
 
 const finishBattle = () => {
-  // Simulate opponent results
-  opponentScore.value = Math.floor(Math.random() * 6) // 0-5
-  opponentTime.value = Math.floor(Math.random() * 100) + 50 // 50-150s
-
-  // Calculate points earned
-  if (playerScore.value > opponentScore.value) {
-    pointsEarned.value = 100
-  } else if (playerScore.value === opponentScore.value) {
-    pointsEarned.value = 50
-  } else {
-    pointsEarned.value = 25
+  stopTimer()
+  
+  // Sauvegarder les résultats dans localStorage pour BattleDetailsView
+  const battleResults = {
+    battleId: Date.now(),
+    opponent: opponent.value,
+    playerScore: playerScore.value,
+    opponentScore: Math.floor(Math.random() * 5), // Score aléatoire pour l'adversaire
+    playerTime: playerTime.value,
+    opponentTime: Math.floor(Math.random() * 100) + 50, // Temps aléatoire
+    questionsData: questions.value,
+    playerAnswers: [], // À remplir avec les vraies réponses
+    opponentAnswers: [] // À remplir avec des réponses mockées
   }
-
-  showResults.value = true
+  
+  localStorage.setItem('lastBattleResults', JSON.stringify(battleResults))
+  
+  // Rediriger vers les détails
+  router.push(`/battle-details/${battleResults.battleId}`)
 }
 
 const getAnswerClass = (index) => {
@@ -326,30 +263,6 @@ const getAvatarStyle = (player) => {
   return {
     background: gradients[index]
   }
-}
-
-const closeResults = () => {
-  showResults.value = false
-  router.push('/battles')
-}
-
-const requestRematch = () => {
-  // Reset quiz state for rematch
-  currentQuestionIndex.value = 0
-  playerScore.value = 0
-  playerTime.value = 0
-  hasAnswered.value = false
-  selectedAnswer.value = null
-  showResults.value = false
-  
-  // Shuffle questions for variety
-  questions.value = [...questions.value].sort(() => Math.random() - 0.5)
-  
-  startTimer()
-}
-
-const returnToBattles = () => {
-  router.push('/battles')
 }
 
 // Lifecycle

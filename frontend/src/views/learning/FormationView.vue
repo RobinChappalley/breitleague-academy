@@ -1,15 +1,19 @@
 <template>
   <div class="formation-image-container">
     <div class="top-action-buttons">
-      <RouterLink class="action-btn" to=/ressources>Read Ressources</RouterLink>
-      <RouterLink class="action-btn" to=/missions>Missions</RouterLink>
+      <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
+      <RouterLink class="action-btn" to="/missions">Missions</RouterLink>
     </div>
+    
     <div ref="watchContainer" class="formation-watch-container">
       <img alt="watch aviators" src="/backgrounds/aviators-watch.png" class="lesson-watch"
            @load="updateContainerDimensions">
 
-      <!-- Votre bouton existant (spécial) -->
-      <button class="checkpoint-button special-button"></button>
+      <!-- Bouton spécial checkpoint -->
+      <button 
+        class="checkpoint-button special-button"
+        @click="showCheckpointModal"
+      ></button>
 
       <!-- Boutons de checkpoint avec progression individuelle -->
       <div
@@ -59,6 +63,41 @@
       </div>
     </div>
 
+    <!-- Modal Checkpoint - Affiché par-dessus -->
+    <div v-if="isCheckpointModalVisible" class="modal-overlay" @click="closeCheckpointModal">
+      <div class="checkpoint-modal" @click.stop>
+        <button class="close-btn" @click="closeCheckpointModal">✕</button>
+        
+        <div class="modal-header">
+          <h2 class="modal-title">CHECKPOINT</h2>
+          <h3 class="modal-subtitle">ONBOARDING</h3>
+        </div>
+        
+        <div class="modal-content">
+          <p class="modal-text">
+            Welcome to your checkpoint assessment. This test will evaluate your understanding 
+            of the material covered in this module. You'll need to answer {{ checkpointData.totalQuestions }} 
+            questions with a minimum score of {{ checkpointData.passScore }}% to pass.
+          </p>
+          
+          <div class="modal-rules">
+            <h4>Test Rules:</h4>
+            <ul>
+              <li>Time limit: {{ checkpointData.timeLimit }}</li>
+              <li>{{ checkpointData.totalQuestions }} multiple choice questions</li>
+              <li>Minimum {{ checkpointData.passScore }}% required to pass</li>
+              <li>You can retake the test if needed</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="modal-actions">
+          <button class="btn-start-test" @click="startCheckpointTest">
+            START TEST
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -71,14 +110,21 @@ export default {
         {id: 1, status: 'completed', progress: 100, title: 'Onboarding'},
         {id: 2, status: 'completed', progress: 100, title: 'Onboarding'},
         {id: 3, status: 'in-progress', progress: 65, title: 'Onboarding'},
-        {id: 4, status: 'in-progress', progress: 30},
-        {id: 5, status: 'not-started', progress: 0},
-        {id: 6, status: 'not-started', progress: 0},
-        {id: 7, status: 'in-progress', progress: 80},
-        // ...(new Array(7)).fill({ id: 8, status: 'not-started', progress: 0 }),
+        {id: 4, status: 'in-progress', progress: 30, title: 'Module 4'},
+        {id: 5, status: 'not-started', progress: 0, title: 'Module 5'},
+        {id: 6, status: 'not-started', progress: 0, title: 'Module 6'},
+        {id: 7, status: 'in-progress', progress: 80, title: 'Module 7'},
       ],
       containerWidth: 0,
       containerHeight: 0,
+      isCheckpointModalVisible: false,
+      checkpointData: {
+        title: 'Breitling Heritage & Foundations',
+        description: 'Test your knowledge of Breitling\'s history, founding principles, and core values that shaped the brand into what it is today.',
+        totalQuestions: 15,
+        timeLimit: '20 minutes',
+        passScore: 70
+      }
     }
   },
 
@@ -148,6 +194,21 @@ export default {
         'lesson-in-progress': status === 'in-progress',
         'lesson-not-started': status === 'not-started'
       };
+    },
+
+    // Méthodes pour le modal checkpoint
+    showCheckpointModal() {
+      this.isCheckpointModalVisible = true;
+    },
+
+    closeCheckpointModal() {
+      this.isCheckpointModalVisible = false;
+    },
+
+    // CORRIGÉ : Redirection vers le quiz
+    startCheckpointTest() {
+      this.isCheckpointModalVisible = false; // Fermer le modal
+      this.$router.push('/checkpoint-quiz'); // Aller au quiz
     },
 
     handleLessonClick(index) {
@@ -321,6 +382,190 @@ export default {
   }
   @media screen and (max-width: 767px) {
     gap: 10px
+  }
+}
+
+/* MODAL CHECKPOINT STYLES */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(5px);
+}
+
+.checkpoint-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  animation: modalSlideIn 0.3s ease-out;
+  overflow: hidden;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #F7C72C;
+  color: #072C54;
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.close-btn:hover {
+  background: #E6B625;
+  transform: scale(1.1);
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #072C54 0%, #1e3a8a 100%);
+  color: white;
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+
+.modal-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #F7C72C;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.modal-subtitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0.5rem 0 0 0;
+  text-transform: uppercase;
+}
+
+.modal-content {
+  padding: 2.5rem 2rem;
+  color: #072C54;
+}
+
+.modal-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.modal-rules {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.modal-rules h4 {
+  margin: 0 0 1rem 0;
+  color: #072C54;
+  font-weight: 600;
+}
+
+.modal-rules ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.modal-rules li {
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+.modal-actions {
+  padding: 0 2rem 2.5rem 2rem;
+  text-align: center;
+}
+
+.btn-start-test {
+  background: #F7C72C;
+  color: #072C54;
+  border: none;
+  border-radius: 15px;
+  padding: 1.2rem 3rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(247, 199, 44, 0.3);
+}
+
+.btn-start-test:hover {
+  background: #E6B625;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(247, 199, 44, 0.4);
+}
+
+/* RESPONSIVE MODAL */
+@media (max-width: 767px) {
+  .checkpoint-modal {
+    width: 95%;
+    margin: 1rem;
+  }
+  
+  .modal-content {
+    padding: 2rem 1.5rem;
+  }
+  
+  .modal-header {
+    padding: 2rem 1.5rem;
+  }
+  
+  .modal-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .modal-title {
+    font-size: 1.8rem;
+  }
+  
+  .modal-subtitle {
+    font-size: 1rem;
+  }
+  
+  .modal-text {
+    font-size: 0.9rem;
+  }
+  
+  .btn-start-test {
+    padding: 1rem 2rem;
+    font-size: 1rem;
   }
 }
 </style>

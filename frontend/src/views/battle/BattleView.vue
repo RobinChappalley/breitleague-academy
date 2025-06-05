@@ -156,6 +156,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // Modal state
 const showInvitationModal = ref(false)
@@ -240,11 +243,15 @@ const declineChallenge = (id) => {
 const handleAction = (challenge) => {
   if (challenge.status === 'play') {
     console.log('Starting battle with', challenge.name)
+    // Navigation simple vers le quiz
+    router.push('/battle-quiz')
   }
 }
 
 const viewBattle = (id) => {
   console.log('Viewing battle', id)
+  // Navigation simple vers les détails
+  router.push(`/battle-details/${id}`)
 }
 
 // Nouvelle méthode pour inviter un joueur
@@ -293,14 +300,14 @@ console.log('BattleView component loaded')
   overflow-x: hidden;
   margin: 0;
   padding: 1rem;
-  padding-bottom: 100px; /* Espace pour navbar mobile */
+  padding-bottom: 100px;
   box-sizing: border-box;
 }
 
 /* MAIN CONTENT */
 .main-content {
   width: 100%;
-  max-width: 1200px;
+  max-width: 800px; /* Plus étroit pour une liste */
   margin: 0 auto;
   padding: 0;
 }
@@ -321,18 +328,9 @@ console.log('BattleView component loaded')
   text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-.battle-subtitle {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.9);
-  margin: 1rem 0 0 0;
-  text-transform: uppercase;
-  font-weight: 500;
-  letter-spacing: 1px;
-}
-
 /* SECTIONS */
 .section {
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
 }
 
 .section-title {
@@ -345,17 +343,16 @@ console.log('BattleView component loaded')
   text-align: center;
 }
 
-/* GRIDS - Format liste pour mobile */
-.battle-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
+/* LISTES - TOUJOURS VERTICALES */
+.battle-grid,
 .invite-grid {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  width: 100%;
+}
+
+.invite-grid {
   margin-top: 1.5rem;
 }
 
@@ -365,11 +362,15 @@ console.log('BattleView component loaded')
   align-items: center;
   justify-content: space-between;
   background: rgba(255, 255, 255, 0.1);
-  padding: 1.5rem;
+  padding: 1.2rem;
   border-radius: 12px;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 80px;
+  gap: 1rem;
 }
 
 .battle-card:hover {
@@ -399,6 +400,7 @@ console.log('BattleView component loaded')
   align-items: center;
   gap: 1rem;
   flex: 1;
+  min-width: 0;
 }
 
 .avatar {
@@ -413,12 +415,15 @@ console.log('BattleView component loaded')
   font-weight: bold;
   font-size: 1.1rem;
   box-shadow: 0 4px 12px rgba(247, 199, 44, 0.3);
+  flex-shrink: 0;
 }
 
 .player-details {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.3rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .player-name {
@@ -426,6 +431,9 @@ console.log('BattleView component loaded')
   font-weight: 600;
   color: white;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .flag {
@@ -439,9 +447,10 @@ console.log('BattleView component loaded')
 .points {
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.8);
-  min-width: 70px;
   text-align: center;
   font-weight: 500;
+  white-space: nowrap;
+  margin: 0 1rem;
 }
 
 .points {
@@ -453,7 +462,8 @@ console.log('BattleView component loaded')
 .action-buttons {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
+  flex-shrink: 0;
 }
 
 .btn-action,
@@ -468,6 +478,7 @@ console.log('BattleView component loaded')
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-size: 0.8rem;
+  white-space: nowrap;
 }
 
 .btn-action.play,
@@ -500,6 +511,7 @@ console.log('BattleView component loaded')
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .btn-accept {
@@ -526,7 +538,8 @@ console.log('BattleView component loaded')
   font-size: 0.7rem;
   color: #F7C72C;
   font-weight: 600;
-  margin-left: 0.3rem;
+  margin-left: 0.5rem;
+  white-space: nowrap;
 }
 
 /* INVITE CARDS */
@@ -535,10 +548,13 @@ console.log('BattleView component loaded')
   align-items: center;
   justify-content: space-between;
   background: rgba(255, 255, 255, 0.05);
-  padding: 1.5rem;
+  padding: 1.2rem;
   border-radius: 12px;
   border: 2px dashed rgba(255, 255, 255, 0.3);
   transition: all 0.3s ease;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .invite-card:hover {
@@ -547,11 +563,11 @@ console.log('BattleView component loaded')
 }
 
 .invite-icon {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   color: #F7C72C;
 }
 
-/* INVITATION MODAL */
+/* MODAL - Reste identique */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -564,6 +580,8 @@ console.log('BattleView component loaded')
   justify-content: center;
   z-index: 2000;
   backdrop-filter: blur(5px);
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .invitation-modal {
@@ -571,23 +589,19 @@ console.log('BattleView component loaded')
   border-radius: 20px;
   padding: 2rem;
   max-width: 400px;
-  width: 90%;
+  width: 100%;
   position: relative;
   color: white;
   border: 2px solid #F7C72C;
   text-align: center;
   animation: modalSlideIn 0.3s ease-out;
+  box-sizing: border-box;
 }
 
+/* Styles modal - identiques */
 @keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-50px) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(-50px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .close-btn {
@@ -606,15 +620,8 @@ console.log('BattleView component loaded')
   transition: all 0.3s ease;
 }
 
-.close-btn:hover {
-  background: #E6B625;
-  transform: scale(1.1);
-}
-
-.modal-icon {
-  margin-bottom: 1.5rem;
-}
-
+.close-btn:hover { background: #E6B625; transform: scale(1.1); }
+.modal-icon { margin-bottom: 1.5rem; }
 .icon-circle {
   background: #4CAF50;
   border-radius: 50%;
@@ -626,25 +633,12 @@ console.log('BattleView component loaded')
   margin: 0 auto;
   animation: checkPulse 0.6s ease-out;
 }
-
 @keyframes checkPulse {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(0); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
-
-.check-icon {
-  font-size: 2.5rem;
-  color: white;
-  font-weight: bold;
-}
-
+.check-icon { font-size: 2.5rem; color: white; font-weight: bold; }
 .modal-title {
   font-size: 1.8rem;
   font-weight: 700;
@@ -653,18 +647,13 @@ console.log('BattleView component loaded')
   text-transform: uppercase;
   letter-spacing: 1px;
 }
-
 .modal-message {
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 2rem;
   line-height: 1.5;
 }
-
-.modal-details {
-  margin-bottom: 2rem;
-}
-
+.modal-details { margin-bottom: 2rem; }
 .invited-player {
   display: flex;
   align-items: center;
@@ -675,7 +664,6 @@ console.log('BattleView component loaded')
   background: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
 }
-
 .player-avatar {
   width: 50px;
   height: 50px;
@@ -688,44 +676,16 @@ console.log('BattleView component loaded')
   font-weight: bold;
   font-size: 1.2rem;
 }
-
 .invited-player .player-name {
   font-size: 1.1rem;
   font-weight: 600;
   color: white;
 }
-
-.waiting-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.8rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.9rem;
-}
-
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: #F7C72C;
-  animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .modal-actions {
   display: flex;
   gap: 1rem;
   justify-content: center;
 }
-
-.btn-cancel,
 .btn-ok {
   padding: 0.8rem 1.5rem;
   border: none;
@@ -736,187 +696,27 @@ console.log('BattleView component loaded')
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-}
-
-.btn-cancel {
-  background: rgba(244, 67, 54, 0.2);
-  color: #F44336;
-  border: 2px solid #F44336;
-}
-
-.btn-cancel:hover {
-  background: rgba(244, 67, 54, 0.3);
-  transform: translateY(-2px);
-}
-
-.btn-ok {
   background: #F7C72C;
   color: #072C54;
 }
-
 .btn-ok:hover {
   background: #E6B625;
   transform: translateY(-2px);
 }
 
-/* DESKTOP (768px et plus) */
-@media (min-width: 768px) {
-  .battle-page {
-    margin-left: 280px; /* Aligné avec navbar desktop */
-    width: calc(100% - 280px);
-    padding: 2rem;
-    padding-bottom: 2rem;
-  }
-  
-  .main-content {
-    max-width: 1000px;
-    padding: 0 2rem;
-  }
-  
-  .battle-title {
-    font-size: 3.5rem;
-    letter-spacing: 3px;
-    margin-bottom: 1rem;
-  }
-  
-  .battle-header {
-    margin-bottom: 3rem;
-  }
-  
-  .section {
-    margin-bottom: 3rem;
-  }
-  
-  .section-title {
-    font-size: 1.8rem;
-    margin-bottom: 2rem;
-  }
-  
-  .battle-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-    gap: 1.5rem;
-  }
-  
-  .invite-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
-  }
-  
-  .battle-card {
-    padding: 2rem;
-  }
-  
-  .avatar {
-    width: 55px;
-    height: 55px;
-    font-size: 1.3rem;
-  }
-  
-  .player-name {
-    font-size: 1.1rem;
-  }
-  
-  .flag {
-    font-size: 0.9rem;
-  }
-  
-  .time-left,
-  .points {
-    font-size: 1rem;
-    min-width: 80px;
-  }
-  
-  .btn-action,
-  .btn-view,
-  .btn-new {
-    padding: 0.8rem 1.5rem;
-    font-size: 0.9rem;
-  }
-  
-  .btn-accept,
-  .btn-decline {
-    width: 35px;
-    height: 35px;
-    font-size: 1rem;
-  }
-  
-  .invitation-label {
-    font-size: 0.8rem;
-  }
-}
+/* RESPONSIVE - CORRECTION POUR 768px */
 
-/* LARGE DESKTOP (1024px et plus) */
-@media (min-width: 1024px) {
-  .battle-page {
-    margin-left: 280px;
-    width: calc(100% - 280px);
-    padding: 3rem;
-  }
-  
-  .main-content {
-    max-width: 1200px;
-    padding: 0 3rem;
-  }
-  
-  .battle-title {
-    font-size: 4rem;
-  }
-  
-  .section {
-    margin-bottom: 4rem;
-  }
-  
-  .section-title {
-    font-size: 2rem;
-  }
-  
-  .battle-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-  }
-  
-  .invite-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-  }
-  
-  .battle-card {
-    padding: 2.5rem;
-  }
-  
-  .avatar {
-    width: 60px;
-    height: 60px;
-    font-size: 1.4rem;
-  }
-  
-  .player-name {
-    font-size: 1.2rem;
-  }
-  
-  .time-left,
-  .points {
-    font-size: 1.1rem;
-  }
-  
-  .btn-action,
-  .btn-view,
-  .btn-new {
-    padding: 1rem 2rem;
-    font-size: 1rem;
-  }
-}
-
-/* MOBILE (moins de 768px) */
-@media (max-width: 767px) {
+/* MOBILE (767px et moins) */
+@media (max-width: 768px) {
   .battle-page {
     margin-left: 0;
     width: 100%;
     padding: 1rem;
-    padding-bottom: 80px; /* Navbar mobile */
+    padding-bottom: 80px;
+  }
+  
+  .main-content {
+    max-width: 100%;
   }
   
   .battle-title {
@@ -929,14 +729,9 @@ console.log('BattleView component loaded')
   }
   
   .battle-card {
-    padding: 1.2rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-  
-  .player-info {
+    padding: 1rem;
+    min-height: 70px;
     gap: 0.8rem;
-    min-width: 200px;
   }
   
   .avatar {
@@ -956,14 +751,7 @@ console.log('BattleView component loaded')
   .time-left,
   .points {
     font-size: 0.8rem;
-    min-width: 60px;
-  }
-  
-  .action-buttons {
-    flex-direction: column;
-    gap: 0.3rem;
-    align-items: flex-end;
-    min-width: 80px;
+    margin: 0 0.5rem;
   }
   
   .btn-action,
@@ -983,55 +771,347 @@ console.log('BattleView component loaded')
   .invitation-label {
     font-size: 0.6rem;
   }
-  
-  .invite-card {
-    padding: 1.2rem;
-  }
 }
 
-/* TRÈS PETIT MOBILE (moins de 480px) */
-@media (max-width: 479px) {
+/* PETIT TABLET (768px à 1023px) - NOUVEAU BREAKPOINT */
+@media (min-width: 769px) and (max-width: 1023px) {
   .battle-page {
-    padding: 0.8rem;
-    padding-bottom: 80px;
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 1.5rem;
+    padding-bottom: 2rem;
+  }
+  
+  .main-content {
+    max-width: 700px;
+    padding: 0 0.5rem;
   }
   
   .battle-title {
-    font-size: 1.8rem;
+    font-size: 2.8rem;
+    letter-spacing: 2px;
+  }
+  
+  .section {
+    margin-bottom: 2.5rem;
   }
   
   .section-title {
-    font-size: 1rem;
+    font-size: 1.4rem;
+    text-align: left;
   }
   
   .battle-card {
-    padding: 1rem;
-  }
-  
-  .player-info {
-    min-width: 150px;
+    padding: 1.3rem;
+    min-height: 75px;
   }
   
   .avatar {
-    width: 35px;
-    height: 35px;
-    font-size: 0.9rem;
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
   }
   
   .player-name {
-    font-size: 0.8rem;
+    font-size: 0.95rem;
+  }
+  
+  .flag {
+    font-size: 0.75rem;
   }
   
   .time-left,
   .points {
-    font-size: 0.7rem;
+    font-size: 0.85rem;
+    margin: 0 0.8rem;
   }
   
   .btn-action,
   .btn-view,
   .btn-new {
-    padding: 0.4rem 0.8rem;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.75rem;
+  }
+  
+  .btn-accept,
+  .btn-decline {
+    width: 30px;
+    height: 30px;
+    font-size: 0.85rem;
+  }
+  
+  .invitation-label {
+    font-size: 0.65rem;
+  }
+}
+
+/* DESKTOP (1024px et plus) */
+@media (min-width: 1024px) {
+  .battle-page {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 2rem;
+    padding-bottom: 2rem;
+  }
+  
+  .main-content {
+    max-width: 900px;
+    padding: 0 1rem;
+  }
+  
+  .battle-title {
+    font-size: 3.5rem;
+    letter-spacing: 3px;
+  }
+  
+  .section {
+    margin-bottom: 3.5rem;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+    text-align: left;
+  }
+  
+  .battle-card {
+    padding: 1.5rem;
+    min-height: 85px;
+  }
+  
+  .avatar {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+  
+  .player-name {
+    font-size: 1.1rem;
+  }
+  
+  .flag {
+    font-size: 0.8rem;
+  }
+  
+  .time-left,
+  .points {
+    font-size: 1rem;
+    margin: 0 1rem;
+  }
+  
+  .btn-action,
+  .btn-view,
+  .btn-new {
+    padding: 0.7rem 1.3rem;
+    font-size: 0.8rem;
+  }
+  
+  .btn-accept,
+  .btn-decline {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+  
+  .invitation-label {
+    font-size: 0.7rem;
+  }
+}
+
+/* TRÈS PETIT MOBILE (479px et moins) - AMÉLIORÉ */
+@media (max-width: 479px) {
+  .battle-page {
+    padding: 0.5rem;
+    padding-bottom: 80px;
+  }
+  
+  .battle-title {
+    font-size: 1.6rem;
+    letter-spacing: 1px;
+  }
+  
+  .section {
+    margin-bottom: 2rem;
+  }
+  
+  .section-title {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  
+  .battle-card {
+    padding: 0.8rem;
+    min-height: 60px;
+    gap: 0.6rem;
+    /* Garder le layout horizontal mais optimisé */
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .player-info {
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+  
+  .player-details {
+    gap: 0.1rem;
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .player-name {
+    font-size: 0.75rem;
+    line-height: 1.1;
+  }
+  
+  .flag {
+    font-size: 0.55rem;
+  }
+  
+  .time-left,
+  .points {
+    font-size: 0.65rem;
+    margin: 0;
+    flex-shrink: 0;
+    min-width: 40px;
+  }
+  
+  .action-buttons {
+    gap: 0.3rem;
+    flex-shrink: 0;
+  }
+  
+  .btn-action,
+  .btn-view,
+  .btn-new {
+    padding: 0.3rem 0.6rem;
     font-size: 0.6rem;
+    border-radius: 6px;
+  }
+  
+  .btn-accept,
+  .btn-decline {
+    width: 20px;
+    height: 20px;
+    font-size: 0.6rem;
+  }
+  
+  .invitation-label {
+    font-size: 0.4rem;
+    margin-left: 0.2rem;
+  }
+  
+  /* Cards d'invitation */
+  .invite-card {
+    padding: 0.8rem;
+    gap: 0.5rem;
+  }
+  
+  .invite-icon {
+    font-size: 1rem;
+  }
+  
+  /* Modal responsive */
+  .invitation-modal {
+    padding: 1.5rem;
+    margin: 0.5rem;
+  }
+  
+  .modal-title {
+    font-size: 1.2rem;
+  }
+  
+  .modal-message {
+    font-size: 0.8rem;
+  }
+  
+  .player-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .invited-player .player-name {
+    font-size: 0.9rem;
+  }
+  
+  .btn-ok {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* ULTRA PETIT MOBILE (380px et moins) - NOUVEAU */
+@media (max-width: 380px) {
+  .battle-page {
+    padding: 0.4rem;
+  }
+  
+  .battle-title {
+    font-size: 1.4rem;
+  }
+  
+  .section-title {
+    font-size: 0.8rem;
+  }
+  
+  .battle-card {
+    padding: 0.6rem;
+    min-height: 55px;
+    gap: 0.4rem;
+  }
+  
+  .avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.7rem;
+  }
+  
+  .player-name {
+    font-size: 0.7rem;
+  }
+  
+  .flag {
+    font-size: 0.5rem;
+  }
+  
+  .time-left,
+  .points {
+    font-size: 0.6rem;
+    min-width: 35px;
+  }
+  
+  .btn-action,
+  .btn-view,
+  .btn-new {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.55rem;
+  }
+  
+  .btn-accept,
+  .btn-decline {
+    width: 18px;
+    height: 18px;
+    font-size: 0.55rem;
+  }
+  
+  .invitation-label {
+    font-size: 0.35rem;
+  }
+  
+  .invite-card {
+    padding: 0.6rem;
+  }
+  
+  .invite-icon {
+    font-size: 0.9rem;
   }
 }
 </style>
