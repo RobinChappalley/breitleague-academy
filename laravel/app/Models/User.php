@@ -56,10 +56,11 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    public function userMissions()
-    {
-        return $this->hasMany(UserMission::class);
-    }
+    //public function userMissions()
+    //{
+    //    return $this->hasMany(UserMission::class);
+    //}
+
     public function battlesAsChallenger()
     {
         return $this->hasMany(Battle::class, 'challenger_id');
