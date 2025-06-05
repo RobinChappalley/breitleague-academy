@@ -14,7 +14,7 @@ class TheoryController extends Controller
      */
     public function index()
     {
-        $theory = Theory::get();
+        $theory = Theory::with('questions.choices')->get();
         if ($theory->count() > 0) {
             return TheoryResource::collection($theory);
         } else {
@@ -26,23 +26,24 @@ class TheoryController extends Controller
      */
     public function show(Theory $theory)
     {
+        $theory->load('questions.choices');
         return new TheoryResource($theory);
     }
-    public function store(Request $request)
+    public function store()
     {
         return response()->json([
             'message' => 'Creating theories is not allowed on this endpoint.'
         ], 405);
     }
 
-    public function update(Request $request, Theory $theory)
+    public function update()
     {
         return response()->json([
             'message' => 'Updating theories is not allowed on this endpoint.'
         ], 405);
     }
 
-    public function destroy(Theory $theory)
+    public function destroy()
     {
         return response()->json([
             'message' => 'Deleting theories is not allowed on this endpoint.'

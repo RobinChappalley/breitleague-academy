@@ -19,4 +19,9 @@ class Theory extends Model
     {
         return $this->belongsTo(Lesson::class);
     }
+
+    public function questions()
+    {
+        return $this->hasMany(Question::class);
+    }
 }
