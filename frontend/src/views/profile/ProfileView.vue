@@ -220,7 +220,7 @@ onMounted(() => {
 })
 const logout = async () => {
   try {
-    await fetch('http://localhost:8000/logout', {
+    await fetch('/logout', {
       method: 'POST',
       credentials: 'include'
     })
