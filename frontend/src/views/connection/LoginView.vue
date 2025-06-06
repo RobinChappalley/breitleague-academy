@@ -18,11 +18,13 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const username = ref('')
 const password = ref('')
 const error = ref('')
 const currentUser = ref(null)
+const router = useRouter()
 
 const login = async () => {
   error.value = ''
@@ -80,6 +82,9 @@ const fetchUser = async () => {
 
     const data = await res.json()
     currentUser.value = data
+
+    // Si l'utilisateur est connecté → rediriger vers "/"
+    router.push('/')
   } catch {
     currentUser.value = null
   }
@@ -92,5 +97,6 @@ const logout = async () => {
   })
 
   currentUser.value = null
+  router.push('/login') // On revient sur la page login après déconnexion
 }
 </script>
