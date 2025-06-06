@@ -1,7 +1,7 @@
 [
     {
         "id": 1,
-        "photo_name": "rewards_photo/TTI1_CHOICE_1.png",
+        "photo_name": "img/rewards_photo/TTI1_CHOICE_1.png",
         "model": "Breitling – Top Time Limited Edition",
         "date": "2020",
         "size": "41 mm",
@@ -11,7 +11,7 @@
     },
     {
         "id": 2,
-        "photo_name": "rewards_photo/NOVELTIES_Q4_23.png",
+        "photo_name": "img/rewards_photo/NOVELTIES_Q4_23.png",
         "model": "Navitimer Automatic 36",
         "date": "2022",
         "size": "36mm",
@@ -21,7 +21,7 @@
     },
     {
         "id": 3,
-        "photo_name": "rewards_photo/NOVELTIES_Q1_2023_21_CHOICE_3.png",
+        "photo_name": "img/rewards_photo/NOVELTIES_Q1_2023_21_CHOICE_3.png",
         "model": "Top Time Deus",
         "date": "2021",
         "size": "41mm",
@@ -31,7 +31,7 @@
     },
     {
         "id": 4,
-        "photo_name": "/storage/rewards_photo/NOVELTIES_1_2024_17.png",
+        "photo_name": "/storage/img/rewards_photo/NOVELTIES_1_2024_17.png",
         "model": "Chronomat B01 42 Triumph",
         "date": "2021",
         "size": "41mm",
@@ -41,7 +41,7 @@
     },
     {
         "id": 5,
-        "photo_name": "rewards_photo/AVI_REF_765_I2_CHOICE_2.png",
+        "photo_name": "img/rewards_photo/AVI_REF_765_I2_CHOICE_2.png",
         "model": "Classic AVI 1953 Edition",
         "date": "2021",
         "size": "41mm",
@@ -51,7 +51,7 @@
     },
     {
         "id": 6,
-        "photo_name": "rewards_photo/AVI_REF_765_04.png",
+        "photo_name": "img/rewards_photo/AVI_REF_765_04.png",
         "model": "Classic AVI Ref. 765 1953 Re-Edition",
         "date": "2020",
         "size": "41mm",
@@ -61,7 +61,7 @@
     },
     {
         "id": 7,
-        "photo_name": "rewards_photo/CHRONOMAT_07.png",
+        "photo_name": "img/rewards_photo/CHRONOMAT_07.png",
         "model": "Breitling Chronomat B01 42",
         "date": "2020",
         "size": "42mm",
@@ -71,7 +71,7 @@
     },
     {
         "id": 8,
-        "photo_name": "rewards_photo/NAVITIMERAUTO_I2_CHOICE_1.png",
+        "photo_name": "img/rewards_photo/NAVITIMERAUTO_I2_CHOICE_1.png",
         "model": "Breitling Navitimer B03 Chronograph Rattrapante 45",
         "date": "2017",
         "size": "45mm",
@@ -81,7 +81,7 @@
     },
     {
         "id": 9,
-        "photo_name": "rewards_photo/CHRONOMAT_08.png",
+        "photo_name": "img/rewards_photo/CHRONOMAT_08.png",
         "model": "Chronomat B01 42 Frecce Tricolori",
         "date": "2020",
         "size": "42mm",
@@ -91,7 +91,7 @@
     },
     {
         "id": 10,
-        "photo_name": "rewards_photo/NAVITIMERAUTO_I1_CHOICE_1.png",
+        "photo_name": "img/rewards_photo/NAVITIMERAUTO_I1_CHOICE_1.png",
         "model": "Superocean Automatic 44 Outerknown",
         "date": "2019",
         "size": "44mm",
@@ -101,7 +101,7 @@
     },
     {
         "id": 11,
-        "photo_name": "rewards_photo/NOVELTIES_1_2024_01.png",
+        "photo_name": "img/rewards_photo/NOVELTIES_1_2024_01.png",
         "model": "Superocean 46 Titanium",
         "date": "2022",
         "size": "46mm",
@@ -111,7 +111,7 @@
     },
     {
         "id": 12,
-        "photo_name": "rewards_photo/NOVELTIES_02_2024_23_CHOICE_1.png",
+        "photo_name": "img/rewards_photo/NOVELTIES_02_2024_23_CHOICE_1.png",
         "model": "Super Chronomat B19 44 Perpetual Calendar 140th Anniversary",
         "date": "2024",
         "size": "44mm",
@@ -121,7 +121,7 @@
     },
     {
         "id": 13,
-        "photo_name": "rewards_photo/NOVELTIES_1_2024_27_CHOICE_1.png",
+        "photo_name": "img/rewards_photo/NOVELTIES_1_2024_27_CHOICE_1.png",
         "model": "Chronomat Automatic GMT 40 Giannis Antetokounmpo",
         "date": "2024",
         "size": "40mm",
@@ -131,7 +131,7 @@
     },
     {
         "id": 14,
-        "photo_name": "rewards_photo/NOVELTIES_Q1_2023_6_CHOICE_2.png",
+        "photo_name": "img/rewards_photo/NOVELTIES_Q1_2023_6_CHOICE_2.png",
         "model": "Chronomat Automatic 36",
         "date": "2024",
         "size": "36mm",
@@ -141,7 +141,7 @@
     },
     {
         "id": 15,
-        "photo_name": "rewards_photo/NOVELTIES_Q2_2023_9_CHOICE_6.png",
+        "photo_name": "img/rewards_photo/NOVELTIES_Q2_2023_9_CHOICE_6.png",
         "model": "Navitimer Automatic 41",
         "date": "2022",
         "size": "41mm",
@@ -151,7 +151,7 @@
     },
     {
         "id": 16,
-        "photo_name": "rewards_photo/NOVELTIES_Q3_2023_3.png",
+        "photo_name": "img/rewards_photo/NOVELTIES_Q3_2023_3.png",
         "model": "Avenger B01 Chronograph 44 Night Mission",
         "date": "2023",
         "size": "44mm",
@@ -161,7 +161,7 @@
     },
     {
         "id": 17,
-        "photo_name": "rewards_photo/NOVELTIES_Q4_2023_5_CHOICE_1.png",
+        "photo_name": "img/rewards_photo/NOVELTIES_Q4_2023_5_CHOICE_1.png",
         "model": "Top Time B21 Chevrolet Corvette",
         "date": "2023",
         "size": "44mm",
@@ -171,7 +171,7 @@
     },
     {
         "id": 18,
-        "photo_name": "rewards_photo/NOVELTIES_Q4_2022_37_CHOICE_4.png",
+        "photo_name": "img/rewards_photo/NOVELTIES_Q4_2022_37_CHOICE_4.png",
         "model": "Top Time Deus",
         "date": "2022",
         "size": "41mm",
@@ -181,7 +181,7 @@
     },
     {
         "id": 19,
-        "photo_name": "rewards_photo/NOVELTIES_Q4_2023_6_CHOICE_3.png",
+        "photo_name": "img/rewards_photo/NOVELTIES_Q4_2023_6_CHOICE_3.png",
         "model": "Top Time B21 Ford Mustang",
         "date": "2023",
         "size": "43mm",
@@ -191,7 +191,7 @@
     },
     {
         "id": 20,
-        "photo_name": "rewards_photo/NOVELTIES_Q4_2023_23_CHOICE_3.png",
+        "photo_name": "img/rewards_photo/NOVELTIES_Q4_2023_23_CHOICE_3.png",
         "model": "Superocean Heritage '57 Pastel Paradise",
         "date": "2023",
         "size": "38mm",
@@ -201,7 +201,7 @@
     },
     {
         "id": 21,
-        "photo_name": "rewards_photo/NOVELTIES_Q5_2022_4_CHOICE_2.png",
+        "photo_name": "img/rewards_photo/NOVELTIES_Q5_2022_4_CHOICE_2.png",
         "model": "Navitimer B01 Chronograph 43 Pan Am Edition",
         "date": "2019",
         "size": "43mm",
