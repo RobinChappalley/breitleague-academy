@@ -119,6 +119,10 @@
           </div>
         </div>
       </div>
+      <!-- LOGOUT BUTTON -->
+      <div style="text-align: center; margin-top: 2rem">
+        <button @click="logout" class="see-all-btn">Se déconnecter</button>
+      </div>
     </div>
   </div>
 </template>
@@ -214,6 +218,19 @@ onMounted(() => {
   console.log('🚀 ProfileView monté, chargement des données...')
   loadUserProfile()
 })
+const logout = async () => {
+  try {
+    await fetch('http://localhost:8000/logout', {
+      method: 'POST',
+      credentials: 'include'
+    })
+
+    // Redirige vers la page de login
+    router.push('/login')
+  } catch (err) {
+    console.error('❌ Erreur lors du logout:', err)
+  }
+}
 </script>
 
 <style scoped>
