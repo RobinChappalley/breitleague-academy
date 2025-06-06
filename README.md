@@ -13,7 +13,7 @@ This repository contains a Docker setup for running the Breitling Academy applic
 
 1. Clone the repository
 2. Navigate to the project directory
-3. Copy the example environment file:
+3. Copy the example environment file and the administrators for the username and password:
 
 ```bash
 cp laravel/.env.docker.example laravel/.env.docker
