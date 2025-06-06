@@ -44,8 +44,9 @@ class User extends Authenticatable
         //$pos = Pos::find($this->pos_id);
         //$this->pos = $pos;
         //return $this;
-        return $this->belongsTo(Pos::class, 'pos_id'); //mettre en minuscule ? (!)/05.06.25
+        return $this->belongsTo(Pos::class, 'pos_id');
     }
+
 
 
     public function missions()
@@ -55,10 +56,11 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    public function userMissions()
-    {
-        return $this->hasMany(UserMission::class);
-    }
+    //public function userMissions()
+    //{
+    //    return $this->hasMany(UserMission::class);
+    //}
+
     public function battlesAsChallenger()
     {
         return $this->hasMany(Battle::class, 'challenger_id');
@@ -74,9 +76,16 @@ class User extends Authenticatable
         return $this->hasOne(Progression::class);
     }
 
-    public function userRewards()
+    //public function userRewards()
+    //{
+    //    return $this->hasMany(UserReward::class);
+    //}
+
+    public function rewards()
     {
-        return $this->hasMany(UserReward::class);
+        return $this->belongsToMany(Reward::class, 'user_rewards')
+            ->withPivot('is_favourite')
+            ->withTimestamps();
     }
 
     public function favouriteRewards()

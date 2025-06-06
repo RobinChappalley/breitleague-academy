@@ -14,7 +14,7 @@ class QuestionController extends Controller
      */
     public function index()
     {
-        $question = Question::get();
+        $question = Question::with('choices')->get();
         if ($question->count() > 0) {
             return QuestionResource::collection($question);
         } else {
@@ -26,23 +26,24 @@ class QuestionController extends Controller
      */
     public function show(Question $question)
     {
+        $question->choices;
         return new QuestionResource($question);
     }
-    public function store(Request $request)
+    public function store()
     {
         return response()->json([
             'message' => 'Creating questions is not allowed on this endpoint.'
         ], 405);
     }
 
-    public function update(Request $request, Question $question)
+    public function update()
     {
         return response()->json([
             'message' => 'Updating questions is not allowed on this endpoint.'
         ], 405);
     }
 
-    public function destroy(Question $question)
+    public function destroy()
     {
         return response()->json([
             'message' => 'Deleting questions is not allowed on this endpoint.'

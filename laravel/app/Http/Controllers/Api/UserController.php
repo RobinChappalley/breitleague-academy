@@ -15,9 +15,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::get();
-        if ($user->count() > 0) {
-            return UserResource::collection($user);
+        $users = User::with('pos')->get();
+
+        if ($users->count() > 0) {
+            return UserResource::collection($users);
         } else {
             return response()->json(['message' => 'No users'], 200);
         }
@@ -27,12 +28,14 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user->pos->users;
+        //Récupérer tous les pos de chaque user, et l'ajouter dans l'objet json retourné
+        $user->pos;
         //$test = User::find(1);
         //die($test->pos_id);
 
         //$test->pos;
         //return $user;
+        $user->load('missions', 'rewards', 'battlesAsChallenger', 'battlesAsChallenged', 'progression');
 
         return new UserResource($user);
     }
@@ -61,14 +64,14 @@ class UserController extends Controller
     }
 
 
-    public function store(Request $request)
+    public function store()
     {
         return response()->json([
             'message' => 'Not allowed on this endpoint.'
         ], 405);
     }
 
-    public function destroy(User $user)
+    public function destroy()
     {
         return response()->json([
             'message' => 'Not allowed on this endpoint.'

@@ -14,7 +14,7 @@ class ModuleController extends Controller
      */
     public function index()
     {
-        $module = Module::get();
+        $module = Module::with('lessons.theories.questions.choices')->get();
         if ($module->count() > 0) {
             return moduleResource::collection($module);
         } else {
@@ -27,23 +27,24 @@ class ModuleController extends Controller
      */
     public function show(Module $module)
     {
+        $module->load('lessons.theories.questions.choices');
         return new ModuleResource($module);
     }
-    public function store(Request $request)
+    public function store()
     {
         return response()->json([
             'message' => 'Creating modules is not allowed on this endpoint.'
         ], 405);
     }
 
-    public function update(Request $request, Module $module)
+    public function update()
     {
         return response()->json([
             'message' => 'Updating modules is not allowed on this endpoint.'
         ], 405);
     }
 
-    public function destroy(Module $module)
+    public function destroy()
     {
         return response()->json([
             'message' => 'Deleting modules is not allowed on this endpoint.'

@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             RewardSeeder::class,
             MissionSeeder::class,
+            UserMissionSeeder::class,
 
 
         ]);

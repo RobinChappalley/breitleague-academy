@@ -14,7 +14,7 @@ class LessonController extends Controller
      */
     public function index()
     {
-        $lesson = Lesson::get();
+        $lesson = Lesson::with('theories.questions.choices')->get();
         if ($lesson->count() > 0) {
             return LessonResource::collection($lesson);
         } else {
@@ -26,23 +26,24 @@ class LessonController extends Controller
      */
     public function show(Lesson $lesson)
     {
+        $lesson->load('theories.questions.choices');
         return new LessonResource($lesson);
     }
-    public function store(Request $request)
+    public function store()
     {
         return response()->json([
             'message' => 'Creating lessons is not allowed on this endpoint.'
         ], 405);
     }
 
-    public function update(Request $request, Lesson $lesson)
+    public function update()
     {
         return response()->json([
             'message' => 'Updating lessons is not allowed on this endpoint.'
         ], 405);
     }
 
-    public function destroy(Lesson $lesson)
+    public function destroy()
     {
         return response()->json([
             'message' => 'Deleting lessons is not allowed on this endpoint.'
