@@ -9,21 +9,24 @@
           
 
           <div class="specs">
-            <div class="spec-item">Date : {{ selectedWatch.date }}</div>
-            <div class="spec-item">Sizes : {{ selectedWatch.size }}</div>
-            <div class="spec-item">Colors : {{ selectedWatch.colors.join(', ') }}</div>
-            <div class="spec-item">Bracelets : {{ selectedWatch.bracelet }}</div>
+           <p class="spec-item ">Date : {{ selectedWatch.date }}</p>
+           <p class="spec-item">Sizes : {{ selectedWatch.size }}</p>
+           <p class="spec-item ">
+              Colors : {{ Array.isArray(selectedWatch.colors) ? selectedWatch.colors.join(', ') : selectedWatch.colors }}
+           </p>
+           <p class="spec-item">Bracelets : {{ selectedWatch.bracelet }}</p>
           </div>
+
 
           <p class="description">{{ selectedWatch.description }}</p>
         </div>
 
         <div class="watch-image">
-          <img
-            v-if="selectedWatch.photo_name"
-            src='/images/hero/breitling-vintage-watches.jpg'
-            :alt="selectedWatch.model"
-            @load="handleImageLoad"
+          <img 
+          v-if="selectedWatch.photo_name"
+          :src="`/images/${selectedWatch.photo_name}`"
+          :alt="selectedWatch.model"
+           @load="handleImageLoad"
           >
         </div>
       </div>
@@ -80,38 +83,51 @@ export default {
     const handleImageLoad = (e) => {
       e.target.classList.add('loaded')
     }
-
-
-
-   const fetchWatches = () => {
+const fetchWatches = async () => {
   isLoading.value = true
   try {
-    watches.value = [
-      {
-        "id": 1,
-        "photo_name": "/images/hero/breitling-vintage-watches.jpg",
-        "model": "Top Time Limited Edition",
-        "date": "2020",
-        "size": "41 mm",
-        "colors": ["Silver Opalin", "Bronze"],
-        "bracelet": "22/20mm",
-        "description": "The Breitling Top Time Limited Edition is a modern reinterpretation..."
-      },
-      
-    ]
+    const response = await fetch('http://localhost:8000/api/v1/rewards')
+    const result = await response.json()
 
-    // 👉 Sélectionne automatiquement la première montre
-    if (watches.value.length > 0) {
-      selectedWatch.value = watches.value[0]
+    // Forcer un tableau même si le backend renvoie un objet avec "message"
+   if (Array.isArray(result.data)) {
+  watches.value = result.data.map(watch => ({
+  ...watch,
+  colors: Array.isArray(watch.colors)
+    ? watch.colors
+    : watch.colors?.split(',').map(c => c.trim()), // transforme "Red, Blue" en ["Red", "Blue"]
+  isFavorite: false
+}))
+
+      if (watches.value.length > 0) {
+        selectedWatch.value = watches.value[0]
+      }
+    } else {
+      // On affiche rien mais on évite les erreurs fatales
+      console.warn('Réponse inattendue :', result)
+      watches.value = []
+      selectedWatch.value = {
+        id: 0,
+        photo_name: '',
+        model: '',
+        date: '',
+        size: '',
+        colors: [],
+        bracelet: '',
+        description: ''
+      }
     }
 
   } catch (err) {
-    error.value = 'Failed to load watches'
+    error.value = 'Erreur lors du chargement'
     console.error(err)
   } finally {
     isLoading.value = false
   }
 }
+
+
+
 
 
     onMounted(() => {
@@ -131,16 +147,20 @@ export default {
 }
 </script>
 <style scoped>
-.collection-page {
+ .collection-page {
   background-color: #072C54;
   color: white;
   height: 100vh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  overflow: hidden;
-  padding-left: 280px; /* desktop */
+  padding-left: 280px;
+  padding-top: 2rem; /* ✅ empêche le débordement haut */
+  overflow-y: auto;  /* ✅ autorise le scroll vertical si nécessaire */
+  scroll-padding-top: 2rem;
 }
+
+
 
 .watch-details {
   background-color: #072C54;
@@ -151,26 +171,25 @@ export default {
   box-sizing: border-box;
   overflow: auto;
 }
-
 .watch-info {
   flex: 1;
-  padding-right: 2rem;
+  margin-top: 2rem;         /* ✅ Ajoute une marge supérieure */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* ✅ Assure que le titre reste en haut */
 }
 
+
+
 .title {
-  font-size: 2.5rem;
-  color: white;
-  margin-bottom: 3rem;
+        /* ↑ Ajoute plus d’espace au-dessus du titre */
+  margin-bottom: 3rem;     /* Espace à droite pour éviter que ça colle à l’image */
   text-transform: uppercase;
-  font-weight: 700;
 }
+
 
 .specs {
   margin-bottom: 1rem;
-  font-size: 1rem;
 }
 
 .description {
@@ -195,15 +214,22 @@ export default {
 
 .watches-grid {
   background-color: #0D4F97;
-  flex: 0 0 40vh;
+  flex: 1;
   padding: 2rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(4, 1fr); /* 4 montres max */
+  row-gap: 5rem; /* espace vertical entre les lignes */
+  column-gap: 2rem; /* espace horizontal entre les colonnes */
   box-sizing: border-box;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 40vh;
 }
+
+
+
 
 .watch-item {
   position: relative;
@@ -226,7 +252,6 @@ export default {
   position: absolute;
   top: 8px;
   right: 8px;
-  font-size: 1.4rem;
   color: #222;
   cursor: pointer;
 }
@@ -241,10 +266,17 @@ export default {
   padding: 2rem;
   color: white;
 }
+@media (min-width: 768px) {
 
+  .favorite-star {
+    font-size: 3rem; 
+  }
+
+}
 @media (max-width: 768px) {
   .collection-page {
     padding-left: 0; /* mobile */
+    padding-top: 2rem;
   }
   .watch-details {
     flex-direction: row; /* image et texte côte à côte */
@@ -261,11 +293,11 @@ export default {
   }
 
   .title {
-    font-size: 1.6rem;
-    text-align: center;
+    text-align: left;
     margin-bottom: 1rem;
+    margin-top: 2rem;
   }
-
+  
   .description {
     position: static;
     margin-top: 1rem;
@@ -293,7 +325,7 @@ export default {
 
   .watch-info {
     order: 2; /* affiche le texte APRÈS l'image */
-    padding: 0;
+    padding: 2rem;
     text-align: center;
     align-items: center;
   }
@@ -310,13 +342,11 @@ export default {
 
   .description {
     margin-top: 1rem;
-    font-size: 0.9rem;
     padding: 0 1rem;
     text-align: center;
   }
 
   .title {
-    font-size: 1.4rem;
     margin-bottom: 0.6rem;
   }
 }
