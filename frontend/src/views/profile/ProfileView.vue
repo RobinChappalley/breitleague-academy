@@ -4,31 +4,36 @@
       <div class="loading-spinner">⏳</div>
       <p>Chargement du profil...</p>
     </div>
-    
+
     <div v-else-if="error" class="error">
       <p>❌ {{ error }}</p>
       <button @click="loadUserProfile" class="retry-btn">Réessayer</button>
     </div>
-    
+
     <div v-else class="profile-content">
       <!-- Profile Header -->
       <div class="profile-header">
         <div class="profile-avatar-container">
           <div class="profile-avatar">
             <div class="avatar-placeholder">
-              <span>{{ getUserInitial() }}</span>  <!-- L'initiale au centre -->
+              <span>{{ getUserInitial() }}</span>
+              <!-- L'initiale au centre -->
             </div>
           </div>
           <!-- Badge Breitling SVG sur le bord -->
           <div v-if="user.is_BS" class="breitling-badge-avatar" title="Breitling Specialist">
-            <img src="/images/icones/breitlingspecialist_badge.svg" alt="Breitling Specialist" class="badge-image-avatar">
+            <img
+              src="/images/icones/breitlingspecialist_badge.svg"
+              alt="Breitling Specialist"
+              class="badge-image-avatar"
+            />
           </div>
         </div>
-        
+
         <div class="profile-name-container">
           <h1 class="profile-name">{{ user.username || 'Utilisateur' }}</h1>
         </div>
-        
+
         <div class="profile-info">
           <div class="country-info">
             <span class="flag">{{ user.pos?.country_flag || '🌍' }}</span>
@@ -70,8 +75,8 @@
             <button class="see-all-btn" @click="goToCollection">See all</button>
           </div>
           <div class="watches-grid">
-            <div 
-              v-for="reward in topRewards" 
+            <div
+              v-for="reward in topRewards"
               :key="reward.id"
               class="watch-item"
               :title="reward.model"
@@ -148,20 +153,31 @@ const loadUserProfile = async () => {
   try {
     isLoading.value = true
     error.value = null
-    
-    console.log('🔄 Chargement utilisateur ID 1...')
-    
-    // Charge l'utilisateur avec l'ID 1 (rafael.dupuis dans tes données)
-    const response = await userService.getUser(1)
+
+    console.log("🔄 Chargement de l'utilisateur connecté...")
+
+    // 1️⃣ Récupérer l'utilisateur connecté
+    const res = await fetch('http://localhost:8000/api/user', {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+
+    if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
+
+    const connectedUser = await res.json()
+    console.log('✅ Utilisateur connecté:', connectedUser)
+
+    // 2️⃣ Appeler ton API pour charger les infos complètes du user
+    const response = await userService.getUser(connectedUser.id)
     console.log('📦 Réponse API user:', response)
-    
-    // Ton UserController retourne les données avec relations
+
     user.value = response.data || response
-    console.log('✅ User chargé:', user.value)
-    
-    // Charger les rewards de l'utilisateur
+    console.log('✅ User complet chargé:', user.value)
+
+    // Charger les rewards
     await loadUserRewards(user.value.id)
-    
   } catch (err) {
     error.value = `Erreur lors du chargement: ${err.message}`
     console.error('❌ Erreur API:', err)
@@ -174,10 +190,9 @@ const loadUserRewards = async (userId) => {
   try {
     const response = await userService.getUserRewards(userId)
     console.log('📦 Réponse rewards:', response)
-    
+
     userRewards.value = response.data || []
     console.log('✅ Rewards chargés:', userRewards.value)
-    
   } catch (err) {
     console.log('⚠️ Pas de rewards trouvés:', err.message)
     userRewards.value = []
@@ -205,7 +220,7 @@ onMounted(() => {
 .profile-page {
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, #072C54 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #072c54 0%, #1e3a8a 100%);
   color: white;
   padding: 1rem;
   padding-bottom: 100px;
@@ -218,7 +233,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   height: 50vh;
-  color: #F7C72C;
+  color: #f7c72c;
 }
 
 .loading-spinner {
@@ -228,8 +243,12 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error {
@@ -239,8 +258,8 @@ onMounted(() => {
 }
 
 .retry-btn {
-  background: #F7C72C;
-  color: #072C54;
+  background: #f7c72c;
+  color: #072c54;
   border: none;
   padding: 0.8rem 1.5rem;
   border-radius: 8px;
@@ -272,7 +291,7 @@ onMounted(() => {
   border-radius: 50%;
   background: #e0e0e0;
   overflow: hidden;
-  border: 4px solid #F7C72C;
+  border: 4px solid #f7c72c;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   margin: 0 auto;
 }
@@ -296,7 +315,7 @@ onMounted(() => {
   right: -5px;
   width: 35px;
   height: 35px;
-  background: #F7C72C;
+  background: #f7c72c;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -310,7 +329,6 @@ onMounted(() => {
   position: absolute;
   bottom: -10px;
   left: -15px;
-
 }
 
 .badge-image-avatar {
@@ -347,8 +365,8 @@ onMounted(() => {
 }
 
 .badge-text {
-  background: linear-gradient(45deg, #F7C72C, #E6B625);
-  color: #072C54;
+  background: linear-gradient(45deg, #f7c72c, #e6b625);
+  color: #072c54;
   padding: 0.4rem 1rem;
   border-radius: 20px;
   font-size: 0.7rem;
@@ -383,7 +401,8 @@ onMounted(() => {
   font-weight: 600;
 }
 
-.store-info, .reseller-since {
+.store-info,
+.reseller-since {
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.25rem;
@@ -414,7 +433,7 @@ onMounted(() => {
 .score-value {
   font-size: 2rem;
   font-weight: 700;
-  color: #F7C72C;
+  color: #f7c72c;
 }
 
 /* STATS SECTION */
@@ -435,7 +454,7 @@ onMounted(() => {
 .stat-value {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #F7C72C;
+  color: #f7c72c;
   margin-bottom: 0.5rem;
 }
 
@@ -468,8 +487,8 @@ onMounted(() => {
 }
 
 .see-all-btn {
-  background: #F7C72C;
-  color: #072C54;
+  background: #f7c72c;
+  color: #072c54;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -480,7 +499,7 @@ onMounted(() => {
 }
 
 .see-all-btn:hover {
-  background: #E6B625;
+  background: #e6b625;
   transform: translateY(-1px);
 }
 
@@ -553,7 +572,7 @@ onMounted(() => {
 
 .info-label {
   font-weight: 600;
-  color: #F7C72C;
+  color: #f7c72c;
 }
 
 .info-value {
@@ -561,7 +580,7 @@ onMounted(() => {
 }
 
 .info-action {
-  color: #F7C72C;
+  color: #f7c72c;
   font-size: 1.2rem;
   transition: transform 0.3s ease;
 }
@@ -593,7 +612,7 @@ onMounted(() => {
 }
 
 .arrow {
-  color: #F7C72C;
+  color: #f7c72c;
   font-size: 1.2rem;
 }
 
@@ -605,16 +624,16 @@ onMounted(() => {
     padding: 2rem;
     padding-bottom: 2rem;
   }
-  
+
   .profile-avatar {
     width: 150px;
     height: 150px;
   }
-  
+
   .profile-name {
     font-size: 2.5rem;
   }
-  
+
   .score-value {
     font-size: 3rem;
   }
@@ -627,12 +646,12 @@ onMounted(() => {
     padding: 1rem;
     padding-bottom: 80px;
   }
-  
+
   .stats-section {
     grid-template-columns: 1fr;
     gap: 0.8rem;
   }
-  
+
   .stat-item {
     padding: 1rem;
   }
