@@ -22,43 +22,52 @@
         </div>
 
         <div class="watch-image">
-          <img 
-          v-if="selectedWatch.photo_name"
-          :src="`/images/${selectedWatch.photo_name}`"
-          :alt="selectedWatch.model"
-           @load="handleImageLoad"
-          >
-        </div>
-      </div>
+         <img
+  v-if="selectedWatch.photo_name"
+  :src="`${backendUrl.replace(/\/$/, '')}/${selectedWatch.photo_name.replace(/^\/+/, '')}`"
 
-      <div class="watches-grid">
-        <div
-          v-for="watch in watches"
-          :key="watch.id"
-          class="watch-item"
-          @click="selectWatch(watch)"
-        >
-          <img :src="watch.photo_name" :alt="watch.model" loading="lazy" />
-          <span
-            class="favorite-star"
-            :class="{ 'is-favorite': watch.isFavorite }"
-            @click.stop="toggleFavorite(watch)"
-          >
-            ★
-          </span>
+  :alt="selectedWatch.model"
+  @load="handleImageLoad"
+/>
+
         </div>
       </div>
+<div class="watches-grid">
+  <div
+    v-for="watch in watches"
+    :key="watch.id"
+    class="watch-item"
+    @click="selectWatch(watch)"
+  >
+    <img
+      :src="`${backendUrl}/${watch.photo_name}`.replace(/([^:]\/)\/+/g, '$1')"
+      :alt="watch.model"
+    />
+    <span
+      class="favorite-star"
+      :class="{ 'is-favorite': watch.isFavorite }"
+      @click.stop="toggleFavorite(watch)"
+    >
+      ★
+    </span>
   </div>
+</div>
+
+
+      </div>
+ 
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,  } from 'vue'
 
 export default {
  
   setup() {
     const isLoading = ref(false)
     const error = ref(null)
+    const backendUrl = 'http://localhost:8000'; // PAS le sous-dossier
+
 
     const watches = ref([])
     const selectedWatch = ref({
@@ -75,10 +84,24 @@ export default {
     const selectWatch = (watch) => {
       selectedWatch.value = watch
     }
+const toggleFavorite = (watch) => {
+  // Si déjà favorite, on la retire
+  if (watch.isFavorite) {
+    watch.isFavorite = false
+    return
+  }
 
-    const toggleFavorite = (watch) => {
-      watch.isFavorite = !watch.isFavorite
-    }
+  // Sinon, on compte combien il y en a déjà
+  const favoritesCount = watches.value.filter(w => w.isFavorite).length
+
+  // Si moins de 3, on peut ajouter
+  if (favoritesCount < 3) {
+    watch.isFavorite = true
+  } else {
+    alert("Tu ne peux avoir que 3 montres favorites maximum.")
+  }
+}
+
 
     const handleImageLoad = (e) => {
       e.target.classList.add('loaded')
@@ -142,6 +165,7 @@ const fetchWatches = async () => {
       selectWatch,
       toggleFavorite,
       handleImageLoad,
+      backendUrl,
     }
   }
 }
@@ -237,15 +261,11 @@ const fetchWatches = async () => {
   transition: transform 0.2s;
 }
 
-.watch-item:hover {
-  transform: scale(1.05);
-}
 
 .watch-item img {
   width: 100%;
   height: auto;
   border-radius: 8px;
-  background-color: white;
 }
 
 .favorite-star {
@@ -264,7 +284,6 @@ const fetchWatches = async () => {
 .error-state {
   text-align: center;
   padding: 2rem;
-  color: white;
 }
 @media (min-width: 768px) {
 
@@ -274,6 +293,9 @@ const fetchWatches = async () => {
 
 }
 @media (max-width: 768px) {
+   .favorite-star {
+    font-size: 3rem; 
+  }
   .collection-page {
     padding-left: 0; /* mobile */
     padding-top: 2rem;
