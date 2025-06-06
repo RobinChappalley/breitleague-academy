@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\ProgressionController;
 use App\Http\Controllers\Api\BattleController;
 use App\Http\Controllers\Api\UserRewardController;
 use App\Http\Controllers\Api\UserMissionController;
+use Illuminate\Support\Facades\Auth;
 
 Route::prefix('v1')->group(function () {
     Route::apiResource('pos', PosController::class)->parameters([
@@ -59,8 +60,3 @@ Route::prefix('v1')->group(function () {
         'user-missions' => 'userMission'
     ]);
 });
-
-// Exemple : authentification
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');

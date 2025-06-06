@@ -18,8 +18,8 @@ class UserSeeder extends Seeder
                 'id' => $user['id'],
                 'username' => $user['username'],
                 'email' => $user['email'],
-                'password' => Hash::make($user['password']), // assume plain text in JSON
-                'POS_id' => $user['POS_id'],
+                'password' => Hash::make('123'),
+                'pos_id' => $user['pos_id'],
                 'signup_year' => $user['signup_year'],
                 'avatar' => $user['avatar'],
                 'elo_score' => $user['elo_score'],
