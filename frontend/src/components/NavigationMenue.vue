@@ -11,7 +11,7 @@
         <RouterLink :to="item.route" class="nav-link">
         <div class="active-bar"/>
         <img :src="item.icon" :alt="item.label"/>
-        <span>{{ item.label }}</span>
+        <span class="text-mini" >{{ item.label }}</span>
         </RouterLink>
       </li>
     </ul>
@@ -102,7 +102,6 @@ onUnmounted(() => {
   gap: 12px;
   padding: 12px 20px;
   color: #3399ff;
-  font-size: 18px;
   text-decoration: none;
   transition: background-color 0.3s, color 0.3s;
 }
@@ -146,6 +145,10 @@ onUnmounted(() => {
   }
   .nav-link.router-link-exact-active .active-bar {
     transform: scaleY(1);
+  }
+  .nav-link span {
+    font-size: 20px;
+    font-weight: 600;
   }
 }
 
@@ -196,7 +199,6 @@ onUnmounted(() => {
     justify-content: center;
     width: 100%;
     height: 100%;
-    font-size: 12px;
     padding: 8px 2px;
   }
 
@@ -221,6 +223,7 @@ onUnmounted(() => {
   .nav-link.router-link-exact-active .active-bar {
     transform: scaleX(1);
   }
+  
 }
 
 /* Optimisation pour très petits écrans (≤350px) */
@@ -234,7 +237,7 @@ onUnmounted(() => {
     max-width: calc(100% / 5);
   }
   .nav-link {
-    font-size: 9px;
+
     padding: 6px 1px;
     gap: 2px;
   }
@@ -253,7 +256,6 @@ onUnmounted(() => {
     height: 60px;
   }
   .nav-link {
-    font-size: 9px;
     padding: 4px 0px;
   }
   .nav-link img {
