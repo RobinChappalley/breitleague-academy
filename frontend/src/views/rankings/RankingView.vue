@@ -25,10 +25,14 @@
               <i class="dropdown-icon">▼</i>
             </button>
             <div class="dropdown-menu" v-if="showDropdown">
-              <a href="#" @click="selectCountry('Switzerland')">Switzerland</a>
-              <a href="#" @click="selectCountry('France')">France</a>
-              <a href="#" @click="selectCountry('Germany')">Germany</a>
-              <a href="#" @click="selectCountry('Italy')">Italy</a>
+              <a
+                v-for="country in availableCountries"
+                :key="country"
+                href="#"
+                @click="selectCountry(country)"
+              >
+                {{ country }}
+              </a>
             </div>
           </div>
         </div>
@@ -44,6 +48,7 @@
             highlight: player.highlight,
             'top-16': player.rank <= 16
           }"
+          @click="openPlayerProfile(player)"
         >
           <div class="rank">{{ player.rank }}.</div>
 
@@ -52,7 +57,7 @@
               <img :src="getAvatarUrl(player.avatar)" alt="avatar" class="avatar-image" />
             </div>
             <div class="player-details">
-              <h3 class="player-name" @click="openPlayerProfile(player)">{{ player.name }}</h3>
+              <h3 class="player-name">{{ player.name }}</h3>
               <div class="country-flag">{{ player.flag }}</div>
             </div>
           </div>
@@ -439,6 +444,7 @@ const loadUsersRanking = async () => {
 
     // Mapper les users pour les adapter à ton format Ranking
     rankingPlayers.value = data.data
+      .filter((user) => user.is_BS === true)
       .map((user, index) => ({
         id: user.id,
         rank: index + 1, // 👈 on trie + on met le rang
@@ -464,6 +470,18 @@ const loadUsersRanking = async () => {
     console.error('❌ Erreur API users ranking:', err.message)
   }
 }
+
+const availableCountries = computed(() => {
+  const countriesSet = new Set()
+
+  rankingPlayers.value.forEach((player) => {
+    if (player.country) {
+      countriesSet.add(player.country)
+    }
+  })
+
+  return Array.from(countriesSet).sort()
+})
 
 const getAvatarUrl = (avatarPath) => {
   if (avatarPath) {
@@ -594,6 +612,7 @@ console.log('RankingView component loaded')
   margin-bottom: 1rem;
   border-radius: 12px;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .ranking-item:hover {
