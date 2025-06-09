@@ -12,7 +12,7 @@
 
       <div v-if="currentUser">
         <p>Connecté en tant que {{ currentUser.username }}</p>
-        <button @click="logout">Se déconnecter</button>
+        <button @click="logout">Logout</button>
       </div>
     </div>
   </div>
@@ -59,7 +59,7 @@ const login = async () => {
       })
     })
 
-    if (!res.ok) throw new Error("Nom d'utilisateur ou mot de passe invalide")
+    if (!res.ok) throw new Error('Username or password not valid')
 
     // Récupérer l'utilisateur connecté
     await fetchUser()

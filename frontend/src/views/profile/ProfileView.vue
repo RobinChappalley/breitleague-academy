@@ -121,7 +121,7 @@
       </div>
       <!-- LOGOUT BUTTON -->
       <div style="text-align: center; margin-top: 2rem">
-        <button @click="logout" class="see-all-btn">Se déconnecter</button>
+        <button @click="logout" class="see-all-btn">Logout</button>
       </div>
     </div>
   </div>
@@ -158,7 +158,7 @@ const loadUserProfile = async () => {
     isLoading.value = true
     error.value = null
 
-    console.log("🔄 Chargement de l'utilisateur connecté...")
+    console.log('🔄 Load logged-in user...')
 
     // 1️⃣ Récupérer l'utilisateur connecté
     const res = await fetch('http://localhost:8000/api/user', {
@@ -168,7 +168,7 @@ const loadUserProfile = async () => {
       }
     })
 
-    if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
+    if (!res.ok) throw new Error('Unauthenticated user (401)')
 
     const connectedUser = await res.json()
     console.log('✅ Utilisateur connecté:', connectedUser)
@@ -178,13 +178,13 @@ const loadUserProfile = async () => {
     console.log('📦 Réponse API user:', response)
 
     user.value = response.data || response
-    console.log('✅ User complet chargé:', user.value)
+    console.log('✅ Full user loaded:', user.value)
 
     // Charger les rewards
     await loadUserRewards(user.value.id)
   } catch (err) {
-    error.value = `Erreur lors du chargement: ${err.message}`
-    console.error('❌ Erreur API:', err)
+    error.value = `Loading error: ${err.message}`
+    console.error('❌ Error API:', err)
   } finally {
     isLoading.value = false
   }
@@ -196,9 +196,9 @@ const loadUserRewards = async (userId) => {
     console.log('📦 Réponse rewards:', response)
 
     userRewards.value = response.data || []
-    console.log('✅ Rewards chargés:', userRewards.value)
+    console.log('✅ Rewards loaded:', userRewards.value)
   } catch (err) {
-    console.log('⚠️ Pas de rewards trouvés:', err.message)
+    console.log('⚠️ No rewards found :', err.message)
     userRewards.value = []
   }
 }
@@ -215,7 +215,7 @@ const goToCollection = () => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('🚀 ProfileView monté, chargement des données...')
+  console.log('🚀 ProfileView mounted, loading ...')
   loadUserProfile()
 })
 const logout = async () => {
@@ -243,7 +243,7 @@ const logout = async () => {
     // Redirige vers la page de login
     router.push('/login')
   } catch (err) {
-    console.error('❌ Erreur lors du logout:', err)
+    console.error('❌ Error when logged out :', err)
   }
 }
 </script>
