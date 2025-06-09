@@ -43,8 +43,8 @@
       </div>
     </div>
 
-    <!-- Question -->
-    <div class="question-container">
+    <!-- Question - avec protection contre les questions non chargées -->
+    <div class="question-container" v-if="currentQuestion">
       <h2 class="question-text">{{ currentQuestion.text }}</h2>
       
       <!-- Answer Options -->
@@ -61,6 +61,12 @@
         </button>
       </div>
     </div>
+
+    <!-- Loading état -->
+    <div class="loading-container" v-else>
+      <div class="loading-spinner"></div>
+      <p>Chargement des questions...</p>
+    </div>
   </div>
 </template>
 
@@ -73,7 +79,8 @@ const router = useRouter()
 // Timer
 let timerInterval = null
 
-// Battle Data - données mockées simples
+// Battle Data - récupérées depuis localStorage
+const battleData = ref(null)
 const opponent = ref({
   id: 2,
   name: 'M.OVSANNA',
@@ -100,64 +107,129 @@ const playerScore = ref(0)
 const opponentScore = ref(0)
 const playerTime = ref(0)
 const opponentTime = ref(0)
+const playerAnswers = ref([]) // CORRIGER ICI - il manquait la parenthèse fermante
 
-// Questions mockées
-const questions = ref([
-  {
-    id: 1,
-    text: 'Which Breitling collection is known for its aviation heritage?',
-    answers: [
-      { text: 'Navitimer', correct: true },
-      { text: 'Superocean', correct: false },
-      { text: 'Premier', correct: false },
-      { text: 'Endurance Pro', correct: false }
-    ]
-  },
-  {
-    id: 2,
-    text: 'What year was Breitling founded?',
-    answers: [
-      { text: '1884', correct: true },
-      { text: '1905', correct: false },
-      { text: '1860', correct: false },
-      { text: '1920', correct: false }
-    ]
-  },
-  {
-    id: 3,
-    text: 'Which movement powers the Breitling B01?',
-    answers: [
-      { text: 'In-house chronograph', correct: true },
-      { text: 'ETA 2824', correct: false },
-      { text: 'Sellita SW200', correct: false },
-      { text: 'Valjoux 7750', correct: false }
-    ]
-  },
-  {
-    id: 4,
-    text: 'What is the water resistance of the Superocean?',
-    answers: [
-      { text: '200m', correct: false },
-      { text: '300m', correct: false },
-      { text: '500m', correct: true },
-      { text: '1000m', correct: false }
-    ]
-  },
-  {
-    id: 5,
-    text: 'Which Breitling watch was worn by astronauts?',
-    answers: [
-      { text: 'Cosmonaute', correct: true },
-      { text: 'Navitimer', correct: false },
-      { text: 'Chronomat', correct: false },
-      { text: 'Premier', correct: false }
-    ]
-  }
-])
+// Questions depuis la base de données
+const questions = ref([])
 
 // Computed
-const currentQuestion = computed(() => questions.value[currentQuestionIndex.value])
-const progressPercentage = computed(() => (currentQuestionIndex.value / totalQuestions.value) * 100)
+const currentQuestion = computed(() => {
+  if (questions.value.length === 0) return null
+  
+  const question = questions.value[currentQuestionIndex.value]
+  
+  // Adapter la structure de ta base de données
+  return {
+    id: question.id,
+    text: question.content_default || question.content_lf_tf || question.content_lf_blank || 'Question sans contenu',
+    answers: question.choices?.map(choice => ({
+      text: choice.content || choice.text,
+      correct: choice.is_correct || choice.correct || false
+    })) || []
+  }
+})
+
+const progressPercentage = computed(() => {
+  if (totalQuestions.value === 0) return 0
+  return (currentQuestionIndex.value / totalQuestions.value) * 100
+})
+
+// Charger les données de bataille depuis localStorage
+const loadBattleData = () => {
+  try {
+    const savedBattle = localStorage.getItem('currentBattle')
+    if (savedBattle) {
+      battleData.value = JSON.parse(savedBattle)
+      
+      // Mettre à jour les données de l'adversaire
+      if (battleData.value.opponent) {
+        opponent.value = {
+          id: battleData.value.opponent.id,
+          name: battleData.value.opponent.name,
+          avatar: battleData.value.opponent.avatar || battleData.value.opponent.name.charAt(0),
+          flag: battleData.value.opponent.flag
+        }
+      }
+      
+      // Charger les questions depuis la base de données
+      if (battleData.value.questions && battleData.value.questions.length > 0) {
+        questions.value = battleData.value.questions
+        totalQuestions.value = questions.value.length
+        
+        console.log('✅ Questions loaded from database:', questions.value.length, 'questions')
+        console.log('📋 First question:', questions.value[0])
+      } else {
+        console.warn('⚠️ No questions found in battle data, using fallback')
+        loadFallbackQuestions()
+      }
+    } else {
+      console.warn('⚠️ No battle data found, using fallback')
+      loadFallbackQuestions()
+    }
+  } catch (error) {
+    console.error('❌ Error loading battle data:', error)
+    loadFallbackQuestions()
+  }
+}
+
+// Questions de fallback si problème avec la base
+const loadFallbackQuestions = () => {
+  questions.value = [
+    {
+      id: 1,
+      content_default: 'Quelle année Breitling a-t-elle été fondée ?',
+      choices: [
+        { content: '1884', is_correct: true },
+        { content: '1885', is_correct: false },
+        { content: '1890', is_correct: false },
+        { content: '1900', is_correct: false }
+      ]
+    },
+    {
+      id: 2,
+      content_default: 'Qui a fondé Breitling ?',
+      choices: [
+        { content: 'Léon Breitling', is_correct: true },
+        { content: 'Gaston Breitling', is_correct: false },
+        { content: 'Willy Breitling', is_correct: false },
+        { content: 'Ernest Schneider', is_correct: false }
+      ]
+    },
+    {
+      id: 3,
+      content_default: 'Quel est le calibre emblématique de Breitling ?',
+      choices: [
+        { content: 'B01', is_correct: true },
+        { content: 'B09', is_correct: false },
+        { content: 'B20', is_correct: false },
+        { content: 'B13', is_correct: false }
+      ]
+    },
+    {
+      id: 4,
+      content_default: 'Quelle est la montre iconique de Breitling depuis 1952 ?',
+      choices: [
+        { content: 'Navitimer', is_correct: true },
+        { content: 'Superocean', is_correct: false },
+        { content: 'Avenger', is_correct: false },
+        { content: 'Premier', is_correct: false }
+      ]
+    },
+    {
+      id: 5,
+      content_default: 'En quelle année le premier poussoir indépendant a-t-il été créé ?',
+      choices: [
+        { content: '1915', is_correct: true },
+        { content: '1920', is_correct: false },
+        { content: '1934', is_correct: false },
+        { content: '1952', is_correct: false }
+      ]
+    }
+  ]
+  
+  totalQuestions.value = questions.value.length
+  console.log('🔄 Using fallback questions:', questions.value.length)
+}
 
 // Methods
 const startTimer = () => {
@@ -166,7 +238,7 @@ const startTimer = () => {
       timeLeft.value--
     } else {
       // Temps écoulé, passer à la question suivante
-      nextQuestion()
+      selectAnswer(null) // Aucune réponse sélectionnée
     }
   }, 1000)
 }
@@ -189,11 +261,35 @@ const selectAnswer = (index) => {
   const timeTaken = 30 - timeLeft.value
   playerTime.value += timeTaken
 
-  // Vérifier si la réponse est correcte - CORRECTION ICI
-  const currentQuestionData = questions.value[currentQuestionIndex.value]
-  if (currentQuestionData.answers[index].correct) {
-    playerScore.value++
+  // Vérifier si la réponse est correcte
+  let isCorrect = false
+  let selectedAnswerText = 'Pas de réponse'
+  
+  if (index !== null && currentQuestion.value?.answers[index]) {
+    isCorrect = currentQuestion.value.answers[index].correct
+    selectedAnswerText = currentQuestion.value.answers[index].text
+    
+    if (isCorrect) {
+      playerScore.value++
+    }
   }
+  
+  // Sauvegarder la réponse du joueur
+  playerAnswers.value.push({
+    questionId: currentQuestion.value?.id,
+    questionText: currentQuestion.value?.text,
+    selectedAnswer: selectedAnswerText,
+    correct: isCorrect,
+    time: timeTaken,
+    timeLeft: timeLeft.value
+  })
+  
+  console.log('📝 Answer recorded:', {
+    question: currentQuestion.value?.text,
+    answer: selectedAnswerText,
+    correct: isCorrect,
+    time: timeTaken
+  })
   
   // Attendre un peu avant de passer à la question suivante
   setTimeout(() => {
@@ -209,7 +305,7 @@ const nextQuestion = () => {
     selectedAnswer.value = null
     startTimer()
   } else {
-    // Quiz terminé - rediriger directement vers BattleDetailsView
+    // Quiz terminé
     finishBattle()
   }
 }
@@ -217,20 +313,50 @@ const nextQuestion = () => {
 const finishBattle = () => {
   stopTimer()
   
-  // Sauvegarder les résultats dans localStorage pour BattleDetailsView
+  // Générer des réponses pour l'adversaire (mockées)
+  const opponentAnswers = questions.value.map((question, index) => {
+    const randomAnswer = Math.floor(Math.random() * 4)
+    const isCorrect = Math.random() > 0.3 // 70% de chance de réussir
+    const timeTaken = Math.floor(Math.random() * 20) + 5 // Entre 5 et 25 secondes
+    
+    if (isCorrect) opponentScore.value++
+    opponentTime.value += timeTaken
+    
+    return {
+      questionId: question.id,
+      questionText: question.content_default,
+      selectedAnswer: question.choices?.[randomAnswer]?.content || 'Réponse mockée',
+      correct: isCorrect,
+      time: timeTaken,
+      timeLeft: Math.max(0, 30 - timeTaken)
+    }
+  })
+  
+  // Sauvegarder les résultats pour BattleDetailsView
   const battleResults = {
-    battleId: Date.now(),
+    battleId: battleData.value?.battleId || Date.now(),
     opponent: opponent.value,
     playerScore: playerScore.value,
-    opponentScore: Math.floor(Math.random() * 5), // Score aléatoire pour l'adversaire
+    opponentScore: opponentScore.value,
     playerTime: playerTime.value,
-    opponentTime: Math.floor(Math.random() * 100) + 50, // Temps aléatoire
-    questionsData: questions.value,
-    playerAnswers: [], // À remplir avec les vraies réponses
-    opponentAnswers: [] // À remplir avec des réponses mockées
+    opponentTime: opponentTime.value,
+    questionsData: questions.value.map(q => ({
+      id: q.id,
+      text: q.content_default || q.content_lf_tf || q.content_lf_blank,
+      correctAnswer: q.choices?.find(c => c.is_correct)?.content || 'Réponse correcte'
+    })),
+    playerAnswers: playerAnswers.value,
+    opponentAnswers: opponentAnswers
   }
   
   localStorage.setItem('lastBattleResults', JSON.stringify(battleResults))
+  
+  console.log('🏁 Battle finished:', {
+    playerScore: playerScore.value,
+    opponentScore: opponentScore.value,
+    playerTime: playerTime.value,
+    opponentTime: opponentTime.value
+  })
   
   // Rediriger vers les détails
   router.push(`/battle-details/${battleResults.battleId}`)
@@ -240,10 +366,10 @@ const getAnswerClass = (index) => {
   if (!hasAnswered.value) return ''
   
   if (selectedAnswer.value === index) {
-    return currentQuestion.value.answers[index].correct ? 'correct' : 'incorrect'
+    return currentQuestion.value?.answers[index]?.correct ? 'correct' : 'incorrect'
   }
   
-  if (currentQuestion.value.answers[index].correct) {
+  if (currentQuestion.value?.answers[index]?.correct) {
     return 'correct-answer'
   }
   
@@ -267,7 +393,14 @@ const getAvatarStyle = (player) => {
 
 // Lifecycle
 onMounted(() => {
-  startTimer()
+  loadBattleData()
+  
+  // Démarrer le timer seulement si on a des questions
+  setTimeout(() => {
+    if (questions.value.length > 0) {
+      startTimer()
+    }
+  }, 1000) // Laisser 1 seconde pour que l'utilisateur voie la question
 })
 
 onUnmounted(() => {
@@ -457,6 +590,27 @@ onUnmounted(() => {
 
 .answer-btn.disabled {
   opacity: 0.5;
+}
+
+/* LOADING STATE */
+.loading-container {
+  text-align: center;
+  padding: 3rem;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(247, 199, 44, 0.3);
+  border-top: 4px solid #F7C72C;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* RESULTS MODAL */

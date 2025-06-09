@@ -379,10 +379,103 @@ const declineChallenge = (id) => {
   incomingChallenges.value = incomingChallenges.value.filter(c => c.id !== id)
 }
 
-const handleAction = (challenge) => {
+const handleAction = async (challenge) => {
   if (challenge.status === 'play') {
-    console.log('Starting battle with', challenge.name)
-    router.push('/battle-quiz')
+    try {
+      console.log('🎮 Starting battle with', challenge.name)
+      
+      // 1. Récupérer TOUTES les questions depuis ta vraie API
+      console.log('📡 Récupération des questions...')
+      const questionsData = await battleService.getQuestions()
+      const allQuestions = questionsData.data || questionsData || []
+      
+      console.log('📋 Questions récupérées:', allQuestions.length)
+      
+      // 2. Récupérer TOUS les choix depuis ta vraie API  
+      console.log('📡 Récupération des choix...')
+      const choicesData = await battleService.getChoices()
+      const allChoices = choicesData.data || choicesData || []
+      
+      console.log('📋 Choix récupérés:', allChoices.length)
+      
+      // 3. Prendre 5 questions aléatoires
+      const shuffled = allQuestions.sort(() => 0.5 - Math.random())
+      const selectedQuestions = shuffled.slice(0, 5)
+      
+      console.log('🎯 5 questions sélectionnées:', selectedQuestions.map(q => `ID: ${q.id}`))
+      
+      // 4. Pour chaque question, associer ses choix et identifier la bonne réponse
+      selectedQuestions.forEach(question => {
+        // Filtrer les choix pour cette question
+        const questionChoices = allChoices.filter(choice => choice.question_id === question.id)
+        
+        console.log(`📋 Question ${question.id}: ${questionChoices.length} choix trouvés`)
+        console.log(`✅ Bonne réponse pour question ${question.id}: "${question.correct_answer_text}"`)
+        
+        // Adapter la structure pour BattleQuizView
+        question.choices = questionChoices.map(choice => {
+          // Comparer le text_answer avec correct_answer_text pour savoir si c'est correct
+          const isCorrect = choice.text_answer === question.correct_answer_text
+          
+          console.log(`🔍 Choix "${choice.text_answer}" ${isCorrect ? '✅ CORRECT' : '❌ incorrect'}`)
+          
+          return {
+            id: choice.id,
+            text: choice.text_answer,
+            content: choice.text_answer, 
+            is_correct: isCorrect // UTILISER correct_answer_text pour déterminer si c'est correct !
+          }
+        })
+        
+        console.log(`✅ Question ${question.id}: ${question.choices.length} choix avec ${question.choices.filter(c => c.is_correct).length} bonne(s) réponse(s)`)
+      })
+      
+      // 5. Vérifier qu'on a bien des choix
+      const questionsWithChoices = selectedQuestions.filter(q => q.choices && q.choices.length > 0)
+      console.log(`✅ ${questionsWithChoices.length}/5 questions ont des choix`)
+      
+      // 6. Si certaines questions n'ont pas de choix, les compléter
+      selectedQuestions.forEach(question => {
+        if (!question.choices || question.choices.length === 0) {
+          console.warn(`⚠️ Pas de choix pour question ${question.id}, ajout de choix par défaut`)
+          question.choices = [
+            { id: 1, text: 'Réponse A', is_correct: true },
+            { id: 2, text: 'Réponse B', is_correct: false },
+            { id: 3, text: 'Réponse C', is_correct: false },
+            { id: 4, text: 'Réponse D', is_correct: false }
+          ]
+        }
+      })
+      
+      // 7. Sauvegarder pour BattleQuizView
+      localStorage.setItem('currentBattle', JSON.stringify({
+        battleId: challenge.id,
+        opponent: {
+          id: challenge.user?.id || challenge.id,
+          name: challenge.name,
+          avatar: challenge.user?.avatar || challenge.name.charAt(0),
+          flag: challenge.country
+        },
+        questions: selectedQuestions
+      }))
+      
+      console.log('💾 Questions RÉELLES avec bonnes réponses sauvegardées!')
+      console.log('📊 Résumé:', selectedQuestions.map(q => ({
+        id: q.id,
+        question: q.content_default?.substring(0, 50) + '...',
+        choicesCount: q.choices.length,
+        correctAnswers: q.choices.filter(c => c.is_correct).length
+      })))
+      
+      router.push('/battle-quiz')
+      
+    } catch (error) {
+      console.error('❌ Erreur chargement depuis la base:', error)
+      alert(`Erreur API: ${error.message}`)
+      
+      // Fallback si erreur
+      router.push('/battle-quiz')
+    }
   }
 }
 
