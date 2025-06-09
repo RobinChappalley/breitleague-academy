@@ -220,10 +220,25 @@ onMounted(() => {
 })
 const logout = async () => {
   try {
-    await fetch('/logout', {
+    // Lire le token CSRF depuis le cookie
+    const csrfTokenFromCookie = decodeURIComponent(
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1] ?? ''
+    )
+
+    await fetch('http://localhost:8000/logout', {
       method: 'POST',
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-XSRF-TOKEN': csrfTokenFromCookie
+      }
     })
+
+    // Nettoyer le localStorage
+    localStorage.removeItem('isLoggedIn')
 
     // Redirige vers la page de login
     router.push('/login')

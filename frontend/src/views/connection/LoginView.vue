@@ -79,16 +79,19 @@ const fetchUser = async () => {
 
     if (!res.ok) {
       currentUser.value = null
+      localStorage.removeItem('isLoggedIn')
       return
     }
 
     const data = await res.json()
     currentUser.value = data
+    localStorage.setItem('isLoggedIn', 'true')
 
     // Si l'utilisateur est connecté → rediriger vers "/"
     router.push('/')
   } catch {
     currentUser.value = null
+    localStorage.removeItem('isLoggedIn')
   }
 }
 
@@ -99,6 +102,7 @@ const logout = async () => {
   })
 
   currentUser.value = null
+  localStorage.removeItem('isLoggedIn')
   router.push('/login') // On revient sur la page login après déconnexion
 }
 </script>
