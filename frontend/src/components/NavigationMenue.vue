@@ -1,17 +1,16 @@
 <template>
   <nav class="navigation-menu">
     <div class="logo" v-if="isDesktop">
-      <img src="/images/icones/logo.png" alt="Breitleague Academy Logo"/>
+      <RouterLink to="/" class="logo">
+        <img src="/images/icones/logo.png" alt="Breitleague Academy Logo" />
+      </RouterLink>
     </div>
     <ul class="nav-list">
-      <li
-          v-for="item in navItems"
-          :key="item.name"
-      >
+      <li v-for="item in navItems" :key="item.name">
         <RouterLink :to="item.route" class="nav-link">
-        <div class="active-bar"/>
-        <img :src="item.icon" :alt="item.label"/>
-        <span class="text-mini" >{{ item.label }}</span>
+          <div class="active-bar" />
+          <img :src="item.icon" :alt="item.label" />
+          <span class="text-mini">{{ item.label }}</span>
         </RouterLink>
       </li>
     </ul>
@@ -19,7 +18,7 @@
 </template>
 
 <script setup>
-import {ref, onMounted, onUnmounted} from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 import learningIcon from '/images/icones/learning.svg'
 import battleIcon from '/images/icones/battle.svg'
@@ -27,13 +26,12 @@ import collectionIcon from '/images/icones/collection.svg'
 import cupIcon from '/images/icones/cup.svg'
 import profileIcon from '/images/icones/profile.svg'
 
-
 const navItems = [
-  {name: 'learning', label: 'Learning', icon: learningIcon, route: '/'},
-  {name: 'battle', label: 'Battle', icon: battleIcon, route: '/battle'},
-  {name: 'collections', label: 'Collections', icon: collectionIcon, route: '/collection'},
-  {name: 'ranking', label: 'Ranking', icon: cupIcon, route: '/ranking'},
-  {name: 'profile', label: 'Profile', icon: profileIcon, route: '/profile'},
+  { name: 'learning', label: 'Learning', icon: learningIcon, route: '/' },
+  { name: 'battle', label: 'Battle', icon: battleIcon, route: '/battle' },
+  { name: 'collections', label: 'Collections', icon: collectionIcon, route: '/collection' },
+  { name: 'ranking', label: 'Ranking', icon: cupIcon, route: '/ranking' },
+  { name: 'profile', label: 'Profile', icon: profileIcon, route: '/profile' }
 ]
 
 const activeItem = ref('learning')
@@ -56,7 +54,8 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>.navigation-menu {
+<style scoped>
+.navigation-menu {
   position: fixed;
   top: 0;
   left: 0;
@@ -117,15 +116,17 @@ onUnmounted(() => {
 .nav-link img {
   width: 28px;
   height: 28px;
-  filter: brightness(0) saturate(100%) invert(48%) sepia(59%) saturate(1326%) hue-rotate(181deg) brightness(95%) contrast(95%);
+  filter: brightness(0) saturate(100%) invert(48%) sepia(59%) saturate(1326%) hue-rotate(181deg)
+    brightness(95%) contrast(95%);
 }
 
 .nav-link.router-link-exact-active {
-  color: #F7C72C;
+  color: #f7c72c;
 }
 
 .nav-link.router-link-exact-active img {
-  filter: brightness(0) saturate(100%) invert(79%) sepia(79%) saturate(415%) hue-rotate(340deg) brightness(100%) contrast(102%);
+  filter: brightness(0) saturate(100%) invert(79%) sepia(79%) saturate(415%) hue-rotate(340deg)
+    brightness(100%) contrast(102%);
 }
 
 .active-bar {
@@ -223,7 +224,6 @@ onUnmounted(() => {
   .nav-link.router-link-exact-active .active-bar {
     transform: scaleX(1);
   }
-  
 }
 
 /* Optimisation pour très petits écrans (≤350px) */
@@ -237,7 +237,6 @@ onUnmounted(() => {
     max-width: calc(100% / 5);
   }
   .nav-link {
-
     padding: 6px 1px;
     gap: 2px;
   }
