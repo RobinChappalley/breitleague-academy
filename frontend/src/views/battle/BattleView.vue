@@ -17,7 +17,15 @@
             :class="{ 'invitation': challenge.status === 'invitation' }"
           >
             <div class="player-info">
-              <div class="avatar">{{ challenge.name.charAt(0) }}</div>
+              <div class="avatar">
+                <img 
+                  v-if="(challenge.user && challenge.user.avatar)" 
+                  :src="getAvatarUrl(challenge.user)" 
+                  :alt="challenge.name"
+                  class="avatar-image"
+                />
+                <span v-else class="avatar-initial">{{ challenge.name.charAt(0) }}</span>
+              </div>
               <div class="player-details">
                 <h3 class="player-name">{{ challenge.name }}</h3>
                 <div class="flag">{{ challenge.country }}</div>
@@ -46,15 +54,37 @@
 
       <!-- You Challenged Them Section -->
       <div class="section">
-        <h2 class="section-title">YOU CHALLENGED THEM</h2>
+        <div class="section-header">
+          <h2 class="section-title">YOU CHALLENGED THEM</h2>
+          <div class="slots-info">
+            <span class="slots-counter">{{ outgoingChallenges.length }}/5 slots used</span>
+            <div class="slots-bar">
+              <div 
+                class="slots-fill" 
+                :style="{ width: (outgoingChallenges.length / 5) * 100 + '%' }"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXACTEMENT 5 CARTES : battle-cards + invite-cards -->
         <div class="battle-grid">
+          <!-- Battle cards pour les slots occupés -->
           <div 
             v-for="challenge in outgoingChallenges" 
             :key="challenge.id"
             class="battle-card"
           >
             <div class="player-info">
-              <div class="avatar">{{ challenge.name.charAt(0) }}</div>
+              <div class="avatar">
+                <img 
+                  v-if="(challenge.user && challenge.user.avatar)" 
+                  :src="getAvatarUrl(challenge.user)" 
+                  :alt="challenge.name"
+                  class="avatar-image"
+                />
+                <span v-else class="avatar-initial">{{ challenge.name.charAt(0) }}</span>
+              </div>
               <div class="player-details">
                 <h3 class="player-name">{{ challenge.name }}</h3>
                 <div class="flag">{{ challenge.country }}</div>
@@ -73,16 +103,14 @@
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Invite Players -->
-        <div class="invite-grid">
-          <div class="invite-card" @click="invitePlayer">
-            <div class="invite-icon">👤</div>
-            <span>Invite a Player</span>
-            <button class="btn-new">New</button>
-          </div>
-          <div class="invite-card" @click="invitePlayer">
+          <!-- Invite cards pour les slots libres (5 - nombre de battles) -->
+          <div 
+            v-for="n in (5 - outgoingChallenges.length)" 
+            :key="'invite-' + n"
+            class="invite-card" 
+            @click="invitePlayer"
+          >
             <div class="invite-icon">👤</div>
             <span>Invite a Player</span>
             <button class="btn-new">New</button>
@@ -101,7 +129,15 @@
             :class="{ 'won': battle.points > 0, 'lost': battle.points < 0 }"
           >
             <div class="player-info">
-              <div class="avatar">{{ battle.name.charAt(0) }}</div>
+              <div class="avatar">
+                <img 
+                  v-if="(battle.user && battle.user.avatar)" 
+                  :src="getAvatarUrl(battle.user)" 
+                  :alt="battle.name"
+                  class="avatar-image"
+                />
+                <span v-else class="avatar-initial">{{ battle.name.charAt(0) }}</span>
+              </div>
               <div class="player-details">
                 <h3 class="player-name">{{ battle.name }}</h3>
                 <div class="flag">{{ battle.country }}</div>
@@ -155,8 +191,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { battleService } from '@/services/api'
 
 const router = useRouter()
 
@@ -164,71 +201,173 @@ const router = useRouter()
 const showInvitationModal = ref(false)
 const invitedPlayerName = ref('')
 
-// Données simulées
-const incomingChallenges = ref([
-  {
-    id: 1,
-    name: 'R.FREUENFELD',
-    country: 'DE',
-    timeLeft: '24h left',
-    status: 'play'
-  },
-  {
-    id: 2,
-    name: 'C.NDIAYE',
-    country: 'FR',
-    timeLeft: '24h left',
-    status: 'waiting'
-  },
-  {
-    id: 3,
-    name: 'R.KELLER',
-    country: 'DE',
-    timeLeft: '24h left',
-    status: 'invitation'
-  },
-  {
-    id: 4,
-    name: 'L.ANEX',
-    country: 'FR',
-    timeLeft: '11h left',
-    status: 'invitation'
-  }
-])
+// Loading state
+const isLoading = ref(true)
+const error = ref('')
+const currentUserId = ref(null)
 
-const outgoingChallenges = ref([
-  {
-    id: 5,
-    name: 'H.OVSANNA',
-    country: 'RO',
-    timeLeft: '6h left',
-    status: 'play'
-  },
-  {
-    id: 6,
-    name: 'S.DACOSTA',
-    country: 'PT',
-    timeLeft: '8h left',
-    status: 'waiting'
-  }
-])
+// Données des battles
+const incomingChallenges = ref([])
+const outgoingChallenges = ref([]) // CORRIGER ICI - il manquait la parenthèse fermante
+const finishedBattles = ref([])
+const allUsers = ref([])
 
-const finishedBattles = ref([
-  {
-    id: 7,
-    name: 'P.DUJARDIN',
-    country: 'FR',
-    points: 300
-  },
-  {
-    id: 8,
-    name: 'L.ANEX',
-    country: 'FR',
-    points: -100
-  }
-])
+// Avatar logic
+const getAvatarUrl = (user) => {
+  if (!user || !user.avatar) return null
+  return `http://localhost:8000/${user.avatar}`
+}
 
-// Methods
+// Charger les vraies données depuis la base
+const loadBattlesFromDB = async () => {
+  try {
+    isLoading.value = true
+    
+    // Récupérer l'utilisateur connecté
+    const userResponse = await fetch('http://localhost:8000/api/user', {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+    
+    if (userResponse.ok) {
+      const userData = await userResponse.json()
+      currentUserId.value = userData.id
+    }
+
+    // Charger tous les utilisateurs disponibles
+    const usersData = await battleService.getAvailableUsers()
+    const loadedUsers = usersData.data || usersData || []
+    allUsers.value = loadedUsers
+    
+    // INCOMING CHALLENGES - pas de limite
+    incomingChallenges.value = loadedUsers
+      .filter(user => user.id !== currentUserId.value)
+      .slice(0, 4)
+      .map((user, index) => ({
+        id: user.id,
+        name: user.username,
+        country: getCountryCode(user.pos_id),
+        timeLeft: '24h left',
+        status: index < 2 ? 'invitation' : (index === 2 ? 'play' : 'waiting'),
+        user: user
+      }))
+
+    // OUTGOING CHALLENGES - MAXIMUM 5 (représentent les slots occupés)
+    // Simuler quelques battles en cours (par exemple 2 sur 5 slots)
+    outgoingChallenges.value = loadedUsers
+      .filter(user => user.id !== currentUserId.value)
+      .slice(4, 6) // Prendre seulement 2 utilisateurs pour simuler 2 slots occupés
+      .map((user, index) => ({
+        id: user.id + 100,
+        name: user.username,
+        country: getCountryCode(user.pos_id),
+        timeLeft: `${Math.floor(Math.random() * 20) + 1}h left`,
+        status: index === 0 ? 'play' : 'waiting',
+        user: user
+      }))
+
+    // FINISHED BATTLES
+    finishedBattles.value = loadedUsers
+      .filter(user => user.id !== currentUserId.value)
+      .slice(6, 8)
+      .map((user, index) => ({
+        id: user.id + 200,
+        name: user.username,
+        country: getCountryCode(user.pos_id),
+        points: index === 0 ? 300 : -100,
+        user: user
+      }))
+
+    console.log('✅ Slots occupés:', outgoingChallenges.value.length, '/5')
+    console.log('✅ Slots libres:', 5 - outgoingChallenges.value.length, '/5')
+
+  } catch (err) {
+    error.value = err.message
+    console.error('❌ Erreur lors du chargement depuis la base:', err)
+    loadMockData()
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Fonction pour convertir pos_id en code pays
+const getCountryCode = (posId) => {
+  const countryMapping = {
+    1: 'CH', 2: 'FR', 3: 'DE', 4: 'IT', 5: 'ES', 
+    6: 'PT', 7: 'RO', 8: 'US', 9: 'GB', 10: 'BE'
+  }
+  return countryMapping[posId] || 'FR'
+}
+
+// Fonction fallback
+const loadMockData = () => {
+  // Simuler 2 slots occupés sur 5
+  outgoingChallenges.value = [
+    {
+      id: 5,
+      name: 'H.OVSANNA',
+      country: 'RO',
+      timeLeft: '6h left',
+      status: 'play'
+    },
+    {
+      id: 6,
+      name: 'S.DACOSTA',
+      country: 'PT',
+      timeLeft: '8h left',
+      status: 'waiting'
+    }
+  ]
+  // Donc 3 invite-cards seront affichées automatiquement (5 - 2 = 3)
+
+  incomingChallenges.value = [
+    {
+      id: 1,
+      name: 'R.FREUENFELD',
+      country: 'DE',
+      timeLeft: '24h left',
+      status: 'play'
+    },
+    {
+      id: 2,
+      name: 'C.NDIAYE',
+      country: 'FR',
+      timeLeft: '24h left',
+      status: 'waiting'
+    },
+    {
+      id: 3,
+      name: 'R.KELLER',
+      country: 'DE',
+      timeLeft: '24h left',
+      status: 'invitation'
+    },
+    {
+      id: 4,
+      name: 'L.ANEX',
+      country: 'FR',
+      timeLeft: '11h left',
+      status: 'invitation'
+    }
+  ]
+
+  finishedBattles.value = [
+    {
+      id: 7,
+      name: 'P.DUJARDIN',
+      country: 'FR',
+      points: 300
+    },
+    {
+      id: 8,
+      name: 'L.ANEX',
+      country: 'FR',
+      points: -100
+    }
+  ]
+}
+
+// Méthodes existantes
 const acceptChallenge = (id) => {
   const challenge = incomingChallenges.value.find(c => c.id === id)
   if (challenge) {
@@ -240,40 +379,161 @@ const declineChallenge = (id) => {
   incomingChallenges.value = incomingChallenges.value.filter(c => c.id !== id)
 }
 
-const handleAction = (challenge) => {
+const handleAction = async (challenge) => {
   if (challenge.status === 'play') {
-    console.log('Starting battle with', challenge.name)
-    // Navigation simple vers le quiz
-    router.push('/battle-quiz')
+    try {
+      console.log('🎮 Starting battle with', challenge.name)
+      
+      // 1. Récupérer TOUTES les questions depuis ta vraie API
+      console.log('📡 Récupération des questions...')
+      const questionsData = await battleService.getQuestions()
+      const allQuestions = questionsData.data || questionsData || []
+      
+      console.log('📋 Questions récupérées:', allQuestions.length)
+      
+      // 2. Récupérer TOUS les choix depuis ta vraie API  
+      console.log('📡 Récupération des choix...')
+      const choicesData = await battleService.getChoices()
+      const allChoices = choicesData.data || choicesData || []
+      
+      console.log('📋 Choix récupérés:', allChoices.length)
+      
+      // 3. Prendre 5 questions aléatoires
+      const shuffled = allQuestions.sort(() => 0.5 - Math.random())
+      const selectedQuestions = shuffled.slice(0, 5)
+      
+      console.log('🎯 5 questions sélectionnées:', selectedQuestions.map(q => `ID: ${q.id}`))
+      
+      // 4. Pour chaque question, associer ses choix et identifier la bonne réponse
+      selectedQuestions.forEach(question => {
+        // Filtrer les choix pour cette question
+        const questionChoices = allChoices.filter(choice => choice.question_id === question.id)
+        
+        console.log(`📋 Question ${question.id}: ${questionChoices.length} choix trouvés`)
+        console.log(`✅ Bonne réponse pour question ${question.id}: "${question.correct_answer_text}"`)
+        
+        // Adapter la structure pour BattleQuizView
+        question.choices = questionChoices.map(choice => {
+          // Comparer le text_answer avec correct_answer_text pour savoir si c'est correct
+          const isCorrect = choice.text_answer === question.correct_answer_text
+          
+          console.log(`🔍 Choix "${choice.text_answer}" ${isCorrect ? '✅ CORRECT' : '❌ incorrect'}`)
+          
+          return {
+            id: choice.id,
+            text: choice.text_answer,
+            content: choice.text_answer, 
+            is_correct: isCorrect // UTILISER correct_answer_text pour déterminer si c'est correct !
+          }
+        })
+        
+        console.log(`✅ Question ${question.id}: ${question.choices.length} choix avec ${question.choices.filter(c => c.is_correct).length} bonne(s) réponse(s)`)
+      })
+      
+      // 5. Vérifier qu'on a bien des choix
+      const questionsWithChoices = selectedQuestions.filter(q => q.choices && q.choices.length > 0)
+      console.log(`✅ ${questionsWithChoices.length}/5 questions ont des choix`)
+      
+      // 6. Si certaines questions n'ont pas de choix, les compléter
+      selectedQuestions.forEach(question => {
+        if (!question.choices || question.choices.length === 0) {
+          console.warn(`⚠️ Pas de choix pour question ${question.id}, ajout de choix par défaut`)
+          question.choices = [
+            { id: 1, text: 'Réponse A', is_correct: true },
+            { id: 2, text: 'Réponse B', is_correct: false },
+            { id: 3, text: 'Réponse C', is_correct: false },
+            { id: 4, text: 'Réponse D', is_correct: false }
+          ]
+        }
+      })
+      
+      // 7. Sauvegarder pour BattleQuizView
+      localStorage.setItem('currentBattle', JSON.stringify({
+        battleId: challenge.id,
+        opponent: {
+          id: challenge.user?.id || challenge.id,
+          name: challenge.name,
+          avatar: challenge.user?.avatar || challenge.name.charAt(0),
+          flag: challenge.country
+        },
+        questions: selectedQuestions
+      }))
+      
+      console.log('💾 Questions RÉELLES avec bonnes réponses sauvegardées!')
+      console.log('📊 Résumé:', selectedQuestions.map(q => ({
+        id: q.id,
+        question: q.content_default?.substring(0, 50) + '...',
+        choicesCount: q.choices.length,
+        correctAnswers: q.choices.filter(c => c.is_correct).length
+      })))
+      
+      router.push('/battle-quiz')
+      
+    } catch (error) {
+      console.error('❌ Erreur chargement depuis la base:', error)
+      alert(`Erreur API: ${error.message}`)
+      
+      // Fallback si erreur
+      router.push('/battle-quiz')
+    }
   }
 }
 
 const viewBattle = (id) => {
   console.log('Viewing battle', id)
-  // Navigation simple vers les détails
   router.push(`/battle-details/${id}`)
 }
 
-// Nouvelle méthode pour inviter un joueur
+// FONCTION MISE À JOUR : Ajouter une battle = remplir un slot
 const invitePlayer = () => {
-  // Simuler l'invitation d'un joueur aléatoire
-  const randomPlayers = ['M.GARCIA', 'T.SMITH', 'A.MILLER', 'S.JONES', 'C.WILSON']
-  const randomPlayer = randomPlayers[Math.floor(Math.random() * randomPlayers.length)]
+  // 1. VÉRIFIER LES SLOTS (maximum 5)
+  if (outgoingChallenges.value.length >= 5) {
+    alert('🚫 All slots are full!')
+    return
+  }
   
-  invitedPlayerName.value = randomPlayer
+  // 2. TROUVER LES UTILISATEURS DISPONIBLES
+  const availableUsers = allUsers.value.filter(user => 
+    user.id !== currentUserId.value &&
+    !incomingChallenges.value.some(c => c.user?.id === user.id) &&
+    !outgoingChallenges.value.some(c => c.user?.id === user.id)
+  )
+  
+  let selectedUser = null
+  
+  // 3. CHOISIR UN UTILISATEUR AU HASARD
+  if (availableUsers.length > 0) {
+    selectedUser = availableUsers[Math.floor(Math.random() * availableUsers.length)]
+    invitedPlayerName.value = selectedUser.username
+    console.log('🎲 Random user selected:', selectedUser.username)
+  } else {
+    const randomPlayers = ['M.GARCIA', 'T.SMITH', 'A.MILLER', 'S.JONES', 'C.WILSON']
+    invitedPlayerName.value = randomPlayers[Math.floor(Math.random() * randomPlayers.length)]
+    console.log('🎲 Fallback to mock user:', invitedPlayerName.value)
+  }
+  
+  // 4. CRÉER LA NOUVELLE BATTLE (remplit un slot)
+  const newChallenge = {
+    id: Date.now(),
+    name: invitedPlayerName.value,
+    country: selectedUser ? getCountryCode(selectedUser.pos_id) : 'US',
+    timeLeft: '24h left',
+    status: 'waiting',
+    user: selectedUser
+  }
+  
+  // 5. AJOUTER IMMÉDIATEMENT = TRANSFORMER UNE INVITE-CARD EN BATTLE-CARD
+  outgoingChallenges.value.push(newChallenge)
+  console.log('✅ Slot filled! Slots used:', outgoingChallenges.value.length, '/5')
+  console.log('✅ Free slots remaining:', 5 - outgoingChallenges.value.length)
+  
+  // 6. AFFICHER LE MODAL
   showInvitationModal.value = true
   
-  // Ajouter automatiquement à la liste des défis envoyés après 2 secondes
+  // 7. FERMER LE MODAL APRÈS 2 SECONDES
   setTimeout(() => {
     if (showInvitationModal.value) {
-      const newChallenge = {
-        id: Date.now(),
-        name: randomPlayer,
-        country: 'US',
-        timeLeft: '24h left',
-        status: 'waiting'
-      }
-      outgoingChallenges.value.unshift(newChallenge)
+      showInvitationModal.value = false
     }
   }, 2000)
 }
@@ -282,11 +542,10 @@ const closeInvitationModal = () => {
   showInvitationModal.value = false
 }
 
-const cancelInvitation = () => {
-  showInvitationModal.value = false
-  // Ici on pourrait annuler l'invitation côté serveur
-  console.log('Invitation cancelled for', invitedPlayerName.value)
-}
+// Lifecycle
+onMounted(() => {
+  loadBattlesFromDB()
+})
 
 console.log('BattleView component loaded')
 </script>
@@ -341,6 +600,44 @@ console.log('BattleView component loaded')
   font-weight: 600;
   letter-spacing: 1px;
   text-align: center;
+}
+
+/* HEADER SECTION - NOUVEAU */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.slots-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.slots-counter {
+  font-size: 0.9rem;
+  color: #F7C72C;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.slots-bar {
+  width: 100px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.slots-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50 0%, #F7C72C 70%, #F44336 100%);
+  transition: width 0.3s ease;
+  border-radius: 3px;
 }
 
 /* LISTES - TOUJOURS VERTICALES */
@@ -416,6 +713,21 @@ console.log('BattleView component loaded')
   font-size: 1.1rem;
   box-shadow: 0 4px 12px rgba(247, 199, 44, 0.3);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
+}
+
+.avatar-initial {
+  font-weight: bold;
+  color: #072C54;
+  text-transform: uppercase;
 }
 
 .player-details {
@@ -555,11 +867,14 @@ console.log('BattleView component loaded')
   cursor: pointer;
   width: 100%;
   box-sizing: border-box;
+  min-height: 80px; /* Même hauteur que battle-card */
+  gap: 1rem;
 }
 
 .invite-card:hover {
   border-color: #F7C72C;
   background: rgba(247, 199, 44, 0.05);
+  transform: translateY(-2px);
 }
 
 .invite-icon {
