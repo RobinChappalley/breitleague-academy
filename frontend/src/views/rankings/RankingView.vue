@@ -5,10 +5,10 @@
       <!-- Header -->
       <div class="ranking-header">
         <h1 class="ranking-title">RANKING</h1>
-        
+
         <!-- Filters -->
         <div class="filters">
-          <button 
+          <button
             class="filter-btn"
             :class="{ active: selectedFilter === 'world' }"
             @click="selectedFilter = 'world'"
@@ -16,19 +16,23 @@
             World
           </button>
           <div class="dropdown">
-            <button 
+            <button
               class="filter-btn dropdown-btn"
-              :class="{ active: selectedFilter === 'switzerland' }"
+              :class="{ active: selectedFilter !== 'world' }"
               @click="toggleDropdown"
             >
-              Switzerland
+              {{ selectedFilterLabel }}
               <i class="dropdown-icon">▼</i>
             </button>
             <div class="dropdown-menu" v-if="showDropdown">
-              <a href="#" @click="selectCountry('Switzerland')">Switzerland</a>
-              <a href="#" @click="selectCountry('France')">France</a>
-              <a href="#" @click="selectCountry('Germany')">Germany</a>
-              <a href="#" @click="selectCountry('Italy')">Italy</a>
+              <a
+                v-for="country in availableCountries"
+                :key="country"
+                href="#"
+                @click="selectCountry(country)"
+              >
+                {{ country }}
+              </a>
             </div>
           </div>
         </div>
@@ -36,52 +40,53 @@
 
       <!-- Ranking List -->
       <div class="ranking-list">
-        <div 
-          v-for="(player, index) in displayedPlayers" 
+        <div
+          v-for="(player, index) in displayedPlayers"
           :key="player.id"
           class="ranking-item"
-          :class="{ 
-            'highlight': player.highlight,
+          :class="{
+            highlight: player.highlight,
             'top-16': player.rank <= 16
           }"
+          @click="openPlayerProfile(player)"
         >
-          <div class="rank">{{ player.rank }}.</div>
-          
+          <div class="rank">{{ player.displayRank }}.</div>
+
           <div class="player-info">
             <div class="avatar" :style="getAvatarStyle(player)">
-              {{ player.avatar }}
+              <img :src="getAvatarUrl(player.avatar)" alt="avatar" class="avatar-image" />
             </div>
             <div class="player-details">
-              <h3 class="player-name" @click="openPlayerProfile(player)">{{ player.name }}</h3>
+              <h3 class="player-name">{{ player.name }}</h3>
               <div class="country-flag">{{ player.flag }}</div>
             </div>
           </div>
-          
+
           <div class="score">{{ player.score.toLocaleString() }}</div>
         </div>
 
         <!-- See All Button -->
-        <button class="see-all-btn" @click="seeAll" v-if="!showingAll">
-          SEE ALL
-        </button>
+        <button class="see-all-btn" @click="seeAll" v-if="!showingAll">SEE ALL</button>
       </div>
     </div>
 
     <!-- Fixed User Position Footer -->
     <div class="user-position-footer">
-      <div class="user-ranking-item">
+      <div class="user-ranking-item" @click="openPlayerProfile(currentUser)">
         <div class="rank">{{ currentUser.rank }}.</div>
-        
+
         <div class="player-info">
-          <div class="avatar" :style="getAvatarStyle(currentUser)">
-            {{ currentUser.avatar }}
+          <div class="avatar">
+            <img :src="getAvatarUrl(currentUser.avatar)" alt="avatar" class="avatar-image" />
           </div>
           <div class="player-details">
-            <h3 class="player-name" @click="openPlayerProfile(currentUser)">{{ currentUser.name }}</h3>
+            <h3 class="player-name">
+              {{ currentUser.name }}
+            </h3>
             <div class="country-flag">{{ currentUser.flag }}</div>
           </div>
         </div>
-        
+
         <div class="score">{{ currentUser.score.toLocaleString() }}</div>
       </div>
     </div>
@@ -90,10 +95,10 @@
     <div class="popup-overlay" v-if="showPlayerPopup" @click="closePlayerPopup">
       <div class="player-popup" @click.stop>
         <button class="close-btn" @click="closePlayerPopup">✕</button>
-        
+
         <div class="popup-header">
-          <div class="popup-avatar" :style="getAvatarStyle(selectedPlayer)">
-            {{ selectedPlayer?.avatar }}
+          <div class="popup-avatar" :style="getAvatarUrl(selectedPlayer)">
+            <img :src="getAvatarUrl(selectedPlayer?.avatar)" alt="avatar" class="avatar-image" />
           </div>
           <div class="popup-player-info">
             <h2 class="popup-player-name">{{ selectedPlayer?.name }}</h2>
@@ -126,14 +131,8 @@
             <button class="see-all-watches-btn">See all</button>
           </div>
           <div class="watches-grid">
-            <div 
-              v-for="watch in selectedPlayer?.topWatches" 
-              :key="watch.id"
-              class="watch-item"
-            >
-              <div class="watch-placeholder">
-                ⌚
-              </div>
+            <div v-for="watch in selectedPlayer?.topWatches" :key="watch.id" class="watch-item">
+              <div class="watch-placeholder">⌚</div>
               <div class="watch-name">{{ watch.name }}</div>
             </div>
           </div>
@@ -154,113 +153,33 @@ const showingAll = ref(false)
 const showPlayerPopup = ref(false)
 const selectedPlayer = ref(null)
 
-// Mock data avec plus de joueurs et infos détaillées
-const allPlayers = ref([
-  { 
-    id: 1, rank: 1, name: 'J.DEGIRMENCI', country: 'South Korea', score: 94532, avatar: 'J', flag: '🇰🇷', 
-    city: 'Seoul, Gangnam District', since: 'Reseller since 2018', battleWin: 145, battleLost: 23,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  { 
-    id: 2, rank: 2, name: 'M.OVSANNA', country: 'Germany', score: 87530, avatar: 'M', flag: '🇩🇪',
-    city: 'Berlin, Mitte', since: 'Reseller since 2017', battleWin: 132, battleLost: 41,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  { 
-    id: 3, rank: 3, name: 'S.DACOSTA', country: 'Spain', score: 84320, avatar: 'S', flag: '🇪🇸',
-    city: 'Madrid, Centro', since: 'Reseller since 2019', battleWin: 128, battleLost: 35,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  { 
-    id: 4, rank: 4, name: 'R.FREUENFELD', country: 'Germany', score: 83234, avatar: 'R', flag: '🇩🇪',
-    city: 'Munich, Maxvorstadt', since: 'Reseller since 2020', battleWin: 119, battleLost: 29,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  { 
-    id: 5, rank: 5, name: 'L.ANEX', country: 'France', score: 82342, avatar: 'L', flag: '🇫🇷',
-    city: 'Paris, 1er Arrondissement', since: 'Reseller since 2016', battleWin: 115, battleLost: 33,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  { 
-    id: 6, rank: 6, name: 'P.DUJARDIN', country: 'France', score: 82234, avatar: 'P', flag: '🇫🇷',
-    city: 'Lyon, Presqu\'île', since: 'Reseller since 2018', battleWin: 112, battleLost: 28,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  // Continuer pour les rangs 7-20
-  { id: 7, rank: 7, name: 'R.BAUMGARTNER', country: 'Switzerland', score: 81832, avatar: 'R', flag: '🇨🇭' },
-  { id: 8, rank: 8, name: 'V.MICHOU', country: 'Canada', score: 80222, avatar: 'V', flag: '🇨🇦' },
-  { id: 9, rank: 9, name: 'L.BENSAID', country: 'Spain', score: 80160, avatar: 'L', flag: '🇪🇸' },
-  { 
-    id: 10, rank: 10, name: 'R.KELLER', country: 'Germany', score: 79883, avatar: 'R', flag: '🇩🇪',
-    city: 'Berlin, Alexander Platz', since: 'Reseller since 2016', battleWin: 128, battleLost: 73,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  { id: 11, rank: 11, name: 'R.ANGER', country: 'Switzerland', score: 79034, avatar: 'R', flag: '🇨🇭' },
-  { id: 12, rank: 12, name: 'A.MOREL', country: 'France', score: 78850, avatar: 'A', flag: '🇫🇷' },
-  { id: 13, rank: 13, name: 'Y.TAKEDA', country: 'Japan', score: 77600, avatar: 'Y', flag: '🇯🇵' },
-  { id: 14, rank: 14, name: 'C.NDIAYE', country: 'France', score: 77502, avatar: 'C', flag: '🇫🇷' },
-  { id: 15, rank: 15, name: 'M.ROJAS', country: 'Canada', score: 76307, avatar: 'M', flag: '🇨🇦' },
-  { id: 16, rank: 16, name: 'K.HADDAD', country: 'Morocco', score: 75998, avatar: 'K', flag: '🇲🇦' },
-  // Les autres ne sont plus en top 16
-  { id: 17, rank: 17, name: 'S.FRAISOU', country: 'South Korea', score: 70532, avatar: 'S', flag: '🇰🇷', highlight: true },
-  { id: 18, rank: 18, name: 'F.MORANGO', country: 'Spain', score: 69530, avatar: 'F', flag: '🇪🇸', highlight: true },
-  { id: 19, rank: 19, name: 'C.TENERA', country: 'Spain', score: 67320, avatar: 'C', flag: '🇪🇸', highlight: true },
-  { id: 20, rank: 20, name: 'H.IBRAHIM', country: 'Germany', score: 42234, avatar: 'H', flag: '🇩🇪', highlight: true }
-])
+const displayedPlayers = computed(() => {
+  // Filtrage par pays si ce n'est pas "world"
+  let filteredPlayers = rankingPlayers.value
 
-// Utilisateur actuel (séparé)
-const currentUser = ref({
-  id: 70, 
-  rank: 70, 
-  name: 'R.DUFUIS', 
-  country: 'Switzerland', 
-  score: 41320, 
-  avatar: 'R', 
-  flag: '🇨🇭',
-  city: 'Zurich, Bahnhofstrasse', 
-  since: 'Reseller since 2021', 
-  battleWin: 45, 
-  battleLost: 28,
-  topWatches: [
-    { id: 1, name: 'Premier B01' },
-    { id: 2, name: 'Navitimer' },
-    { id: 3, name: 'Superocean' }
-  ]
+  if (selectedFilter.value !== 'world') {
+    filteredPlayers = filteredPlayers.filter(
+      (player) => player.country.toLowerCase() === selectedFilter.value
+    )
+  }
+
+  // Recalcule le rank pour affichage (1, 2, 3...)
+  const playersWithLocalRank = filteredPlayers.map((player, index) => ({
+    ...player,
+    displayRank: index + 1
+  }))
+
+  // Limite à top 20 si pas "see all"
+  if (!showingAll.value) {
+    return playersWithLocalRank.slice(0, 20)
+  }
+
+  return playersWithLocalRank
 })
 
-const displayedPlayers = computed(() => {
-  if (showingAll.value) {
-    return allPlayers.value
-  }
-  return allPlayers.value.slice(0, 20)
+const selectedFilterLabel = computed(() => {
+  if (selectedFilter.value === 'world') return 'Select your country'
+  return selectedFilter.value.charAt(0).toUpperCase() + selectedFilter.value.slice(1)
 })
 
 // Methods
@@ -294,7 +213,7 @@ const closePlayerPopup = () => {
 // Generate random gradient for each avatar
 const getAvatarStyle = (player) => {
   if (!player) return {}
-  
+
   const gradients = [
     'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
@@ -305,16 +224,150 @@ const getAvatarStyle = (player) => {
     'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
     'linear-gradient(135deg, #ff8a80 0%, #ff5722 100%)'
   ]
-  
+
   const index = player.id % gradients.length
   return {
     background: gradients[index]
   }
 }
 
+const rankingPlayers = ref([])
+
+const loadUsersRanking = async () => {
+  try {
+    const res = await fetch('http://localhost:8000/api/v1/users', {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+
+    if (!res.ok) throw new Error('Erreur lors du chargement des utilisateurs')
+
+    const data = await res.json()
+    console.log('✅ Utilisateurs chargés:', data)
+
+    // Mapper les users pour les adapter à ton format Ranking
+    rankingPlayers.value = data.data
+      .filter((user) => user.is_BS === true)
+      .map((user, index) => ({
+        id: user.id,
+        rank: index + 1, // 👈 on trie + on met le rang
+        name: user.username.toUpperCase(),
+        country: user.pos?.country || 'Unknown',
+        score: user.elo_score || 0,
+        avatar: user.avatar,
+        flag: user.pos?.country_flag || '🌍',
+        city: user.pos?.address || 'Unknown',
+        since: `Reseller since ${user.signup_year}`,
+        battleWin: user.battle_won || 0,
+        battleLost: user.battle_lost || 0,
+        topWatches: [] // on met vide pour l’instant si tu n’as pas l’info
+      }))
+      // On trie par elo_score DESC
+      .sort((a, b) => b.score - a.score)
+      // On attribue le rang correct après tri
+      .map((player, index) => ({
+        ...player,
+        rank: index + 1
+      }))
+  } catch (err) {
+    console.error('❌ Erreur API users ranking:', err.message)
+  }
+}
+
+const currentUser = ref({
+  id: null,
+  rank: 'N/A',
+  name: '',
+  country: '',
+  score: 0,
+  avatar: '',
+  flag: '',
+  city: '',
+  since: '',
+  battleWin: 0,
+  battleLost: 0,
+  topWatches: []
+})
+
+const loadCurrentUser = async () => {
+  try {
+    // Étape 1 : Vérifier que l'utilisateur est connecté
+    const res1 = await fetch('http://localhost:8000/api/user', {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+    if (!res1.ok) throw new Error('Utilisateur non authentifié')
+    const userData = await res1.json()
+
+    const userId = userData.id
+    //console.log(userId)
+
+    // Étape 2 : Charger les vraies infos utilisateur via /v1/users/{id}
+    const res2 = await fetch(`http://localhost:8000/api/v1/users/${userId}`, {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+    if (!res2.ok) throw new Error('Erreur chargement données utilisateur')
+    const fullUser = await res2.json()
+    //console.log(fullUser)
+    const userDataFull = fullUser.data
+
+    // Étape 3 : Chercher le rank si présent dans le classement
+    const foundPlayer = rankingPlayers.value.find((player) => player.id === userId)
+
+    currentUser.value = {
+      id: userDataFull.id,
+      rank: foundPlayer ? foundPlayer.rank : 'N/A',
+      name: userDataFull.username?.toUpperCase() || '',
+      country: userDataFull.pos?.country || 'Unknown',
+      score: userDataFull.elo_score || 0,
+      avatar: userDataFull.avatar || '',
+      flag: userDataFull.pos?.country_flag || '🌍',
+      city: userDataFull.pos?.address || 'Unknown',
+      since: `Reseller since ${userDataFull.signup_year || 'Unknown'}`,
+      battleWin: userDataFull.battle_won || 0,
+      battleLost: userDataFull.battle_lost || 0,
+      topWatches: [] // à remplir plus tard si dispo
+    }
+    //console.log(fullUser.data.id)
+
+    console.log('✅ Utilisateur courant chargé :', currentUser.value)
+  } catch (err) {
+    console.error('❌ Erreur lors du chargement du currentUser:', err.message)
+  }
+}
+
+const availableCountries = computed(() => {
+  const countriesSet = new Set()
+
+  rankingPlayers.value.forEach((player) => {
+    if (player.country) {
+      countriesSet.add(player.country)
+    }
+  })
+
+  return Array.from(countriesSet).sort()
+})
+
+const getAvatarUrl = (avatarPath) => {
+  if (avatarPath) {
+    return `http://localhost:8000/${avatarPath}`
+  }
+  return '/images/icones/default_avatar.png' // fallback si pas d'avatar
+}
+
 onMounted(() => {
   checkScreenSize()
   window.addEventListener('resize', checkScreenSize)
+  loadUsersRanking().then(() => {
+    loadCurrentUser()
+  })
 })
 
 console.log('RankingView component loaded')
@@ -324,7 +377,7 @@ console.log('RankingView component loaded')
 .ranking-page {
   min-height: 100vh;
   width: 100vw;
-  background: linear-gradient(135deg, #072C54 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #072c54 0%, #1e3a8a 100%);
   color: white;
   overflow-x: hidden;
 }
@@ -346,7 +399,7 @@ console.log('RankingView component loaded')
 .ranking-title {
   font-size: 3rem;
   font-weight: 700;
-  color: #F7C72C;
+  color: #f7c72c;
   margin: 0 0 2rem 0;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -375,8 +428,8 @@ console.log('RankingView component loaded')
 }
 
 .filter-btn.active {
-  background: #F7C72C;
-  color: #072C54;
+  background: #f7c72c;
+  color: #072c54;
 }
 
 .dropdown {
@@ -400,7 +453,7 @@ console.log('RankingView component loaded')
   top: 100%;
   left: 0;
   right: 0;
-  background: #072C54;
+  background: #072c54;
   border-radius: 0 0 8px 8px;
   overflow: hidden;
   z-index: 10;
@@ -433,6 +486,7 @@ console.log('RankingView component loaded')
   margin-bottom: 1rem;
   border-radius: 12px;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .ranking-item:hover {
@@ -446,7 +500,7 @@ console.log('RankingView component loaded')
 /* TOP 16 STYLING */
 .ranking-item.top-16 {
   background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(247, 199, 44, 0.1) 100%);
-  border-left: 4px solid #F7C72C;
+  border-left: 4px solid #f7c72c;
   box-shadow: 0 4px 15px rgba(247, 199, 44, 0.2);
 }
 
@@ -458,7 +512,7 @@ console.log('RankingView component loaded')
 .rank {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #F7C72C;
+  color: #f7c72c;
   min-width: 40px;
 }
 
@@ -482,6 +536,13 @@ console.log('RankingView component loaded')
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   border: 2px solid rgba(255, 255, 255, 0.2);
 }
+.avatar img.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
+}
 
 .player-details {
   display: flex;
@@ -499,7 +560,7 @@ console.log('RankingView component loaded')
 }
 
 .player-name:hover {
-  color: #F7C72C;
+  color: #f7c72c;
 }
 
 .country-flag {
@@ -516,8 +577,8 @@ console.log('RankingView component loaded')
 .see-all-btn {
   width: 100%;
   padding: 1rem;
-  background: #F7C72C;
-  color: #072C54;
+  background: #f7c72c;
+  color: #072c54;
   border: none;
   border-radius: 12px;
   font-weight: 700;
@@ -529,7 +590,7 @@ console.log('RankingView component loaded')
 }
 
 .see-all-btn:hover {
-  background: #E6B625;
+  background: #e6b625;
   transform: translateY(-2px);
 }
 
@@ -539,8 +600,8 @@ console.log('RankingView component loaded')
   bottom: 0;
   left: 0;
   right: 0;
-  background: #072C54;
-  border-top: 3px solid #F7C72C;
+  background: #072c54;
+  border-top: 3px solid #f7c72c;
   padding: 1rem 2rem;
   z-index: 1000;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
@@ -555,13 +616,13 @@ console.log('RankingView component loaded')
   background: rgba(247, 199, 44, 0.15);
   padding: 1rem 1.5rem;
   border-radius: 12px;
-  border: 2px solid #F7C72C;
+  border: 2px solid #f7c72c;
 }
 
 .user-ranking-item .rank {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #F7C72C;
+  color: #f7c72c;
   min-width: 40px;
 }
 
@@ -583,7 +644,7 @@ console.log('RankingView component loaded')
   font-weight: bold;
   font-size: 1.2rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  border: 2px solid #F7C72C;
+  border: 2px solid #f7c72c;
 }
 
 .user-ranking-item .player-details {
@@ -626,22 +687,22 @@ console.log('RankingView component loaded')
 }
 
 .player-popup {
-  background: linear-gradient(135deg, #1e3a8a 0%, #072C54 100%);
+  background: linear-gradient(135deg, #1e3a8a 0%, #072c54 100%);
   border-radius: 20px;
   padding: 2rem;
   max-width: 400px;
   width: 90%;
   position: relative;
   color: white;
-  border: 2px solid #F7C72C;
+  border: 2px solid #f7c72c;
 }
 
 .close-btn {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: #F7C72C;
-  color: #072C54;
+  background: #f7c72c;
+  color: #072c54;
   border: none;
   border-radius: 50%;
   width: 30px;
@@ -670,8 +731,15 @@ console.log('RankingView component loaded')
   justify-content: center;
   font-weight: bold;
   font-size: 2rem;
-  border: 3px solid #F7C72C;
+  border: 3px solid #f7c72c;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+.popup-avatar img.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
 }
 
 .popup-player-info {
@@ -727,7 +795,7 @@ console.log('RankingView component loaded')
 
 .stat-label {
   display: block;
-  color: #F7C72C;
+  color: #f7c72c;
   font-size: 0.9rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
@@ -760,8 +828,8 @@ console.log('RankingView component loaded')
 }
 
 .see-all-watches-btn {
-  background: #F7C72C;
-  color: #072C54;
+  background: #f7c72c;
+  color: #072c54;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -802,40 +870,40 @@ console.log('RankingView component loaded')
     width: calc(100% - 280px);
     padding-bottom: 0; /* Pas de padding bottom sur desktop */
   }
-  
+
   .main-content {
     padding-bottom: 120px; /* Espace pour le footer utilisateur */
   }
-  
+
   .user-position-footer {
     left: 280px; /* Aligné avec la navbar desktop */
     padding: 1.5rem 2rem;
   }
-  
+
   .user-ranking-item {
     max-width: 900px;
     padding: 1.2rem 2rem;
   }
-  
+
   .user-ranking-item .rank {
     font-size: 1.4rem;
     min-width: 50px;
   }
-  
+
   .user-ranking-item .avatar {
     width: 60px;
     height: 60px;
     font-size: 1.4rem;
   }
-  
+
   .user-ranking-item .player-name {
     font-size: 1.1rem;
   }
-  
+
   .user-ranking-item .score {
     font-size: 1.4rem;
   }
-  
+
   .ranking-title {
     font-size: 3.5rem;
   }
@@ -848,39 +916,39 @@ console.log('RankingView component loaded')
     padding: 3rem;
     padding-bottom: 0;
   }
-  
+
   .main-content {
     padding-bottom: 140px; /* Plus d'espace sur large desktop */
   }
-  
+
   .user-position-footer {
     left: 280px;
     padding: 2rem 3rem;
   }
-  
+
   .user-ranking-item {
     max-width: 1000px;
     padding: 1.5rem 2.5rem;
   }
-  
+
   .user-ranking-item .rank {
     font-size: 1.5rem;
   }
-  
+
   .user-ranking-item .avatar {
     width: 70px;
     height: 70px;
     font-size: 1.6rem;
   }
-  
+
   .user-ranking-item .player-name {
     font-size: 1.2rem;
   }
-  
+
   .user-ranking-item .score {
     font-size: 1.5rem;
   }
-  
+
   .ranking-title {
     font-size: 4rem;
   }
@@ -894,70 +962,70 @@ console.log('RankingView component loaded')
     padding: 1rem;
     padding-bottom: 0;
   }
-  
+
   .main-content {
     padding: 1rem;
     padding-bottom: 180px; /* Plus d'espace : footer fixe (100px) + navbar mobile (70px) + marge (10px) */
   }
-  
+
   .user-position-footer {
     left: 0; /* Pleine largeur sur mobile */
     padding: 0.8rem 1rem;
     bottom: 70px; /* Au-dessus de la navbar mobile */
   }
-  
+
   .see-all-btn {
     margin: 2rem 0 3rem 0; /* Plus de marge en bas */
   }
-  
+
   .user-ranking-item {
     padding: 0.8rem 1rem;
     gap: 0.8rem;
   }
-  
+
   .user-ranking-item .rank {
     font-size: 1rem;
     min-width: 35px;
   }
-  
+
   .user-ranking-item .avatar {
     width: 40px;
     height: 40px;
     font-size: 1rem;
   }
-  
+
   .user-ranking-item .player-name {
     font-size: 0.9rem;
   }
-  
+
   .user-ranking-item .score {
     font-size: 1rem;
   }
-  
+
   .ranking-title {
     font-size: 2rem;
   }
-  
+
   .ranking-item {
     padding: 0.8rem 1rem;
     gap: 0.8rem;
   }
-  
+
   .ranking-item .rank {
     font-size: 1rem;
     min-width: 35px;
   }
-  
+
   .ranking-item .avatar {
     width: 40px;
     height: 40px;
     font-size: 1rem;
   }
-  
+
   .ranking-item .player-name {
     font-size: 0.9rem;
   }
-  
+
   .ranking-item .score {
     font-size: 1rem;
   }
@@ -969,30 +1037,30 @@ console.log('RankingView component loaded')
     padding: 1rem;
     padding-bottom: 190px; /* Encore plus d'espace sur très petit mobile */
   }
-  
+
   .user-position-footer {
     padding: 0.6rem 0.8rem;
   }
-  
+
   .user-ranking-item {
     padding: 0.6rem 0.8rem;
   }
-  
+
   .user-ranking-item .rank {
     font-size: 0.9rem;
     min-width: 30px;
   }
-  
+
   .user-ranking-item .avatar {
     width: 35px;
     height: 35px;
     font-size: 0.9rem;
   }
-  
+
   .user-ranking-item .player-name {
     font-size: 0.8rem;
   }
-  
+
   .user-ranking-item .score {
     font-size: 0.9rem;
   }

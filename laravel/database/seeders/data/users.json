@@ -25,7 +25,7 @@
         "battle_won": 128,
         "battle_lost": 73,
         "number_available_slots": 2,
-        "is_BS": false
+        "is_BS": true
     },
     {
         "id": 3,
@@ -39,7 +39,7 @@
         "battle_won": 110,
         "battle_lost": 45,
         "number_available_slots": 4,
-        "is_BS": false
+        "is_BS": true
     },
     {
         "id": 4,
@@ -138,5 +138,19 @@
         "battle_lost": 45,
         "number_available_slots": 2,
         "is_BS": false
+    },
+    {
+        "id": 11,
+        "username": "cedrine",
+        "email": "cedrine@example.com",
+        "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
+        "pos_id": 1,
+        "signup_year": 2025,
+        "avatar": "img/profile_photo/cedrine.jpg",
+        "elo_score": 50000,
+        "battle_won": 40,
+        "battle_lost": 5,
+        "number_available_slots": 2,
+        "is_BS": true
     }
 ]
