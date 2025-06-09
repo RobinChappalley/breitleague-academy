@@ -56,11 +56,11 @@
         <div class="stats-section">
           <div class="stat-item">
             <div class="stat-value">{{ user.battle_won || 0 }}</div>
-            <div class="stat-label">Victoires</div>
+            <div class="stat-label">Victories</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ user.battle_lost || 0 }}</div>
-            <div class="stat-label">Défaites</div>
+            <div class="stat-label">Defeats</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ winRate }}%</div>
@@ -90,23 +90,23 @@
         <!-- User Info Section -->
         <div class="user-info-section">
           <div class="info-item">
-            <span class="info-label">Email:</span>
+            <span class="info-label">E-mail:</span>
             <span class="info-value">{{ user.email || 'Non renseigné' }}</span>
           </div>
           <div class="info-item clickable">
-            <span class="info-label">Modifier le mot de passe</span>
+            <span class="info-label">Update password</span>
             <span class="info-action">→</span>
           </div>
           <div class="info-item clickable">
-            <span class="info-label">Changer d'avatar</span>
+            <span class="info-label">Edit profile photo </span>
             <span class="info-action">→</span>
           </div>
           <div class="info-item clickable">
-            <span class="info-label">Paramètres de notification</span>
+            <span class="info-label">Notification parameter</span>
             <span class="info-action">→</span>
           </div>
           <div class="info-item clickable">
-            <span class="info-label">Confidentialité</span>
+            <span class="info-label">Privacy</span>
             <span class="info-action">→</span>
           </div>
         </div>
@@ -121,7 +121,7 @@
       </div>
       <!-- LOGOUT BUTTON -->
       <div style="text-align: center; margin-top: 2rem">
-        <button @click="logout" class="see-all-btn">Se déconnecter</button>
+        <button @click="logout" class="see-all-btn">Logout</button>
       </div>
     </div>
   </div>
