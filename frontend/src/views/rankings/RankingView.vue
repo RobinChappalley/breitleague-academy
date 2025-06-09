@@ -50,7 +50,7 @@
           }"
           @click="openPlayerProfile(player)"
         >
-          <div class="rank">{{ player.rank }}.</div>
+          <div class="rank">{{ player.displayRank }}.</div>
 
           <div class="player-info">
             <div class="avatar" :style="getAvatarStyle(player)">
@@ -154,17 +154,27 @@ const showPlayerPopup = ref(false)
 const selectedPlayer = ref(null)
 
 const displayedPlayers = computed(() => {
-  let players = rankingPlayers.value
+  // Filtrage par pays si ce n'est pas "world"
+  let filteredPlayers = rankingPlayers.value
 
   if (selectedFilter.value !== 'world') {
-    players = players.filter((player) => player.country.toLowerCase() === selectedFilter.value)
+    filteredPlayers = filteredPlayers.filter(
+      (player) => player.country.toLowerCase() === selectedFilter.value
+    )
   }
 
-  if (showingAll.value) {
-    return players
+  // Recalcule le rank pour affichage (1, 2, 3...)
+  const playersWithLocalRank = filteredPlayers.map((player, index) => ({
+    ...player,
+    displayRank: index + 1
+  }))
+
+  // Limite à top 20 si pas "see all"
+  if (!showingAll.value) {
+    return playersWithLocalRank.slice(0, 20)
   }
 
-  return players.slice(0, 20)
+  return playersWithLocalRank
 })
 
 const selectedFilterLabel = computed(() => {
