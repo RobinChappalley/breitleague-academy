@@ -72,15 +72,15 @@
 
     <!-- Fixed User Position Footer -->
     <div class="user-position-footer">
-      <div class="user-ranking-item">
+      <div class="user-ranking-item" @click="openPlayerProfile(currentUser)">
         <div class="rank">{{ currentUser.rank }}.</div>
 
         <div class="player-info">
-          <div class="avatar" :style="getAvatarStyle(currentUser)">
-            {{ currentUser.avatar }}
+          <div class="avatar">
+            <img :src="getAvatarUrl(currentUser.avatar)" alt="avatar" class="avatar-image" />
           </div>
           <div class="player-details">
-            <h3 class="player-name" @click="openPlayerProfile(currentUser)">
+            <h3 class="player-name">
               {{ currentUser.name }}
             </h3>
             <div class="country-flag">{{ currentUser.flag }}</div>
@@ -97,8 +97,8 @@
         <button class="close-btn" @click="closePlayerPopup">✕</button>
 
         <div class="popup-header">
-          <div class="popup-avatar" :style="getAvatarStyle(selectedPlayer)">
-            {{ selectedPlayer?.avatar }}
+          <div class="popup-avatar" :style="getAvatarUrl(selectedPlayer)">
+            <img :src="getAvatarUrl(selectedPlayer?.avatar)" alt="avatar" class="avatar-image" />
           </div>
           <div class="popup-player-info">
             <h2 class="popup-player-name">{{ selectedPlayer?.name }}</h2>
@@ -152,223 +152,6 @@ const isDesktop = ref(false)
 const showingAll = ref(false)
 const showPlayerPopup = ref(false)
 const selectedPlayer = ref(null)
-
-// Mock data avec plus de joueurs et infos détaillées
-const allPlayers = ref([
-  {
-    id: 1,
-    rank: 1,
-    name: 'J.DEGIRMENCI',
-    country: 'South Korea',
-    score: 94532,
-    avatar: 'J',
-    flag: '🇰🇷',
-    city: 'Seoul, Gangnam District',
-    since: 'Reseller since 2018',
-    battleWin: 145,
-    battleLost: 23,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  {
-    id: 2,
-    rank: 2,
-    name: 'M.OVSANNA',
-    country: 'Germany',
-    score: 87530,
-    avatar: 'M',
-    flag: '🇩🇪',
-    city: 'Berlin, Mitte',
-    since: 'Reseller since 2017',
-    battleWin: 132,
-    battleLost: 41,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  {
-    id: 3,
-    rank: 3,
-    name: 'S.DACOSTA',
-    country: 'Spain',
-    score: 84320,
-    avatar: 'S',
-    flag: '🇪🇸',
-    city: 'Madrid, Centro',
-    since: 'Reseller since 2019',
-    battleWin: 128,
-    battleLost: 35,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  {
-    id: 4,
-    rank: 4,
-    name: 'R.FREUENFELD',
-    country: 'Germany',
-    score: 83234,
-    avatar: 'R',
-    flag: '🇩🇪',
-    city: 'Munich, Maxvorstadt',
-    since: 'Reseller since 2020',
-    battleWin: 119,
-    battleLost: 29,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  {
-    id: 5,
-    rank: 5,
-    name: 'L.ANEX',
-    country: 'France',
-    score: 82342,
-    avatar: 'L',
-    flag: '🇫🇷',
-    city: 'Paris, 1er Arrondissement',
-    since: 'Reseller since 2016',
-    battleWin: 115,
-    battleLost: 33,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  {
-    id: 6,
-    rank: 6,
-    name: 'P.DUJARDIN',
-    country: 'France',
-    score: 82234,
-    avatar: 'P',
-    flag: '🇫🇷',
-    city: "Lyon, Presqu'île",
-    since: 'Reseller since 2018',
-    battleWin: 112,
-    battleLost: 28,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  // Continuer pour les rangs 7-20
-  {
-    id: 7,
-    rank: 7,
-    name: 'R.BAUMGARTNER',
-    country: 'Switzerland',
-    score: 81832,
-    avatar: 'R',
-    flag: '🇨🇭'
-  },
-  { id: 8, rank: 8, name: 'V.MICHOU', country: 'Canada', score: 80222, avatar: 'V', flag: '🇨🇦' },
-  { id: 9, rank: 9, name: 'L.BENSAID', country: 'Spain', score: 80160, avatar: 'L', flag: '🇪🇸' },
-  {
-    id: 10,
-    rank: 10,
-    name: 'R.KELLER',
-    country: 'Germany',
-    score: 79883,
-    avatar: 'R',
-    flag: '🇩🇪',
-    city: 'Berlin, Alexander Platz',
-    since: 'Reseller since 2016',
-    battleWin: 128,
-    battleLost: 73,
-    topWatches: [
-      { id: 1, name: 'Premier B01' },
-      { id: 2, name: 'Navitimer' },
-      { id: 3, name: 'Superocean' }
-    ]
-  },
-  {
-    id: 11,
-    rank: 11,
-    name: 'R.ANGER',
-    country: 'Switzerland',
-    score: 79034,
-    avatar: 'R',
-    flag: '🇨🇭'
-  },
-  { id: 12, rank: 12, name: 'A.MOREL', country: 'France', score: 78850, avatar: 'A', flag: '🇫🇷' },
-  { id: 13, rank: 13, name: 'Y.TAKEDA', country: 'Japan', score: 77600, avatar: 'Y', flag: '🇯🇵' },
-  { id: 14, rank: 14, name: 'C.NDIAYE', country: 'France', score: 77502, avatar: 'C', flag: '🇫🇷' },
-  { id: 15, rank: 15, name: 'M.ROJAS', country: 'Canada', score: 76307, avatar: 'M', flag: '🇨🇦' },
-  { id: 16, rank: 16, name: 'K.HADDAD', country: 'Morocco', score: 75998, avatar: 'K', flag: '🇲🇦' },
-  // Les autres ne sont plus en top 16
-  {
-    id: 17,
-    rank: 17,
-    name: 'S.FRAISOU',
-    country: 'South Korea',
-    score: 70532,
-    avatar: 'S',
-    flag: '🇰🇷',
-    highlight: true
-  },
-  {
-    id: 18,
-    rank: 18,
-    name: 'F.MORANGO',
-    country: 'Spain',
-    score: 69530,
-    avatar: 'F',
-    flag: '🇪🇸',
-    highlight: true
-  },
-  {
-    id: 19,
-    rank: 19,
-    name: 'C.TENERA',
-    country: 'Spain',
-    score: 67320,
-    avatar: 'C',
-    flag: '🇪🇸',
-    highlight: true
-  },
-  {
-    id: 20,
-    rank: 20,
-    name: 'H.IBRAHIM',
-    country: 'Germany',
-    score: 42234,
-    avatar: 'H',
-    flag: '🇩🇪',
-    highlight: true
-  }
-])
-
-// Utilisateur actuel (séparé)
-const currentUser = ref({
-  id: 70,
-  rank: 70,
-  name: 'R.DUFUIS',
-  country: 'Switzerland',
-  score: 41320,
-  avatar: 'R',
-  flag: '🇨🇭',
-  city: 'Zurich, Bahnhofstrasse',
-  since: 'Reseller since 2021',
-  battleWin: 45,
-  battleLost: 28,
-  topWatches: [
-    { id: 1, name: 'Premier B01' },
-    { id: 2, name: 'Navitimer' },
-    { id: 3, name: 'Superocean' }
-  ]
-})
 
 const displayedPlayers = computed(() => {
   if (showingAll.value) {
@@ -471,6 +254,73 @@ const loadUsersRanking = async () => {
   }
 }
 
+const currentUser = ref({
+  id: null,
+  rank: 'N/A',
+  name: '',
+  country: '',
+  score: 0,
+  avatar: '',
+  flag: '',
+  city: '',
+  since: '',
+  battleWin: 0,
+  battleLost: 0,
+  topWatches: []
+})
+
+const loadCurrentUser = async () => {
+  try {
+    // Étape 1 : Vérifier que l'utilisateur est connecté
+    const res1 = await fetch('http://localhost:8000/api/user', {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+    if (!res1.ok) throw new Error('Utilisateur non authentifié')
+    const userData = await res1.json()
+
+    const userId = userData.id
+    //console.log(userId)
+
+    // Étape 2 : Charger les vraies infos utilisateur via /v1/users/{id}
+    const res2 = await fetch(`http://localhost:8000/api/v1/users/${userId}`, {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+    if (!res2.ok) throw new Error('Erreur chargement données utilisateur')
+    const fullUser = await res2.json()
+    //console.log(fullUser)
+    const userDataFull = fullUser.data
+
+    // Étape 3 : Chercher le rank si présent dans le classement
+    const foundPlayer = rankingPlayers.value.find((player) => player.id === userId)
+
+    currentUser.value = {
+      id: userDataFull.id,
+      rank: foundPlayer ? foundPlayer.rank : 'N/A',
+      name: userDataFull.username?.toUpperCase() || '',
+      country: userDataFull.pos?.country || 'Unknown',
+      score: userDataFull.elo_score || 0,
+      avatar: userDataFull.avatar || '',
+      flag: userDataFull.pos?.country_flag || '🌍',
+      city: userDataFull.pos?.address || 'Unknown',
+      since: `Reseller since ${userDataFull.signup_year || 'Unknown'}`,
+      battleWin: userDataFull.battle_won || 0,
+      battleLost: userDataFull.battle_lost || 0,
+      topWatches: [] // à remplir plus tard si dispo
+    }
+    //console.log(fullUser.data.id)
+
+    console.log('✅ Utilisateur courant chargé :', currentUser.value)
+  } catch (err) {
+    console.error('❌ Erreur lors du chargement du currentUser:', err.message)
+  }
+}
+
 const availableCountries = computed(() => {
   const countriesSet = new Set()
 
@@ -493,7 +343,9 @@ const getAvatarUrl = (avatarPath) => {
 onMounted(() => {
   checkScreenSize()
   window.addEventListener('resize', checkScreenSize)
-  loadUsersRanking()
+  loadUsersRanking().then(() => {
+    loadCurrentUser()
+  })
 })
 
 console.log('RankingView component loaded')
@@ -859,6 +711,13 @@ console.log('RankingView component loaded')
   font-size: 2rem;
   border: 3px solid #f7c72c;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+.popup-avatar img.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
 }
 
 .popup-player-info {
