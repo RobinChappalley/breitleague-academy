@@ -187,6 +187,7 @@ const loadUserProfile = async () => {
   } catch (err) {
     error.value = `Erreur lors du chargement: ${err.message}`
     console.error('❌ Erreur API:', err)
+    router.push('/login')
   } finally {
     isLoading.value = false
   }
