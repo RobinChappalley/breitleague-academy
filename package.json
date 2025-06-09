@@ -1,5 +1,6 @@
 {
-  "devDependencies": {
+  "dependencies": {
+    "pinia": "^3.0.3",
     "widdershins": "^4.0.1"
   }
 }

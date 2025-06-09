@@ -33,5 +33,15 @@ export const routes = [
     component: CheckpointResultsView,
     meta: { hideNavBar: true }
   },
-  { path: '/ressources/history', component: HistoireView, meta: { hideNavBar: true } }
+  { path: '/ressources/history', component: HistoireView, meta: { hideNavBar: true } },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: (to) => {
+      if (localStorage.getItem('isLoggedIn') === 'true') {
+        return '/'
+      } else {
+        return '/login'
+      }
+    }
+  }
 ]

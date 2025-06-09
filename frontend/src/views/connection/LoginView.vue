@@ -12,7 +12,7 @@
 
       <div v-if="currentUser">
         <p>Connecté en tant que {{ currentUser.username }}</p>
-        <button @click="logout">Se déconnecter</button>
+        <button @click="logout">Logout</button>
       </div>
     </div>
   </div>
@@ -59,7 +59,7 @@ const login = async () => {
       })
     })
 
-    if (!res.ok) throw new Error("Nom d'utilisateur ou mot de passe invalide")
+    if (!res.ok) throw new Error('Username or password not valid')
 
     // Récupérer l'utilisateur connecté
     await fetchUser()
@@ -79,16 +79,19 @@ const fetchUser = async () => {
 
     if (!res.ok) {
       currentUser.value = null
+      localStorage.removeItem('isLoggedIn')
       return
     }
 
     const data = await res.json()
     currentUser.value = data
+    localStorage.setItem('isLoggedIn', 'true')
 
     // Si l'utilisateur est connecté → rediriger vers "/"
     router.push('/')
   } catch {
     currentUser.value = null
+    localStorage.removeItem('isLoggedIn')
   }
 }
 
@@ -99,6 +102,7 @@ const logout = async () => {
   })
 
   currentUser.value = null
+  localStorage.removeItem('isLoggedIn')
   router.push('/login') // On revient sur la page login après déconnexion
 }
 </script>
