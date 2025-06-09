@@ -5,12 +5,12 @@
         <path d="M15 19l-7-7 7-7" stroke="#F7C72C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
-    <!-- Header Section avec image -->
+    <!-- Header Section with image -->
     <div class="hero-section">
       <div class="hero-image">
         <img 
           src="/images/hero/breitling-vintage-watches.jpg"
-          alt="Montres Breitling vintage avec documentation historique"
+          alt="Breitling vintage watches with historical documentation"
           class="hero-img"
         />
       </div>
@@ -21,45 +21,45 @@
       <div class="onboarding-content">
         <div class="section-header">
           <span class="section-tag">ONBOARDING</span>
-          <h2 class="section-title">HISTOIRE</h2>
+          <h2 class="section-title">HISTORY</h2>
         </div>
 
         <div class="content-block">
           <h3 class="content-subtitle">INTRODUCTION</h3>
           <p class="content-text intro-bold">
-            IL EST ESSENTIEL DE REVENIR SUR NOTRE HISTOIRE POUR EXPLIQUER NOTRE HÉRITAGE ET COMPRENDRE LE NOUVEAU POSITIONNEMENT DE LA MARQUE
+            IT IS ESSENTIAL TO REVISIT OUR HISTORY TO EXPLAIN OUR HERITAGE AND UNDERSTAND THE BRAND'S NEW POSITIONING
           </p>
           
           <p class="content-text">
-            Dans cette présentation, vous allez voir que si la réputation d'une marque est généralement le fruit de quelques décennies de son histoire, ce n'est pas toujours le cas.
+            In this presentation, you will see that while a brand's reputation is generally the result of a few decades of its history, this is not always the case.
           </p>
 
           <p class="content-text">
-            Par exemple, Breitling est souvent vue comme une marque d'instruments destinés aux professionnels de l'aviation. C'est en effet l'image que nous voulions donner jusqu'ici, et ce depuis la crise du quartz. Le module Histoire est une exploration de la marque et de ses univers au fil du temps.
+            For example, Breitling is often seen as a brand of instruments designed for aviation professionals. This is indeed the image we wanted to convey until now, since the quartz crisis. The History module is an exploration of the brand and its universes over time.
           </p>
 
           <p class="content-text">
-            Nous allons explorer l'histoire de la marque dans ses grandes lignes pour vous aider à expliquer les tenants et la légitimité de notre positionnement actuel, et vous aider à appuyer votre argumentaire de vente.
+            We will explore the brand's history in broad strokes to help you explain the foundations and legitimacy of our current positioning, and help you support your sales argument.
           </p>
 
-          <h4 class="subsection-title">BIEN PLUS QU'UNE MARQUE DE MONTRES POUR AVIATEURS</h4>
+          <h4 class="subsection-title">MUCH MORE THAN A WATCH BRAND FOR AVIATORS</h4>
           
           <p class="content-text">
-            Tout a commencé par la fondation de la marque, en 1884, par Léon Breitling, dont le but était de développer les instruments de mesure du temps les plus performants.
+            It all began with the founding of the brand in 1884 by Léon Breitling, whose goal was to develop the most efficient time measurement instruments.
           </p>
 
           <p class="content-text">
-            Cet héritage s'est perpétué pendant plus d'un siècle jusqu'à aujourd'hui.
+            This heritage has been perpetuated for more than a century until today.
           </p>
         </div>
 
-        <!-- Deuxième chapitre -->
+        <!-- Second chapter -->
         <div class="content-block chapter-block">
-          <h3 class="content-subtitle">UNE HISTOIRE PEUPLÉE D'INVENTEURS</h3>
-          <h4 class="subsection-title">LA FAMILLE BREITLING</h4>
+          <h3 class="content-subtitle">A HISTORY POPULATED BY INVENTORS</h3>
+          <h4 class="subsection-title">THE BREITLING FAMILY</h4>
           
           <p class="content-text">
-            Cette rubrique passe en revue les principaux acteurs qui ont fait de Breitling l'une des marques horlogères les plus emblématiques au monde. Les trois générations de la famille fondatrice — Léon, Gaston et Willy — étaient liées par une quête commune : le développement du meilleur chronographe au monde.
+            This section reviews the main actors who made Breitling one of the most iconic watch brands in the world. The three generations of the founding family — Léon, Gaston and Willy — were united by a common quest: the development of the world's best chronograph.
           </p>
 
           <!-- Timeline -->
@@ -69,7 +69,7 @@
               <div class="timeline-content">
                 <h5 class="timeline-title">LÉON BREITLING</h5>
                 <p class="timeline-text">
-                  Léon est celui qui a fondé la marque à St. Imier, en 1884. Face à son succès, il déménagea à La Chaux-de-Fonds, pour y concevoir des instruments destinés, non pas à indiquer l'heure, mais à mesurer le temps : une distinction importante.
+                  Léon is the one who founded the brand in St. Imier in 1884. Given his success, he moved to La Chaux-de-Fonds to design instruments intended not to tell time, but to measure time: an important distinction.
                 </p>
               </div>
             </div>
@@ -77,9 +77,9 @@
             <div class="timeline-item">
               <div class="timeline-year">1905</div>
               <div class="timeline-content">
-                <h5 class="timeline-title">COMPTE-À-REBOURS/TACHYMÈTRE</h5>
+                <h5 class="timeline-title">COUNTDOWN/TACHYMETER</h5>
                 <p class="timeline-text">
-                  En 1905, Léon a présenté un compte-à-rebours/tachymètre à la précision sans précédent, dont l'aiguille des secondes accomplissait une rotation complète toutes les quatre minutes, garantissant une meilleure visibilité et la capacité de calculer l'allure au cadran. Rapidement adoptée dans les sports, comme le cyclisme ou les courses hippiques, cette fonctionnalité a aussi été appréciée par la police : le chronomètre, baptisé « Vitesse », permet de mesurer la vitesse des automobilistes et de délivrer les toutes premières contraventions pour excès de vitesse (oui, c'est Breitling qu'il faut remercier pour cette innovation).
+                  In 1905, Léon presented a countdown/tachymeter with unprecedented precision, whose seconds hand completed a full rotation every four minutes, ensuring better visibility and the ability to calculate pace on the dial. Quickly adopted in sports, such as cycling or horse racing, this functionality was also appreciated by the police: the chronometer, called "Vitesse" (Speed), allowed measuring the speed of motorists and issuing the very first speeding tickets (yes, it's Breitling we have to thank for this innovation).
                 </p>
               </div>
             </div>
@@ -89,7 +89,7 @@
               <div class="timeline-content">
                 <h5 class="timeline-title">GASTON BREITLING</h5>
                 <p class="timeline-text">
-                  Gaston, qui reprit l'entreprise après le décès de Léon, poursuivit le rêve de son père et continua à innover pour développer les meilleurs instruments de mesure du temps.
+                  Gaston, who took over the company after Léon's death, continued his father's dream and continued to innovate to develop the best time measurement instruments.
                 </p>
               </div>
             </div>
@@ -97,9 +97,9 @@
             <div class="timeline-item">
               <div class="timeline-year">1915</div>
               <div class="timeline-content">
-                <h5 class="timeline-title">1ER POUSSOIR INDÉPENDANT</h5>
+                <h5 class="timeline-title">1ST INDEPENDENT PUSHER</h5>
                 <p class="timeline-text">
-                  C'est son esprit pionnier qui l'a amené logiquement à équiper ses montres d'un poussoir pour isoler les fonctionnalités. Lancé en 1915, le premier poussoir indépendant sur une montre-bracelet séparait la fonction « départ-arrêt » et « remise à zéro » de la couronne. En 1923, il améliore encore son système de contrôle en ajoutant une fonction de « réinitialisation » sur la couronne, permettant aux utilisateurs d'interrompre et de reprendre le chronométrage, mais aussi d'enregistrer plusieurs temps successifs.
+                  It was his pioneering spirit that logically led him to equip his watches with a pusher to isolate the functionalities. Launched in 1915, the first independent pusher on a wristwatch separated the "start-stop" and "reset" function from the crown. In 1923, he further improved his control system by adding a "reset" function on the crown, allowing users to interrupt and resume timing, but also to record several successive times.
                 </p>
               </div>
             </div>
@@ -109,7 +109,7 @@
               <div class="timeline-content">
                 <h5 class="timeline-title">WILLY BREITLING</h5>
                 <p class="timeline-text">
-                  En 1932, à 19 ans, Willy Breitling a repris la direction de l'entreprise, quelques années après le décès de son père, Gaston. Son nouveau regard, aiguisé par des études techniques et commerciales, s'avère crucial : Willy décida en effet au bon moment d'axer ses publicités sur la fonctionnalité des produits Breitling mais aussi sur leur élégance : ce fut un tournant décisif dans l'histoire de la marque.
+                  In 1932, at age 19, Willy Breitling took over the direction of the company, a few years after his father Gaston's death. His new perspective, sharpened by technical and commercial studies, proved crucial: Willy decided at the right time to focus his advertisements on the functionality of Breitling products but also on their elegance: this was a decisive turning point in the brand's history.
                 </p>
               </div>
             </div>
@@ -117,28 +117,28 @@
             <div class="timeline-item">
               <div class="timeline-year">1934</div>
               <div class="timeline-content">
-                <h5 class="timeline-title">2E POUSSOIR INDÉPENDANT</h5>
+                <h5 class="timeline-title">2ND INDEPENDENT PUSHER</h5>
                 <p class="timeline-text">
-                  Willy fut l'inventeur, ni plus ni moins, du premier chronographe moderne, ce qui lui vaut de figurer parmi les plus grands noms de l'histoire horlogère. Aujourd'hui encore, la quasi-totalité des chronographes produits dans le monde sont influencés et inspirés de l'invention de Willy Breitling, le deuxième poussoir indépendant à 4 heures pour remettre le chronographe à zéro.
+                  Willy was the inventor, no more no less, of the first modern chronograph, which earns him a place among the greatest names in watchmaking history. Even today, almost all chronographs produced in the world are influenced and inspired by Willy Breitling's invention, the second independent pusher at 4 o'clock to reset the chronograph.
                 </p>
               </div>
             </div>
           </div>
 
           <div class="highlight-box">
-            <h4 class="highlight-title">QUAND PARLER DE CES DATES HISTORIQUES ?</h4>
+            <h4 class="highlight-title">WHEN TO TALK ABOUT THESE HISTORICAL DATES?</h4>
             <p class="highlight-text">
-              Les trois générations qui se sont succédé à la tête de Breitling sont des sources inépuisables d'anecdotes.
+              The three generations that succeeded each other at the head of Breitling are inexhaustible sources of anecdotes.
             </p>
             <p class="highlight-text">
-              Parlez de Léon, de Gaston et surtout de Willy pour souligner notre esprit pionnier et attester notre légitimité, notre volonté d'innovation et notre héritage.
+              Talk about Léon, Gaston and especially Willy to emphasize our pioneering spirit and attest to our legitimacy, our will to innovate and our heritage.
             </p>
           </div>
 
           <div class="conclusion-box">
-            <h4 class="conclusion-title">LE CHRONOGRAPHE MODERNE EST NÉ</h4>
+            <h4 class="conclusion-title">THE MODERN CHRONOGRAPH WAS BORN</h4>
             <p class="conclusion-text">
-              Le premier chronographe moderne a été inventé en 1934 par Willy Breitling, qui était le petit-fils du fondateur de la marque et a dirigé cette dernière jusque dans les années 1970. Aujourd'hui, plus de 80 ans plus tard, son design et sa technologie continuent d'influencer l'immense majorité des chronographes produits à travers le monde.
+              The first modern chronograph was invented in 1934 by Willy Breitling, who was the grandson of the brand's founder and led the company until the 1970s. Today, more than 80 years later, his design and technology continue to influence the vast majority of chronographs produced around the world.
             </p>
           </div>
         </div>

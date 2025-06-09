@@ -1,177 +1,160 @@
 <template>
   <div class="collection-page">
+    <div v-if="isLoading" class="loading-state">Loading...</div>
 
+    <div v-else-if="error" class="error-state text-secondary">❌ {{ error }}</div>
 
-
+    <div v-else>
       <div class="watch-details" v-if="selectedWatch.id">
         <div class="watch-info">
           <h1 class="title">{{ selectedWatch.model }}</h1>
-          
-
           <div class="specs">
-           <p class="spec-item ">Date : {{ selectedWatch.date }}</p>
-           <p class="spec-item">Sizes : {{ selectedWatch.size }}</p>
-           <p class="spec-item ">
-              Colors : {{ Array.isArray(selectedWatch.colors) ? selectedWatch.colors.join(', ') : selectedWatch.colors }}
-           </p>
-           <p class="spec-item">Bracelets : {{ selectedWatch.bracelet }}</p>
+            <p class="spec-item">Date: {{ selectedWatch.date }}</p>
+            <p class="spec-item">Sizes: {{ selectedWatch.size }}</p>
+            <p class="spec-item">
+              Colors:
+              {{ Array.isArray(selectedWatch.colors) ? selectedWatch.colors.join(', ') : selectedWatch.colors }}
+            </p>
+            <p class="spec-item">Bracelets: {{ selectedWatch.bracelet }}</p>
           </div>
-
-
           <p class="description">{{ selectedWatch.description }}</p>
         </div>
 
         <div class="watch-image">
-         <img
-  v-if="selectedWatch.photo_name"
-  :src="`${backendUrl.replace(/\/$/, '')}/${selectedWatch.photo_name.replace(/^\/+/, '')}`"
-
-  :alt="selectedWatch.model"
-  @load="handleImageLoad"
-/>
-
+          <img
+            v-if="selectedWatch.photo_name"
+            :src="`${backendUrl.replace(/\/$/, '')}/${selectedWatch.photo_name.replace(/^\/\//, '')}`"
+            :alt="selectedWatch.model"
+            @load="handleImageLoad"
+          />
         </div>
       </div>
-<div class="watches-grid">
-  <div
-    v-for="watch in watches"
-    :key="watch.id"
-    class="watch-item"
-    @click="selectWatch(watch)"
-  >
-    <img
-      :src="`${backendUrl}/${watch.photo_name}`.replace(/([^:]\/)\/+/g, '$1')"
-      :alt="watch.model"
-    />
-    <span
-      class="favorite-star"
-      :class="{ 'is-favorite': watch.isFavorite }"
-      @click.stop="toggleFavorite(watch)"
-    >
-      ★
-    </span>
-  </div>
-</div>
 
-
+      <div class="watches-grid" v-if="watches.length">
+        <div
+          v-for="watch in watches"
+          :key="watch.id"
+          class="watch-item"
+          @click="selectWatch(watch)"
+        >
+          <img
+            :src="`${backendUrl}/${watch.photo_name}`.replace(/([^:]\/)(\/)+/g, '$1')"
+            :alt="watch.model"
+          />
+          <span
+            class="favorite-star"
+            :class="{ 'is-favorite': watch.isFavorite }"
+            @click.stop="toggleFavorite(watch)"
+          >
+            ★
+          </span>
+        </div>
       </div>
- 
+
+      <div v-else class="loading-state text-secondary">You haven't earned any rewards yet, so no watches are available.</div>
+    </div>
+  </div>
 </template>
 
-<script>
-import { ref, onMounted,  } from 'vue'
+<script setup>
+import { ref, onMounted } from 'vue'
 
-export default {
- 
-  setup() {
-    const isLoading = ref(false)
-    const error = ref(null)
-    const backendUrl = 'http://localhost:8000'; // PAS le sous-dossier
+const backendUrl = 'http://localhost:8000'
+const watches = ref([])
+const selectedWatch = ref({})
+const favoriteIds = ref([])
+const isLoading = ref(true)
+const error = ref(null)
 
+const fetchWatches = async () => {
+  try {
+    const res = await fetch(`${backendUrl}/api/v1/rewards`, { credentials: 'include' })
+    const data = await res.json()
 
-    const watches = ref([])
-    const selectedWatch = ref({
-      id: 0,
-      photo_name: '',
-      model: '',
-      date: '',
-      size: '',
-      colors: [],
-      bracelet: '',
-      description: ''
-    })
+    watches.value = data.data.map(watch => ({
+      ...watch,
+      colors: Array.isArray(watch.colors)
+        ? watch.colors
+        : (watch.colors?.split(',').map(c => c.trim()) || []),
+      isFavorite: false
+    }))
 
-    const selectWatch = (watch) => {
-      selectedWatch.value = watch
+    if (watches.value.length > 0) {
+      selectedWatch.value = watches.value[0]
     }
-const toggleFavorite = (watch) => {
-  // Si déjà favorite, on la retire
-  if (watch.isFavorite) {
-    watch.isFavorite = false
+  } catch (err) {
+    error.value = 'Error loading watches'
+    console.error(err)
+  }
+}
+
+const fetchFavorites = async () => {
+  try {
+    const res = await fetch(`${backendUrl}/api/v1/user-rewards`, { credentials: 'include' })
+    if (!res.ok) throw new Error('User not authenticated (401)')
+    const data = await res.json()
+    favoriteIds.value = Array.isArray(data.data) ? data.data.map(entry => entry.reward_id) : []
+    watches.value.forEach(watch => {
+      watch.isFavorite = favoriteIds.value.includes(watch.id)
+    })
+  } catch (err) {
+    error.value = "You haven't earned any rewards yet, so no watches are available."
+    favoriteIds.value = []
+    console.warn('⚠️ Missing or empty auth:', err.message)
+  }
+}
+
+const toggleFavorite = async (watch) => {
+  const isCurrentlyFavorite = watch.isFavorite
+  const maxFavoritesReached = favoriteIds.value.length >= 3
+
+  if (!isCurrentlyFavorite && maxFavoritesReached) {
+    alert('You can only have a maximum of 3 favorite watches.')
     return
   }
 
-  // Sinon, on compte combien il y en a déjà
-  const favoritesCount = watches.value.filter(w => w.isFavorite).length
-
-  // Si moins de 3, on peut ajouter
-  if (favoritesCount < 3) {
-    watch.isFavorite = true
-  } else {
-    alert("Tu ne peux avoir que 3 montres favorites maximum.")
-  }
-}
-
-
-    const handleImageLoad = (e) => {
-      e.target.classList.add('loaded')
-    }
-const fetchWatches = async () => {
-  isLoading.value = true
   try {
-    const response = await fetch('http://localhost:8000/api/v1/rewards')
-    const result = await response.json()
-
-    // Forcer un tableau même si le backend renvoie un objet avec "message"
-   if (Array.isArray(result.data)) {
-  watches.value = result.data.map(watch => ({
-  ...watch,
-  colors: Array.isArray(watch.colors)
-    ? watch.colors
-    : watch.colors?.split(',').map(c => c.trim()), // transforme "Red, Blue" en ["Red", "Blue"]
-  isFavorite: false
-}))
-
-      if (watches.value.length > 0) {
-        selectedWatch.value = watches.value[0]
-      }
-    } else {
-      // On affiche rien mais on évite les erreurs fatales
-      console.warn('Réponse inattendue :', result)
-      watches.value = []
-      selectedWatch.value = {
-        id: 0,
-        photo_name: '',
-        model: '',
-        date: '',
-        size: '',
-        colors: [],
-        bracelet: '',
-        description: ''
-      }
-    }
-
-  } catch (err) {
-    error.value = 'Erreur lors du chargement'
-    console.error(err)
-  } finally {
-    isLoading.value = false
-  }
-}
-
-
-
-
-
-    onMounted(() => {
-      fetchWatches()
+    const method = isCurrentlyFavorite ? 'DELETE' : 'POST'
+    const response = await fetch(`${backendUrl}/api/v1/user-rewards`, {
+      method,
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reward_id: watch.id })
     })
 
-    return {
-      isLoading,
-      error,
-      watches,
-      selectedWatch,
-      selectWatch,
-      toggleFavorite,
-      handleImageLoad,
-      backendUrl,
+    const result = await response.json()
+    if (response.ok) {
+      watch.isFavorite = !isCurrentlyFavorite
+      if (isCurrentlyFavorite) {
+        favoriteIds.value = favoriteIds.value.filter(id => id !== watch.id)
+      } else {
+        favoriteIds.value.push(watch.id)
+      }
+    } else {
+      console.error('Favorites API error', result)
     }
+  } catch (error) {
+    console.error('Favorites network error', error)
   }
 }
+
+const selectWatch = (watch) => {
+  selectedWatch.value = watch
+}
+
+const handleImageLoad = (e) => {
+  e.target.classList.add('loaded')
+}
+
+onMounted(async () => {
+  await fetchWatches()
+  await fetchFavorites()
+  isLoading.value = false
+})
 </script>
+
 <style scoped>
- .collection-page {
+.collection-page {
   background-color: #072C54;
   color: white;
   height: 100vh;
@@ -179,38 +162,34 @@ const fetchWatches = async () => {
   flex-direction: column;
   box-sizing: border-box;
   padding-left: 280px;
-  padding-top: 2rem; /* ✅ empêche le débordement haut */
-  overflow-y: auto;  /* ✅ autorise le scroll vertical si nécessaire */
-  scroll-padding-top: 2rem;
+  padding-top: 1rem; /* ajustement espace haut */
+  overflow-y: auto;
+  scroll-padding-top: 1rem;
 }
-
-
 
 .watch-details {
   background-color: #072C54;
-  padding: 2rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
   display: flex;
   justify-content: space-between;
   flex: 0 0 60vh;
   box-sizing: border-box;
   overflow: auto;
 }
+
 .watch-info {
   flex: 1;
-  margin-top: 2rem;         /* ✅ Ajoute une marge supérieure */
+  margin-top: 2rem;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* ✅ Assure que le titre reste en haut */
+  justify-content: flex-start;
 }
-
-
 
 .title {
-        /* ↑ Ajoute plus d’espace au-dessus du titre */
-  margin-bottom: 3rem;     /* Espace à droite pour éviter que ça colle à l’image */
+  margin-bottom: 3rem;
   text-transform: uppercase;
 }
-
 
 .specs {
   margin-bottom: 1rem;
@@ -241,19 +220,15 @@ const fetchWatches = async () => {
   flex: 1;
   padding: 2rem;
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 montres max */
-  row-gap: 5rem; /* espace vertical entre les lignes */
-  column-gap: 2rem; /* espace horizontal entre les colonnes */
+  grid-template-columns: repeat(4, 1fr);
+  row-gap: 3rem;
+  column-gap: 2rem;
   box-sizing: border-box;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
   overflow-y: auto;
-  overflow-x: hidden;
   max-height: 40vh;
 }
-
-
-
 
 .watch-item {
   position: relative;
@@ -261,11 +236,9 @@ const fetchWatches = async () => {
   transition: transform 0.2s;
 }
 
-
 .watch-item img {
   width: 100%;
   height: auto;
-  border-radius: 8px;
 }
 
 .favorite-star {
@@ -274,104 +247,94 @@ const fetchWatches = async () => {
   right: 8px;
   color: #222;
   cursor: pointer;
+  font-size: 1.5rem;
 }
 
 .is-favorite {
   color: #FFD700;
 }
 
-.loading-state,
-.error-state {
+.no-watches {
   text-align: center;
+  color: white;
+  font-style: italic;
+  font-size: 1rem;
+  grid-column: 1 / -1;
+}
+.error-state  {
+  text-align: center;
+  color: #ff6b6b;
   padding: 2rem;
 }
 @media (min-width: 768px) {
-
   .favorite-star {
-    font-size: 3rem; 
+    font-size: 3rem;
   }
-
 }
+
 @media (max-width: 768px) {
-   .favorite-star {
-    font-size: 3rem; 
-  }
   .collection-page {
-    padding-left: 0; /* mobile */
-    padding-top: 2rem;
+    padding-left: 0;
+    padding-top: 1rem;
   }
   .watch-details {
-    flex-direction: row; /* image et texte côte à côte */
+    flex-direction: row;
     align-items: center;
-    padding: 1rem;
     gap: 1rem;
     flex-wrap: wrap;
   }
-
   .watch-info {
     text-align: left;
     align-items: flex-start;
     flex: 1;
   }
-
   .title {
-    text-align: left;
     margin-bottom: 1rem;
-    margin-top: 2rem;
   }
-  
   .description {
     position: static;
     margin-top: 1rem;
     padding: 0;
     text-align: left;
   }
-
   .watch-image {
     flex: 1;
     justify-content: center;
+    max-width: 180 px;
   }
-
   .watch-image img {
     max-width: 300px;
     height: auto;
-    width: auto;
   }
 }
+
 @media (max-width: 350px) {
   .watch-details {
     flex-direction: column;
     align-items: center;
     padding: 1rem;
   }
-
   .watch-info {
-    order: 2; /* affiche le texte APRÈS l'image */
+    order: 2;
     padding: 2rem;
     text-align: center;
     align-items: center;
   }
-
   .watch-image {
-    order: 1; /* image avant le texte */
+    order: 1;
     margin-bottom: 1rem;
   }
-
   .watch-image img {
-    max-width: 180px;
-    height: auto;
+    max-width: auto;
+    height: 120px;
   }
-
   .description {
     margin-top: 1rem;
     padding: 0 1rem;
     text-align: center;
   }
-
   .title {
     margin-bottom: 0.6rem;
   }
 }
-
-
 </style>
