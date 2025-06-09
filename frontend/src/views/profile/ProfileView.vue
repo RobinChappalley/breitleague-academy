@@ -16,7 +16,9 @@
         <div class="profile-avatar-container">
           <div class="profile-avatar">
             <div class="avatar-placeholder">
-              <span>{{ getUserInitial() }}</span>
+              <img :src="getUserInitial()" alt="User's Avatar" class="avatar-image" />
+
+              <!--<span>{{ getUserInitial() }}</span>-->
               <!-- L'initiale au centre -->
             </div>
           </div>
@@ -204,7 +206,7 @@ const loadUserRewards = async (userId) => {
 }
 
 const getUserInitial = () => {
-  if (user.value.avatar) return user.value.avatar
+  if (user.value.avatar) return `http://localhost:8000/${user.value.avatar}`
   if (user.value.username) return user.value.username[0].toUpperCase()
   return 'U'
 }
@@ -324,6 +326,13 @@ const logout = async () => {
   font-weight: bold;
   color: white;
   text-transform: uppercase;
+}
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
 }
 
 .edit-icon {
