@@ -17,7 +17,15 @@
             :class="{ 'invitation': challenge.status === 'invitation' }"
           >
             <div class="player-info">
-              <div class="avatar">{{ challenge.name.charAt(0) }}</div>
+              <div class="avatar">
+                <img 
+                  v-if="(challenge.user && challenge.user.avatar)" 
+                  :src="getAvatarUrl(challenge.user)" 
+                  :alt="challenge.name"
+                  class="avatar-image"
+                />
+                <span v-else class="avatar-initial">{{ challenge.name.charAt(0) }}</span>
+              </div>
               <div class="player-details">
                 <h3 class="player-name">{{ challenge.name }}</h3>
                 <div class="flag">{{ challenge.country }}</div>
@@ -54,7 +62,15 @@
             class="battle-card"
           >
             <div class="player-info">
-              <div class="avatar">{{ challenge.name.charAt(0) }}</div>
+              <div class="avatar">
+                <img 
+                  v-if="(challenge.user && challenge.user.avatar)" 
+                  :src="getAvatarUrl(challenge.user)" 
+                  :alt="challenge.name"
+                  class="avatar-image"
+                />
+                <span v-else class="avatar-initial">{{ challenge.name.charAt(0) }}</span>
+              </div>
               <div class="player-details">
                 <h3 class="player-name">{{ challenge.name }}</h3>
                 <div class="flag">{{ challenge.country }}</div>
@@ -101,7 +117,15 @@
             :class="{ 'won': battle.points > 0, 'lost': battle.points < 0 }"
           >
             <div class="player-info">
-              <div class="avatar">{{ battle.name.charAt(0) }}</div>
+              <div class="avatar">
+                <img 
+                  v-if="(battle.user && battle.user.avatar)" 
+                  :src="getAvatarUrl(battle.user)" 
+                  :alt="battle.name"
+                  class="avatar-image"
+                />
+                <span v-else class="avatar-initial">{{ battle.name.charAt(0) }}</span>
+              </div>
               <div class="player-details">
                 <h3 class="player-name">{{ battle.name }}</h3>
                 <div class="flag">{{ battle.country }}</div>
@@ -175,6 +199,12 @@ const incomingChallenges = ref([])
 const outgoingChallenges = ref([])
 const finishedBattles = ref([])
 
+// MÊME LOGIQUE QUE TA COLLÈGUE POUR LES AVATARS
+const getAvatarUrl = (user) => {
+  if (!user || !user.avatar) return null
+  return `http://localhost:8000/${user.avatar}`
+}
+
 // Charger les vraies données depuis la base
 const loadBattlesFromDB = async () => {
   try {
@@ -196,16 +226,17 @@ const loadBattlesFromDB = async () => {
     const allUsers = usersData.data || usersData || []
     
     // Convertir les utilisateurs en format de tes cartes existantes
-    // Pour l'instant, simuler des battles avec les vrais utilisateurs
+    // STOCKER L'OBJET USER COMPLET COMME TA COLLÈGUE
     incomingChallenges.value = allUsers
       .filter(user => user.id !== currentUserId.value && user.number_available_slots > 0)
-      .slice(0, 4) // Prendre 4 utilisateurs max
+      .slice(0, 4)
       .map((user, index) => ({
         id: user.id,
         name: user.username,
-        country: getCountryCode(user.pos_id), // Adapter selon ta logique
+        country: getCountryCode(user.pos_id),
         timeLeft: '24h left',
-        status: index < 2 ? 'invitation' : (index === 2 ? 'play' : 'waiting')
+        status: index < 2 ? 'invitation' : (index === 2 ? 'play' : 'waiting'),
+        user: user // OBJET USER COMPLET POUR L'AVATAR
       }))
 
     // Simuler quelques outgoing challenges avec d'autres utilisateurs
@@ -213,11 +244,12 @@ const loadBattlesFromDB = async () => {
       .filter(user => user.id !== currentUserId.value)
       .slice(4, 6)
       .map((user, index) => ({
-        id: user.id + 100, // Offset pour éviter conflicts
+        id: user.id + 100,
         name: user.username,
         country: getCountryCode(user.pos_id),
         timeLeft: `${Math.floor(Math.random() * 20) + 1}h left`,
-        status: index === 0 ? 'play' : 'waiting'
+        status: index === 0 ? 'play' : 'waiting',
+        user: user // OBJET USER COMPLET POUR L'AVATAR
       }))
 
     // Simuler quelques finished battles
@@ -228,7 +260,8 @@ const loadBattlesFromDB = async () => {
         id: user.id + 200,
         name: user.username,
         country: getCountryCode(user.pos_id),
-        points: index === 0 ? 300 : -100
+        points: index === 0 ? 300 : -100,
+        user: user // OBJET USER COMPLET POUR L'AVATAR
       }))
 
     console.log('Users loaded from database:', allUsers)
@@ -515,6 +548,21 @@ console.log('BattleView component loaded')
   font-size: 1.1rem;
   box-shadow: 0 4px 12px rgba(247, 199, 44, 0.3);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
+}
+
+.avatar-initial {
+  font-weight: bold;
+  color: #072C54;
+  text-transform: uppercase;
 }
 
 .player-details {
