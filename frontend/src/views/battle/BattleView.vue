@@ -155,80 +155,172 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { battleService } from '@/services/api'
 
 const router = useRouter()
 
-// Modal state
+// Modal state - garder identique
 const showInvitationModal = ref(false)
 const invitedPlayerName = ref('')
 
-// Données simulées
-const incomingChallenges = ref([
-  {
-    id: 1,
-    name: 'R.FREUENFELD',
-    country: 'DE',
-    timeLeft: '24h left',
-    status: 'play'
-  },
-  {
-    id: 2,
-    name: 'C.NDIAYE',
-    country: 'FR',
-    timeLeft: '24h left',
-    status: 'waiting'
-  },
-  {
-    id: 3,
-    name: 'R.KELLER',
-    country: 'DE',
-    timeLeft: '24h left',
-    status: 'invitation'
-  },
-  {
-    id: 4,
-    name: 'L.ANEX',
-    country: 'FR',
-    timeLeft: '11h left',
-    status: 'invitation'
-  }
-])
+// Loading state pour la connexion base de données
+const isLoading = ref(true)
+const error = ref('')
+const currentUserId = ref(null)
 
-const outgoingChallenges = ref([
-  {
-    id: 5,
-    name: 'H.OVSANNA',
-    country: 'RO',
-    timeLeft: '6h left',
-    status: 'play'
-  },
-  {
-    id: 6,
-    name: 'S.DACOSTA',
-    country: 'PT',
-    timeLeft: '8h left',
-    status: 'waiting'
-  }
-])
+// Données des battles - garder la même structure
+const incomingChallenges = ref([])
+const outgoingChallenges = ref([])
+const finishedBattles = ref([])
 
-const finishedBattles = ref([
-  {
-    id: 7,
-    name: 'P.DUJARDIN',
-    country: 'FR',
-    points: 300
-  },
-  {
-    id: 8,
-    name: 'L.ANEX',
-    country: 'FR',
-    points: -100
-  }
-])
+// Charger les vraies données depuis la base
+const loadBattlesFromDB = async () => {
+  try {
+    isLoading.value = true
+    
+    // Récupérer l'utilisateur connecté
+    const userResponse = await fetch('http://localhost:8000/api/user', {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+    
+    if (userResponse.ok) {
+      const userData = await userResponse.json()
+      currentUserId.value = userData.id
+    }
 
-// Methods
+    // Charger tous les utilisateurs disponibles depuis ta base de données
+    const usersData = await battleService.getAvailableUsers()
+    const allUsers = usersData.data || usersData || []
+    
+    // Convertir les utilisateurs en format de tes cartes existantes
+    // Pour l'instant, simuler des battles avec les vrais utilisateurs
+    incomingChallenges.value = allUsers
+      .filter(user => user.id !== currentUserId.value && user.number_available_slots > 0)
+      .slice(0, 4) // Prendre 4 utilisateurs max
+      .map((user, index) => ({
+        id: user.id,
+        name: user.username,
+        country: getCountryCode(user.pos_id), // Adapter selon ta logique
+        timeLeft: '24h left',
+        status: index < 2 ? 'invitation' : (index === 2 ? 'play' : 'waiting')
+      }))
+
+    // Simuler quelques outgoing challenges avec d'autres utilisateurs
+    outgoingChallenges.value = allUsers
+      .filter(user => user.id !== currentUserId.value)
+      .slice(4, 6)
+      .map((user, index) => ({
+        id: user.id + 100, // Offset pour éviter conflicts
+        name: user.username,
+        country: getCountryCode(user.pos_id),
+        timeLeft: `${Math.floor(Math.random() * 20) + 1}h left`,
+        status: index === 0 ? 'play' : 'waiting'
+      }))
+
+    // Simuler quelques finished battles
+    finishedBattles.value = allUsers
+      .filter(user => user.id !== currentUserId.value)
+      .slice(6, 8)
+      .map((user, index) => ({
+        id: user.id + 200,
+        name: user.username,
+        country: getCountryCode(user.pos_id),
+        points: index === 0 ? 300 : -100
+      }))
+
+    console.log('Users loaded from database:', allUsers)
+    console.log('Incoming challenges:', incomingChallenges.value)
+
+  } catch (err) {
+    error.value = err.message
+    console.error('Erreur lors du chargement depuis la base:', err)
+    
+    // En cas d'erreur, garder tes données mockées originales
+    loadMockData()
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Fonction pour convertir pos_id en code pays (adapter selon ta logique)
+const getCountryCode = (posId) => {
+  const countryMapping = {
+    1: 'CH', 2: 'FR', 3: 'DE', 4: 'IT', 5: 'ES', 
+    6: 'PT', 7: 'RO', 8: 'US', 9: 'GB', 10: 'BE'
+  }
+  return countryMapping[posId] || 'FR'
+}
+
+// Fonction fallback avec tes données mockées originales
+const loadMockData = () => {
+  incomingChallenges.value = [
+    {
+      id: 1,
+      name: 'R.FREUENFELD',
+      country: 'DE',
+      timeLeft: '24h left',
+      status: 'play'
+    },
+    {
+      id: 2,
+      name: 'C.NDIAYE',
+      country: 'FR',
+      timeLeft: '24h left',
+      status: 'waiting'
+    },
+    {
+      id: 3,
+      name: 'R.KELLER',
+      country: 'DE',
+      timeLeft: '24h left',
+      status: 'invitation'
+    },
+    {
+      id: 4,
+      name: 'L.ANEX',
+      country: 'FR',
+      timeLeft: '11h left',
+      status: 'invitation'
+    }
+  ]
+
+  outgoingChallenges.value = [
+    {
+      id: 5,
+      name: 'H.OVSANNA',
+      country: 'RO',
+      timeLeft: '6h left',
+      status: 'play'
+    },
+    {
+      id: 6,
+      name: 'S.DACOSTA',
+      country: 'PT',
+      timeLeft: '8h left',
+      status: 'waiting'
+    }
+  ]
+
+  finishedBattles.value = [
+    {
+      id: 7,
+      name: 'P.DUJARDIN',
+      country: 'FR',
+      points: 300
+    },
+    {
+      id: 8,
+      name: 'L.ANEX',
+      country: 'FR',
+      points: -100
+    }
+  ]
+}
+
+// Garder toutes tes méthodes existantes identiques
 const acceptChallenge = (id) => {
   const challenge = incomingChallenges.value.find(c => c.id === id)
   if (challenge) {
@@ -243,32 +335,35 @@ const declineChallenge = (id) => {
 const handleAction = (challenge) => {
   if (challenge.status === 'play') {
     console.log('Starting battle with', challenge.name)
-    // Navigation simple vers le quiz
     router.push('/battle-quiz')
   }
 }
 
 const viewBattle = (id) => {
   console.log('Viewing battle', id)
-  // Navigation simple vers les détails
   router.push(`/battle-details/${id}`)
 }
 
-// Nouvelle méthode pour inviter un joueur
 const invitePlayer = () => {
-  // Simuler l'invitation d'un joueur aléatoire
-  const randomPlayers = ['M.GARCIA', 'T.SMITH', 'A.MILLER', 'S.JONES', 'C.WILSON']
-  const randomPlayer = randomPlayers[Math.floor(Math.random() * randomPlayers.length)]
+  // Choisir un utilisateur aléatoire de la base de données si disponible
+  const availableUsers = incomingChallenges.value.concat(outgoingChallenges.value)
   
-  invitedPlayerName.value = randomPlayer
+  if (availableUsers.length > 0) {
+    const randomUser = availableUsers[Math.floor(Math.random() * availableUsers.length)]
+    invitedPlayerName.value = randomUser.name
+  } else {
+    // Fallback vers tes noms mockés
+    const randomPlayers = ['M.GARCIA', 'T.SMITH', 'A.MILLER', 'S.JONES', 'C.WILSON']
+    invitedPlayerName.value = randomPlayers[Math.floor(Math.random() * randomPlayers.length)]
+  }
+  
   showInvitationModal.value = true
   
-  // Ajouter automatiquement à la liste des défis envoyés après 2 secondes
   setTimeout(() => {
     if (showInvitationModal.value) {
       const newChallenge = {
         id: Date.now(),
-        name: randomPlayer,
+        name: invitedPlayerName.value,
         country: 'US',
         timeLeft: '24h left',
         status: 'waiting'
@@ -284,9 +379,13 @@ const closeInvitationModal = () => {
 
 const cancelInvitation = () => {
   showInvitationModal.value = false
-  // Ici on pourrait annuler l'invitation côté serveur
   console.log('Invitation cancelled for', invitedPlayerName.value)
 }
+
+// Charger les données au montage
+onMounted(() => {
+  loadBattlesFromDB()
+})
 
 console.log('BattleView component loaded')
 </script>
