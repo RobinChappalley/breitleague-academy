@@ -18,10 +18,10 @@
           <div class="dropdown">
             <button
               class="filter-btn dropdown-btn"
-              :class="{ active: selectedFilter === 'switzerland' }"
+              :class="{ active: selectedFilter !== 'world' }"
               @click="toggleDropdown"
             >
-              Switzerland
+              {{ selectedFilterLabel }}
               <i class="dropdown-icon">▼</i>
             </button>
             <div class="dropdown-menu" v-if="showDropdown">
@@ -154,10 +154,22 @@ const showPlayerPopup = ref(false)
 const selectedPlayer = ref(null)
 
 const displayedPlayers = computed(() => {
-  if (showingAll.value) {
-    return rankingPlayers.value
+  let players = rankingPlayers.value
+
+  if (selectedFilter.value !== 'world') {
+    players = players.filter((player) => player.country.toLowerCase() === selectedFilter.value)
   }
-  return rankingPlayers.value.slice(0, 20)
+
+  if (showingAll.value) {
+    return players
+  }
+
+  return players.slice(0, 20)
+})
+
+const selectedFilterLabel = computed(() => {
+  if (selectedFilter.value === 'world') return 'Select your country'
+  return selectedFilter.value.charAt(0).toUpperCase() + selectedFilter.value.slice(1)
 })
 
 // Methods
