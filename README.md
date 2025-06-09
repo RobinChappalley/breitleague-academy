@@ -26,6 +26,7 @@ docker-compose up --build
 ```
 
 This will start three containers:
+
 - `breitling-backend`: PHP container running the Laravel application
 - `breitling-frontend`: Node.js container running the Vue.js application
 - `breitling-mysql`: MySQL database
@@ -119,6 +120,7 @@ docker-compose exec backend chmod -R 775 /var/www/storage
 ### Database Connection Issues
 
 If the application cannot connect to the database, ensure that:
+
 1. The MySQL container is running (`docker-compose ps` should show `breitling-mysql` as "Up")
 2. The environment variables in `.env.docker` match those in `docker-compose.yaml`
 3. The database has been created and migrations have been run
@@ -128,17 +130,20 @@ If the application cannot connect to the database, ensure that:
 If the backend service fails to start or you can't access it:
 
 1. Check the logs for the backend container:
+
 ```bash
 docker-compose logs backend
 ```
 
 2. Ensure the Laravel application is properly configured:
+
 ```bash
 docker-compose exec backend php artisan config:clear
 docker-compose exec backend php artisan cache:clear
 ```
 
 3. Verify that the APP_KEY is set in .env.docker:
+
 ```bash
 docker-compose exec backend php artisan key:generate
 ```
@@ -148,16 +153,19 @@ docker-compose exec backend php artisan key:generate
 If the frontend service fails to start or you can't access it:
 
 1. Check the logs for the frontend container:
+
 ```bash
 docker-compose logs frontend
 ```
 
 2. Ensure all dependencies are installed:
+
 ```bash
 docker-compose exec frontend npm install
 ```
 
 3. Restart the frontend service:
+
 ```bash
 docker-compose restart frontend
 ```
@@ -169,6 +177,7 @@ If hot reload isn't working for the frontend:
 1. Make sure CHOKIDAR_USEPOLLING is set to true in the docker-compose.yaml
 2. Check that your volumes are properly mounted
 3. Try restarting the frontend container:
+
 ```bash
 docker-compose restart frontend
 ```
@@ -190,3 +199,8 @@ docker-compose down -v
 ## Additional Information
 
 For more detailed information about the Vue.js frontend, please refer to the `VUE_README.md` file in the Laravel directory.
+
+## API Documentation
+
+To see the documentation regarding the API, you can launch the containers and then access to
+`http://localhost:8000/swagger`

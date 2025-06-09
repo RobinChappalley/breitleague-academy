@@ -1,0 +1,2614 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "API Documentation",
+        "version": "1.0.0",
+        "description": "Documentation des endpoints de l'API"
+    },
+    "paths": {
+        "/api/v1/choices": {
+            "get": {
+                "summary": "GET /api/v1/choices",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Choice"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "question_id": 1,
+                                            "text_answer": "Celebrity endorsements",
+                                            "img_answer": null,
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/choices/{id}": {
+            "get": {
+                "summary": "GET /api/v1/choices/{id}",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Choice"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "question_id": 1,
+                                            "text_answer": "Celebrity endorsements",
+                                            "img_answer": null,
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/lessons": {
+            "get": {
+                "summary": "GET /api/v1/lessons",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Lesson"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "title": "History of Breitling",
+                                            "description": "Explore Breitling’s evolution through its key milestones, from its founding to its modern renaissance.",
+                                            "module_id": 1,
+                                            "order_position": 1,
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z",
+                                            "theories": [
+                                                {
+                                                    "id": 1,
+                                                    "lesson_id": 1,
+                                                    "content": "The perception of a brand is often shaped by only a few key decades.\nFor Breitling, this is usually the aviation era, especially during the quartz crisis.\n\nBut there is much more to discover.\nThis lesson explores how Breitling evolved over time and built its reputation across different eras.\n\nYou’ll learn the milestones that define the brand and how to use them to tell a powerful story.",
+                                                    "position_order": 1,
+                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:43.000000Z",
+                                                    "questions": [
+                                                        {
+                                                            "id": 1,
+                                                            "content_default": "What shapes the perception of a brand like Breitling over time?",
+                                                            "content_if_TF": "The perception of Breitling is shaped mostly by its aviation history during the quartz crisis.",
+                                                            "content_if_blank": "The perception of Breitling is shaped mostly by its __________ history during the quartz crisis.",
+                                                            "isMatchable": false,
+                                                            "checkpoint_id": 1,
+                                                            "theory_id": 1,
+                                                            "position_order": 1,
+                                                            "correct_answer_text": {
+                                                                "true_false": true,
+                                                                "correct_choice_id": 2
+                                                            },
+                                                            "created_at": null,
+                                                            "updated_at": null,
+                                                            "choices": [
+                                                                {
+                                                                    "id": 1,
+                                                                    "question_id": 1,
+                                                                    "text_answer": "Celebrity endorsements",
+                                                                    "img_answer": null,
+                                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                },
+                                                                {
+                                                                    "id": 2,
+                                                                    "question_id": 1,
+                                                                    "text_answer": "Aviation history during key decades",
+                                                                    "img_answer": null,
+                                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                },
+                                                                {
+                                                                    "id": 3,
+                                                                    "question_id": 1,
+                                                                    "text_answer": "Modern marketing campaigns",
+                                                                    "img_answer": null,
+                                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                },
+                                                                {
+                                                                    "id": 4,
+                                                                    "question_id": 1,
+                                                                    "text_answer": "Social media trends",
+                                                                    "img_answer": null,
+                                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/lessons/{id}": {
+            "get": {
+                "summary": "GET /api/v1/lessons/{id}",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Lesson"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "title": "History of Breitling",
+                                            "description": "Explore Breitling’s evolution through its key milestones, from its founding to its modern renaissance.",
+                                            "module_id": 1,
+                                            "order_position": 1,
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z",
+                                            "theories": [
+                                                {
+                                                    "id": 1,
+                                                    "lesson_id": 1,
+                                                    "content": "The perception of a brand is often shaped by only a few key decades.\nFor Breitling, this is usually the aviation era, especially during the quartz crisis.\n\nBut there is much more to discover.\nThis lesson explores how Breitling evolved over time and built its reputation across different eras.\n\nYou’ll learn the milestones that define the brand and how to use them to tell a powerful story.",
+                                                    "position_order": 1,
+                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:43.000000Z",
+                                                    "questions": [
+                                                        {
+                                                            "id": 1,
+                                                            "content_default": "What shapes the perception of a brand like Breitling over time?",
+                                                            "content_if_TF": "The perception of Breitling is shaped mostly by its aviation history during the quartz crisis.",
+                                                            "content_if_blank": "The perception of Breitling is shaped mostly by its __________ history during the quartz crisis.",
+                                                            "isMatchable": false,
+                                                            "checkpoint_id": 1,
+                                                            "theory_id": 1,
+                                                            "position_order": 1,
+                                                            "correct_answer_text": {
+                                                                "true_false": true,
+                                                                "correct_choice_id": 2
+                                                            },
+                                                            "created_at": null,
+                                                            "updated_at": null,
+                                                            "choices": [
+                                                                {
+                                                                    "id": 1,
+                                                                    "question_id": 1,
+                                                                    "text_answer": "Celebrity endorsements",
+                                                                    "img_answer": null,
+                                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                },
+                                                                {
+                                                                    "id": 2,
+                                                                    "question_id": 1,
+                                                                    "text_answer": "Aviation history during key decades",
+                                                                    "img_answer": null,
+                                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                },
+                                                                {
+                                                                    "id": 3,
+                                                                    "question_id": 1,
+                                                                    "text_answer": "Modern marketing campaigns",
+                                                                    "img_answer": null,
+                                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                },
+                                                                {
+                                                                    "id": 4,
+                                                                    "question_id": 1,
+                                                                    "text_answer": "Social media trends",
+                                                                    "img_answer": null,
+                                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/missions": {
+            "get": {
+                "summary": "GET /api/v1/missions",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Mission"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "description": "Complete the 'Understanding the Collection' module",
+                                            "reward_id": 1,
+                                            "created_at": "2025-06-09T07:15:45.000000Z",
+                                            "updated_at": "2025-06-09T07:15:45.000000Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/missions/{id}": {
+            "get": {
+                "summary": "GET /api/v1/missions/{id}",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Mission"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "description": "Complete the 'Understanding the Collection' module",
+                                            "reward_id": 1,
+                                            "created_at": "2025-06-09T07:15:45.000000Z",
+                                            "updated_at": "2025-06-09T07:15:45.000000Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/modules": {
+            "get": {
+                "summary": "GET /api/v1/modules",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Module"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "title": "Onboarding",
+                                            "order_position": 1,
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z",
+                                            "lessons": [
+                                                {
+                                                    "id": 1,
+                                                    "title": "History of Breitling",
+                                                    "description": "Explore Breitling’s evolution through its key milestones, from its founding to its modern renaissance.",
+                                                    "module_id": 1,
+                                                    "order_position": 1,
+                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:43.000000Z",
+                                                    "theories": [
+                                                        {
+                                                            "id": 1,
+                                                            "lesson_id": 1,
+                                                            "content": "The perception of a brand is often shaped by only a few key decades.\nFor Breitling, this is usually the aviation era, especially during the quartz crisis.\n\nBut there is much more to discover.\nThis lesson explores how Breitling evolved over time and built its reputation across different eras.\n\nYou’ll learn the milestones that define the brand and how to use them to tell a powerful story.",
+                                                            "position_order": 1,
+                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                            "updated_at": "2025-06-09T07:15:43.000000Z",
+                                                            "questions": [
+                                                                {
+                                                                    "id": 1,
+                                                                    "content_default": "What shapes the perception of a brand like Breitling over time?",
+                                                                    "content_if_TF": "The perception of Breitling is shaped mostly by its aviation history during the quartz crisis.",
+                                                                    "content_if_blank": "The perception of Breitling is shaped mostly by its __________ history during the quartz crisis.",
+                                                                    "isMatchable": false,
+                                                                    "checkpoint_id": 1,
+                                                                    "theory_id": 1,
+                                                                    "position_order": 1,
+                                                                    "correct_answer_text": {
+                                                                        "true_false": true,
+                                                                        "correct_choice_id": 2
+                                                                    },
+                                                                    "created_at": null,
+                                                                    "updated_at": null,
+                                                                    "choices": [
+                                                                        {
+                                                                            "id": 1,
+                                                                            "question_id": 1,
+                                                                            "text_answer": "Celebrity endorsements",
+                                                                            "img_answer": null,
+                                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                        },
+                                                                        {
+                                                                            "id": 2,
+                                                                            "question_id": 1,
+                                                                            "text_answer": "Aviation history during key decades",
+                                                                            "img_answer": null,
+                                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                        },
+                                                                        {
+                                                                            "id": 3,
+                                                                            "question_id": 1,
+                                                                            "text_answer": "Modern marketing campaigns",
+                                                                            "img_answer": null,
+                                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                        },
+                                                                        {
+                                                                            "id": 4,
+                                                                            "question_id": 1,
+                                                                            "text_answer": "Social media trends",
+                                                                            "img_answer": null,
+                                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/modules/{id}": {
+            "get": {
+                "summary": "GET /api/v1/modules/{id}",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Module"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "title": "Onboarding",
+                                            "order_position": 1,
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z",
+                                            "lessons": [
+                                                {
+                                                    "id": 1,
+                                                    "title": "History of Breitling",
+                                                    "description": "Explore Breitling’s evolution through its key milestones, from its founding to its modern renaissance.",
+                                                    "module_id": 1,
+                                                    "order_position": 1,
+                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:43.000000Z",
+                                                    "theories": [
+                                                        {
+                                                            "id": 1,
+                                                            "lesson_id": 1,
+                                                            "content": "The perception of a brand is often shaped by only a few key decades.\nFor Breitling, this is usually the aviation era, especially during the quartz crisis.\n\nBut there is much more to discover.\nThis lesson explores how Breitling evolved over time and built its reputation across different eras.\n\nYou’ll learn the milestones that define the brand and how to use them to tell a powerful story.",
+                                                            "position_order": 1,
+                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                            "updated_at": "2025-06-09T07:15:43.000000Z",
+                                                            "questions": [
+                                                                {
+                                                                    "id": 1,
+                                                                    "content_default": "What shapes the perception of a brand like Breitling over time?",
+                                                                    "content_if_TF": "The perception of Breitling is shaped mostly by its aviation history during the quartz crisis.",
+                                                                    "content_if_blank": "The perception of Breitling is shaped mostly by its __________ history during the quartz crisis.",
+                                                                    "isMatchable": false,
+                                                                    "checkpoint_id": 1,
+                                                                    "theory_id": 1,
+                                                                    "position_order": 1,
+                                                                    "correct_answer_text": {
+                                                                        "true_false": true,
+                                                                        "correct_choice_id": 2
+                                                                    },
+                                                                    "created_at": null,
+                                                                    "updated_at": null,
+                                                                    "choices": [
+                                                                        {
+                                                                            "id": 1,
+                                                                            "question_id": 1,
+                                                                            "text_answer": "Celebrity endorsements",
+                                                                            "img_answer": null,
+                                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                        },
+                                                                        {
+                                                                            "id": 2,
+                                                                            "question_id": 1,
+                                                                            "text_answer": "Aviation history during key decades",
+                                                                            "img_answer": null,
+                                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                        },
+                                                                        {
+                                                                            "id": 3,
+                                                                            "question_id": 1,
+                                                                            "text_answer": "Modern marketing campaigns",
+                                                                            "img_answer": null,
+                                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                        },
+                                                                        {
+                                                                            "id": 4,
+                                                                            "question_id": 1,
+                                                                            "text_answer": "Social media trends",
+                                                                            "img_answer": null,
+                                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pos": {
+            "get": {
+                "summary": "GET /api/v1/pos",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Pos"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "address": "Lausanne, St. Fran\u00e7ois",
+                                            "zipcode": "1003",
+                                            "country": "Switzerland",
+                                            "breitling_pin": true,
+                                            "country_flag": "\ud83c\udde8\ud83c\udded",
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pos/{id}": {
+            "get": {
+                "summary": "GET /api/v1/pos/{id}",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Pos"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "address": "Lausanne, St. Fran\u00e7ois",
+                                            "zipcode": "1003",
+                                            "country": "Switzerland",
+                                            "breitling_pin": true,
+                                            "country_flag": "\ud83c\udde8\ud83c\udded",
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/questions": {
+            "get": {
+                "summary": "GET /api/v1/questions",
+                "responses": {
+                    "200": {
+                        "description": "Réussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Question"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "content_default": "What shapes the perception of a brand like Breitling over time?",
+                                            "content_if_TF": "The perception of Breitling is shaped mostly by its aviation history during the quartz crisis.",
+                                            "content_if_blank": "The perception of Breitling is shaped mostly by its __________ history during the quartz crisis.",
+                                            "isMatchable": false,
+                                            "checkpoint_id": 1,
+                                            "theory_id": 1,
+                                            "position_order": 1,
+                                            "correct_answer_text": {
+                                                "true_false": true,
+                                                "correct_choice_id": 2
+                                            },
+                                            "created_at": null,
+                                            "updated_at": null,
+                                            "choices": [
+                                                {
+                                                    "id": 1,
+                                                    "question_id": 1,
+                                                    "text_answer": "Celebrity endorsements",
+                                                    "img_answer": null,
+                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                },
+                                                {
+                                                    "id": 2,
+                                                    "question_id": 1,
+                                                    "text_answer": "Aviation history during key decades",
+                                                    "img_answer": null,
+                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                },
+                                                {
+                                                    "id": 3,
+                                                    "question_id": 1,
+                                                    "text_answer": "Modern marketing campaigns",
+                                                    "img_answer": null,
+                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                },
+                                                {
+                                                    "id": 4,
+                                                    "question_id": 1,
+                                                    "text_answer": "Social media trends",
+                                                    "img_answer": null,
+                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v1/questions/{id}": {
+            "get": {
+                "summary": "GET /api/v1/questions/{id}",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Question"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "content_default": "What shapes the perception of a brand like Breitling over time?",
+                                            "content_if_TF": "The perception of Breitling is shaped mostly by its aviation history during the quartz crisis.",
+                                            "content_if_blank": "The perception of Breitling is shaped mostly by its __________ history during the quartz crisis.",
+                                            "isMatchable": false,
+                                            "checkpoint_id": 1,
+                                            "theory_id": 1,
+                                            "position_order": 1,
+                                            "correct_answer_text": {
+                                                "true_false": true,
+                                                "correct_choice_id": 2
+                                            },
+                                            "created_at": null,
+                                            "updated_at": null,
+                                            "choices": [
+                                                {
+                                                    "id": 1,
+                                                    "question_id": 1,
+                                                    "text_answer": "Celebrity endorsements",
+                                                    "img_answer": null,
+                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                },
+                                                {
+                                                    "id": 2,
+                                                    "question_id": 1,
+                                                    "text_answer": "Aviation history during key decades",
+                                                    "img_answer": null,
+                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                },
+                                                {
+                                                    "id": 3,
+                                                    "question_id": 1,
+                                                    "text_answer": "Modern marketing campaigns",
+                                                    "img_answer": null,
+                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                },
+                                                {
+                                                    "id": 4,
+                                                    "question_id": 1,
+                                                    "text_answer": "Social media trends",
+                                                    "img_answer": null,
+                                                    "created_at": "2025-06-09T07:15:43.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/rewards": {
+            "get": {
+                "summary": "GET /api/v1/rewards",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Reward"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "photo_name": "img/rewards_photo/TTI1_CHOICE_1.png",
+                                            "model": "Breitling – Top Time Limited Edition",
+                                            "date": "2020",
+                                            "size": "41 mm",
+                                            "colors": "Silver Opalin, Bronze",
+                                            "bracelet": "22/20mm",
+                                            "description": "The Breitling Top Time Limited Edition is a modern reinterpretation of an iconic 1960s chronograph, nicknamed the \"Zorro\" for its bold dial design. Limited to 2,000 pieces, it combines retro styling, COSC-certified performance, and digital innovation with a blockchain-backed passport guaranteeing authenticity.",
+                                            "created_at": "2025-06-09T07:15:45.000000Z",
+                                            "updated_at": "2025-06-09T07:15:45.000000Z",
+                                            "missions": [
+                                                {
+                                                    "id": 1,
+                                                    "description": "Complete the 'Understanding the Collection' module",
+                                                    "reward_id": 1,
+                                                    "created_at": "2025-06-09T07:15:45.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:45.000000Z"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/rewards/{id}": {
+            "get": {
+                "summary": "GET /api/v1/rewards/{id}",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Reward"
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "photo_name": "img/rewards_photo/TTI1_CHOICE_1.png",
+                                        "model": "Breitling \u2013 Top Time Limited Edition",
+                                        "date": "2020",
+                                        "size": "41 mm",
+                                        "colors": "Silver Opalin, Bronze",
+                                        "bracelet": "22/20mm",
+                                        "description": "...",
+                                        "created_at": "2025-06-09T07:15:45.000000Z",
+                                        "updated_at": "2025-06-09T07:15:45.000000Z",
+                                        "missions": [
+                                            {
+                                                "id": 1,
+                                                "description": "Complete the 'Understanding the Collection' module",
+                                                "reward_id": 1,
+                                                "created_at": "2025-06-09T07:15:45.000000Z",
+                                                "updated_at": "2025-06-09T07:15:45.000000Z"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/theories": {
+            "get": {
+                "summary": "GET /api/v1/theories",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Theory"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "lesson_id": 1,
+                                            "content": "The perception of a brand is often shaped by only a few key decades.\nFor Breitling, this is usually the aviation era, especially during the quartz crisis.\n\nBut there is much more to discover.\nThis lesson explores how Breitling evolved over time and built its reputation across different eras.\n\nYou’ll learn the milestones that define the brand and how to use them to tell a powerful story.",
+                                            "position_order": 1,
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z",
+                                            "questions": [
+                                                {
+                                                    "id": 1,
+                                                    "content_default": "What shapes the perception of a brand like Breitling over time?",
+                                                    "content_if_TF": "The perception of Breitling is shaped mostly by its aviation history during the quartz crisis.",
+                                                    "content_if_blank": "The perception of Breitling is shaped mostly by its __________ history during the quartz crisis.",
+                                                    "isMatchable": false,
+                                                    "checkpoint_id": 1,
+                                                    "theory_id": 1,
+                                                    "position_order": 1,
+                                                    "correct_answer_text": {
+                                                        "true_false": true,
+                                                        "correct_choice_id": 2
+                                                    },
+                                                    "created_at": null,
+                                                    "updated_at": null,
+                                                    "choices": [
+                                                        {
+                                                            "id": 1,
+                                                            "question_id": 1,
+                                                            "text_answer": "Celebrity endorsements",
+                                                            "img_answer": null,
+                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                        },
+                                                        {
+                                                            "id": 2,
+                                                            "question_id": 1,
+                                                            "text_answer": "Aviation history during key decades",
+                                                            "img_answer": null,
+                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                        },
+                                                        {
+                                                            "id": 3,
+                                                            "question_id": 1,
+                                                            "text_answer": "Modern marketing campaigns",
+                                                            "img_answer": null,
+                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                        },
+                                                        {
+                                                            "id": 4,
+                                                            "question_id": 1,
+                                                            "text_answer": "Social media trends",
+                                                            "img_answer": null,
+                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/theories/{id}": {
+            "get": {
+                "summary": "GET /api/v1/theories/{id}",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Theory"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "lesson_id": 1,
+                                            "content": "The perception of a brand is often shaped by only a few key decades.\nFor Breitling, this is usually the aviation era, especially during the quartz crisis.\n\nBut there is much more to discover.\nThis lesson explores how Breitling evolved over time and built its reputation across different eras.\n\nYou’ll learn the milestones that define the brand and how to use them to tell a powerful story.",
+                                            "position_order": 1,
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z",
+                                            "questions": [
+                                                {
+                                                    "id": 1,
+                                                    "content_default": "What shapes the perception of a brand like Breitling over time?",
+                                                    "content_if_TF": "The perception of Breitling is shaped mostly by its aviation history during the quartz crisis.",
+                                                    "content_if_blank": "The perception of Breitling is shaped mostly by its __________ history during the quartz crisis.",
+                                                    "isMatchable": false,
+                                                    "checkpoint_id": 1,
+                                                    "theory_id": 1,
+                                                    "position_order": 1,
+                                                    "correct_answer_text": {
+                                                        "true_false": true,
+                                                        "correct_choice_id": 2
+                                                    },
+                                                    "created_at": null,
+                                                    "updated_at": null,
+                                                    "choices": [
+                                                        {
+                                                            "id": 1,
+                                                            "question_id": 1,
+                                                            "text_answer": "Celebrity endorsements",
+                                                            "img_answer": null,
+                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                        },
+                                                        {
+                                                            "id": 2,
+                                                            "question_id": 1,
+                                                            "text_answer": "Aviation history during key decades",
+                                                            "img_answer": null,
+                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                        },
+                                                        {
+                                                            "id": 3,
+                                                            "question_id": 1,
+                                                            "text_answer": "Modern marketing campaigns",
+                                                            "img_answer": null,
+                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                        },
+                                                        {
+                                                            "id": 4,
+                                                            "question_id": 1,
+                                                            "text_answer": "Social media trends",
+                                                            "img_answer": null,
+                                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user-missions/{id}": {
+            "get": {
+                "summary": "GET /api/v1/user-missions/{id}",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Mission"
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "mission_id": 2,
+                                        "user_id": 1,
+                                        "is_completed": true,
+                                        "start_date": "2025-05-30T07:15:45.000000Z",
+                                        "end_date": "2025-06-05T07:15:45.000000Z",
+                                        "created_at": "2025-06-09T07:15:45.000000Z",
+                                        "updated_at": "2025-06-09T07:15:45.000000Z",
+                                        "mission": {
+                                            "id": 2,
+                                            "description": "Score 100% on a quiz from the 'Main Collections' module",
+                                            "reward_id": 2,
+                                            "created_at": "2025-06-09T07:15:45.000000Z",
+                                            "updated_at": "2025-06-09T07:15:45.000000Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user-rewards": {
+            "get": {
+                "summary": "GET /api/v1/user-rewards",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID de l'utilisateur dont on veut les rewards"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des user rewards",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserReward"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "user_id": 1,
+                                            "reward_id": 1,
+                                            "is_favourite": true,
+                                            "acquired_at": "2025-06-09T07:15:45.000000Z",
+                                            "created_at": "2025-06-09T07:15:45.000000Z",
+                                            "updated_at": "2025-06-09T07:15:45.000000Z",
+                                            "reward": {
+                                                "id": 1,
+                                                "photo_name": "img/rewards_photo/TTI1_CHOICE_1.png",
+                                                "model": "Breitling – Top Time Limited Edition",
+                                                "date": "2020",
+                                                "size": "41 mm",
+                                                "colors": "Silver Opalin, Bronze",
+                                                "bracelet": "22/20mm",
+                                                "description": "...",
+                                                "created_at": "2025-06-09T07:15:45.000000Z",
+                                                "updated_at": "2025-06-09T07:15:45.000000Z"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Paramètre manquant",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "user_id is required"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "POST /api/v1/user-rewards",
+                "description": "Attribuer une reward à un user",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserRewardCreateRequest"
+                            },
+                            "example": {
+                                "user_id": 1,
+                                "reward_id": 1,
+                                "is_favourite": true,
+                                "acquired_at": "2025-06-09T07:15:45.000000Z"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User reward créée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserReward"
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "user_id": 1,
+                                        "reward_id": 1,
+                                        "is_favourite": true,
+                                        "acquired_at": "2025-06-09T07:15:45.000000Z",
+                                        "created_at": "2025-06-09T07:15:45.000000Z",
+                                        "updated_at": "2025-06-09T07:15:45.000000Z",
+                                        "reward": {
+                                            "id": 1,
+                                            "photo_name": "img/rewards_photo/TTI1_CHOICE_1.png",
+                                            "model": "Breitling – Top Time Limited Edition",
+                                            "date": "2020",
+                                            "size": "41 mm",
+                                            "colors": "Silver Opalin, Bronze",
+                                            "bracelet": "22/20mm",
+                                            "description": "...",
+                                            "created_at": "2025-06-09T07:15:45.000000Z",
+                                            "updated_at": "2025-06-09T07:15:45.000000Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user-rewards/{id}": {
+            "get": {
+                "summary": "GET /api/v1/user-rewards/{id}",
+                "responses": {
+                    "200": {
+                        "description": "Détail d'un user reward",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserReward"
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "user_id": 1,
+                                        "reward_id": 1,
+                                        "is_favourite": true,
+                                        "acquired_at": "2025-06-09T07:15:45.000000Z",
+                                        "created_at": "2025-06-09T07:15:45.000000Z",
+                                        "updated_at": "2025-06-09T07:15:45.000000Z",
+                                        "reward": {
+                                            "id": 1,
+                                            "photo_name": "img/rewards_photo/TTI1_CHOICE_1.png",
+                                            "model": "Breitling – Top Time Limited Edition",
+                                            "date": "2020",
+                                            "size": "41 mm",
+                                            "colors": "Silver Opalin, Bronze",
+                                            "bracelet": "22/20mm",
+                                            "description": "...",
+                                            "created_at": "2025-06-09T07:15:45.000000Z",
+                                            "updated_at": "2025-06-09T07:15:45.000000Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "PUT /api/v1/user-rewards/{id}",
+                "description": "Mettre à jour un user reward",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserRewardUpdateRequest"
+                            },
+                            "example": {
+                                "is_favourite": false,
+                                "acquired_at": "2025-06-09T07:15:45.000000Z"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User reward mis à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserReward"
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "user_id": 1,
+                                        "reward_id": 1,
+                                        "is_favourite": false,
+                                        "acquired_at": "2025-06-09T07:15:45.000000Z",
+                                        "created_at": "2025-06-09T07:15:45.000000Z",
+                                        "updated_at": "2025-06-09T07:15:45.000000Z",
+                                        "reward": {
+                                            "id": 1,
+                                            "photo_name": "img/rewards_photo/TTI1_CHOICE_1.png",
+                                            "model": "Breitling – Top Time Limited Edition",
+                                            "date": "2020",
+                                            "size": "41 mm",
+                                            "colors": "Silver Opalin, Bronze",
+                                            "bracelet": "22/20mm",
+                                            "description": "...",
+                                            "created_at": "2025-06-09T07:15:45.000000Z",
+                                            "updated_at": "2025-06-09T07:15:45.000000Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v1/users": {
+            "get": {
+                "summary": "GET /api/v1/users",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "username": "rafael.dupuis",
+                                            "email": "rafael.dupuis@example.com",
+                                            "email_verified_at": null,
+                                            "pos_id": 1,
+                                            "signup_year": 2020,
+                                            "avatar": "img/profile_photo/rafael.jpg",
+                                            "elo_score": 79034,
+                                            "battle_won": 95,
+                                            "battle_lost": 50,
+                                            "number_available_slots": 3,
+                                            "is_BS": true,
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z",
+                                            "pos": {
+                                                "id": 1,
+                                                "address": "Lausanne, St. François",
+                                                "zipcode": "1003",
+                                                "country": "Switzerland",
+                                                "breitling_pin": true,
+                                                "country_flag": "🇨🇭",
+                                                "created_at": "2025-06-09T07:15:43.000000Z",
+                                                "updated_at": "2025-06-09T07:15:43.000000Z"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/{id}": {
+            "get": {
+                "summary": "GET /api/v1/users/{id}",
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9ussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "username": "rafael.dupuis",
+                                        "email": "rafael.dupuis@example.com",
+                                        "email_verified_at": null,
+                                        "pos_id": 1,
+                                        "signup_year": 2020,
+                                        "avatar": "img/profile_photo/rafael.jpg",
+                                        "elo_score": 79034,
+                                        "battle_won": 95,
+                                        "battle_lost": 50,
+                                        "number_available_slots": 3,
+                                        "is_BS": true,
+                                        "created_at": "2025-06-09T07:15:43.000000Z",
+                                        "updated_at": "2025-06-09T07:15:43.000000Z",
+                                        "pos": {
+                                            "id": 1,
+                                            "address": "Lausanne, St. François",
+                                            "zipcode": "1003",
+                                            "country": "Switzerland",
+                                            "breitling_pin": true,
+                                            "country_flag": "🇨🇭",
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                        },
+                                        "missions": [
+                                            {
+                                                "id": 2,
+                                                "description": "Score 100% on a quiz from the 'Main Collections' module",
+                                                "reward_id": 2,
+                                                "created_at": "2025-06-09T07:15:45.000000Z",
+                                                "updated_at": "2025-06-09T07:15:45.000000Z",
+                                                "pivot": {
+                                                    "user_id": 1,
+                                                    "mission_id": 2,
+                                                    "is_completed": 1,
+                                                    "start_date": "2025-05-30 07:15:45",
+                                                    "end_date": "2025-06-05 07:15:45",
+                                                    "created_at": "2025-06-09T07:15:45.000000Z",
+                                                    "updated_at": "2025-06-09T07:15:45.000000Z"
+                                                }
+                                            }
+                                        ],
+                                        "rewards": [],
+                                        "battles_as_challenger": [],
+                                        "battles_as_challenged": [],
+                                        "progression": null
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/battles": {
+            "get": {
+                "summary": "GET /api/v1/battles",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Filtrer les battles par user_id (en tant que challenger ou challenged)"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des battles",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Battle"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "challenger_id": 1,
+                                            "challenged_id": 2,
+                                            "has_challenger_won": true,
+                                            "has_challenger_accepted": true,
+                                            "has_challenged_accepted": true,
+                                            "challenger_init_date": "2025-06-09T07:15:45.000000Z",
+                                            "questions_id": [1, 2, 3],
+                                            "challenger_summary": [],
+                                            "challenged_summary": [],
+                                            "created_at": "2025-06-09T07:15:45.000000Z",
+                                            "updated_at": "2025-06-09T07:15:45.000000Z",
+                                            "challenger": {
+                                                "id": 1,
+                                                "username": "rafael.dupuis",
+                                                "email": "rafael.dupuis@example.com",
+                                                "...": "..."
+                                            },
+                                            "challenged": {
+                                                "id": 2,
+                                                "username": "john.doe",
+                                                "email": "john.doe@example.com",
+                                                "...": "..."
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "POST /api/v1/battles",
+                "description": "Créer un nouveau battle",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BattleCreateRequest"
+                            },
+                            "example": {
+                                "challenger_id": 12,
+                                "challenged_id": 34,
+                                "challenger_init_date": "2025-06-09T07:15:43.000000Z",
+                                "questions_id": [1, 2, 3]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Battle créé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Battle"
+                                },
+                                "example": {
+                                    "id": 1,
+                                    "challenger_id": 12,
+                                    "challenged_id": 34,
+                                    "has_challenger_won": null,
+                                    "has_challenger_accepted": false,
+                                    "has_challenged_accepted": false,
+                                    "challenger_init_date": "2025-06-09T07:15:43.000000Z",
+                                    "questions_id": [1, 2, 3],
+                                    "challenger_summary": null,
+                                    "challenged_summary": null,
+                                    "challenger": {
+                                        "id": 12,
+                                        "username": "john.doe",
+                                        "email": "john.doe@example.com",
+                                        "avatar": "img/profile_photo/john.jpg"
+                                    },
+                                    "challenged": {
+                                        "id": 34,
+                                        "username": "jane.smith",
+                                        "email": "jane.smith@example.com",
+                                        "avatar": "img/profile_photo/jane.jpg"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/battles/{id}": {
+            "get": {
+                "summary": "GET /api/v1/battles/{id}",
+                "responses": {
+                    "200": {
+                        "description": "Réussi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Battle"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "challenger_id": 12,
+                                            "challenged_id": 34,
+                                            "has_challenger_won": true,
+                                            "has_challenger_accepted": true,
+                                            "has_challenged_accepted": false,
+                                            "challenger_init_date": "2025-06-09T07:15:43.000000Z",
+                                            "questions_id": [1, 2, 3],
+                                            "challenger_summary": {
+                                                "score": 3,
+                                                "time_taken": 120
+                                            },
+                                            "challenged_summary": {
+                                                "score": 2,
+                                                "time_taken": 140
+                                            },
+                                            "challenger": {
+                                                "id": 12,
+                                                "username": "john.doe",
+                                                "email": "john.doe@example.com",
+                                                "avatar": "img/profile_photo/john.jpg"
+                                            },
+                                            "challenged": {
+                                                "id": 34,
+                                                "username": "jane.smith",
+                                                "email": "jane.smith@example.com",
+                                                "avatar": "img/profile_photo/jane.jpg"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "DELETE /api/v1/battles/{id}",
+                "description": "Supprimer un battle (nécessite le paramètre user_id dans query)",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID du user effectuant la suppression"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Succès de la suppression",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "Match cancelled by challenger."
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Action interdite",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "You are not part of this match."
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v1/checkpoints": {
+            "get": {
+                "summary": "GET /api/v1/checkpoints",
+                "responses": {
+                    "200": {
+                        "description": "Liste des checkpoints",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Checkpoint"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "title": "Checkpoint 1",
+                                            "description": "This is checkpoint 1.",
+                                            "module_id": 1,
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z",
+                                            "questions": []
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/checkpoints/{id}": {
+            "get": {
+                "summary": "GET /api/v1/checkpoints/{id}",
+                "responses": {
+                    "200": {
+                        "description": "Détail d'un checkpoint",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Checkpoint"
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "title": "Checkpoint 1",
+                                        "description": "This is checkpoint 1.",
+                                        "module_id": 1,
+                                        "created_at": "2025-06-09T07:15:43.000000Z",
+                                        "updated_at": "2025-06-09T07:15:43.000000Z",
+                                        "questions": []
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/progression": {
+            "get": {
+                "summary": "GET /api/v1/progression",
+                "responses": {
+                    "200": {
+                        "description": "Liste des progressions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Progression"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "user_id": 1,
+                                            "last_lesson_id": 2,
+                                            "last_checkpoint_id": 3,
+                                            "idofquestionscorrectlyanswered": [
+                                                4, 5, 6
+                                            ],
+                                            "created_at": "2025-06-09T07:15:43.000000Z",
+                                            "updated_at": "2025-06-09T07:15:43.000000Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "POST /api/v1/progression",
+                "description": "Créer une progression",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProgressionCreateRequest"
+                            },
+                            "example": {
+                                "user_id": 1,
+                                "last_lesson_id": 2,
+                                "last_checkpoint_id": 3,
+                                "idofquestionscorrectlyanswered": [4, 5, 6]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Progression créée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Progression"
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "user_id": 1,
+                                        "last_lesson_id": 2,
+                                        "last_checkpoint_id": 3,
+                                        "idofquestionscorrectlyanswered": [
+                                            4, 5, 6
+                                        ],
+                                        "created_at": "2025-06-09T07:15:43.000000Z",
+                                        "updated_at": "2025-06-09T07:15:43.000000Z"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/progression/{id}": {
+            "get": {
+                "summary": "GET /api/v1/progression/{id}",
+                "responses": {
+                    "200": {
+                        "description": "Détail d'une progression",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Progression"
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "user_id": 1,
+                                        "last_lesson_id": 2,
+                                        "last_checkpoint_id": 3,
+                                        "idofquestionscorrectlyanswered": [
+                                            4, 5, 6
+                                        ],
+                                        "created_at": "2025-06-09T07:15:43.000000Z",
+                                        "updated_at": "2025-06-09T07:15:43.000000Z"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "PUT /api/v1/progression/{id}",
+                "description": "Met à jour une progression",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProgressionUpdateRequest"
+                            },
+                            "example": {
+                                "last_lesson_id": 2,
+                                "last_checkpoint_id": 3,
+                                "idofquestionscorrectlyanswered": [4, 5, 6]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Progression mise à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Progression"
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "user_id": 1,
+                                        "last_lesson_id": 2,
+                                        "last_checkpoint_id": 3,
+                                        "idofquestionscorrectlyanswered": [
+                                            4, 5, 6
+                                        ],
+                                        "created_at": "2025-06-09T07:15:43.000000Z",
+                                        "updated_at": "2025-06-09T07:15:43.000000Z"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v1/user-missions": {
+            "get": {
+                "summary": "GET /api/v1/user-missions",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "ID de l'utilisateur dont on veut les missions"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des user missions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserMission"
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "user_id": 1,
+                                            "mission_id": 2,
+                                            "is_completed": true,
+                                            "start_date": "2025-05-30T07:15:45.000000Z",
+                                            "end_date": "2025-06-05T07:15:45.000000Z",
+                                            "created_at": "2025-06-09T07:15:45.000000Z",
+                                            "updated_at": "2025-06-09T07:15:45.000000Z",
+                                            "mission": {
+                                                "id": 2,
+                                                "description": "Score 100% on a quiz from the 'Main Collections' module",
+                                                "reward_id": 2,
+                                                "created_at": "2025-06-09T07:15:45.000000Z",
+                                                "updated_at": "2025-06-09T07:15:45.000000Z"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Paramètre manquant",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "user_id is required"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "POST /api/v1/user-missions",
+                "description": "Créer une user mission",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserMissionCreateRequest"
+                            },
+                            "example": {
+                                "user_id": 1,
+                                "mission_id": 2,
+                                "is_completed": false,
+                                "start_date": "2025-06-09T07:15:45.000000Z",
+                                "end_date": null
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User mission créée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserMission"
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "user_id": 1,
+                                        "mission_id": 2,
+                                        "is_completed": false,
+                                        "start_date": "2025-06-09T07:15:45.000000Z",
+                                        "end_date": null,
+                                        "created_at": "2025-06-09T07:15:45.000000Z",
+                                        "updated_at": "2025-06-09T07:15:45.000000Z",
+                                        "mission": {
+                                            "id": 2,
+                                            "description": "Score 100% on a quiz from the 'Main Collections' module",
+                                            "reward_id": 2,
+                                            "created_at": "2025-06-09T07:15:45.000000Z",
+                                            "updated_at": "2025-06-09T07:15:45.000000Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user-missions/{id}": {
+            "get": {
+                "summary": "GET /api/v1/user-missions/{id}",
+                "responses": {
+                    "200": {
+                        "description": "Détail d'une user mission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserMission"
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "user_id": 1,
+                                        "mission_id": 2,
+                                        "is_completed": true,
+                                        "start_date": "2025-05-30T07:15:45.000000Z",
+                                        "end_date": "2025-06-05T07:15:45.000000Z",
+                                        "created_at": "2025-06-09T07:15:45.000000Z",
+                                        "updated_at": "2025-06-09T07:15:45.000000Z",
+                                        "mission": {
+                                            "id": 2,
+                                            "description": "Score 100% on a quiz from the 'Main Collections' module",
+                                            "reward_id": 2,
+                                            "created_at": "2025-06-09T07:15:45.000000Z",
+                                            "updated_at": "2025-06-09T07:15:45.000000Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "PUT /api/v1/user-missions/{id}",
+                "description": "Mettre à jour une user mission",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserMissionUpdateRequest"
+                            },
+                            "example": {
+                                "is_completed": true,
+                                "start_date": "2025-05-30T07:15:45.000000Z",
+                                "end_date": "2025-06-05T07:15:45.000000Z"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User mission mise à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserMission"
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "user_id": 1,
+                                        "mission_id": 2,
+                                        "is_completed": true,
+                                        "start_date": "2025-05-30T07:15:45.000000Z",
+                                        "end_date": "2025-06-05T07:15:45.000000Z",
+                                        "created_at": "2025-06-09T07:15:45.000000Z",
+                                        "updated_at": "2025-06-09T07:15:45.000000Z",
+                                        "mission": {
+                                            "id": 2,
+                                            "description": "Score 100% on a quiz from the 'Main Collections' module",
+                                            "reward_id": 2,
+                                            "created_at": "2025-06-09T07:15:45.000000Z",
+                                            "updated_at": "2025-06-09T07:15:45.000000Z"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "DELETE /api/v1/user-missions/{id}",
+                "description": "Supprimer une user mission",
+                "responses": {
+                    "200": {
+                        "description": "User mission supprimée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "message": "User mission removed"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "DefaultEntity": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "field1": {
+                        "type": "string"
+                    },
+                    "field2": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "LoginResponse": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/DefaultEntity"
+                    }
+                }
+            },
+            "LogoutResponse": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Choice": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "question_id": {
+                        "type": "integer"
+                    },
+                    "text_answer": {
+                        "type": "string"
+                    },
+                    "img_answer": {
+                        "type": ["string", "null"]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "Question": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "content_default": {
+                        "type": "string"
+                    },
+                    "content_if_TF": {
+                        "type": "string"
+                    },
+                    "content_if_blank": {
+                        "type": "string"
+                    },
+                    "isMatchable": {
+                        "type": "boolean"
+                    },
+                    "checkpoint_id": {
+                        "type": "integer"
+                    },
+                    "theory_id": {
+                        "type": "integer"
+                    },
+                    "position_order": {
+                        "type": "integer"
+                    },
+                    "correct_answer_text": {
+                        "type": "object",
+                        "properties": {
+                            "true_false": {
+                                "type": "boolean"
+                            },
+                            "correct_choice_id": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "created_at": {
+                        "type": ["string", "null"],
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": ["string", "null"],
+                        "format": "date-time"
+                    },
+                    "choices": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Choice"
+                        }
+                    }
+                }
+            },
+            "Theory": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "lesson_id": {
+                        "type": "integer"
+                    },
+                    "content": {
+                        "type": "string"
+                    },
+                    "position_order": {
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Question"
+                        }
+                    }
+                }
+            },
+            "Lesson": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "module_id": {
+                        "type": "integer"
+                    },
+                    "order_position": {
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "theories": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Theory"
+                        }
+                    }
+                }
+            },
+            "Module": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "order_position": {
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "lessons": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Lesson"
+                        }
+                    }
+                }
+            },
+            "Mission": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "reward_id": {
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "Reward": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "photo_name": {
+                        "type": "string"
+                    },
+                    "model": {
+                        "type": "string"
+                    },
+                    "date": {
+                        "type": "string"
+                    },
+                    "size": {
+                        "type": "string"
+                    },
+                    "colors": {
+                        "type": "string"
+                    },
+                    "bracelet": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "missions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Mission"
+                        }
+                    }
+                }
+            },
+            "Pos": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "address": {
+                        "type": "string"
+                    },
+                    "zipcode": {
+                        "type": "string"
+                    },
+                    "country": {
+                        "type": "string"
+                    },
+                    "breitling_pin": {
+                        "type": "boolean"
+                    },
+                    "country_flag": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "User": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "username": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "email_verified_at": {
+                        "type": ["string", "null"],
+                        "format": "date-time"
+                    },
+                    "pos_id": {
+                        "type": "integer"
+                    },
+                    "signup_year": {
+                        "type": "integer"
+                    },
+                    "avatar": {
+                        "type": "string"
+                    },
+                    "elo_score": {
+                        "type": "integer"
+                    },
+                    "battle_won": {
+                        "type": "integer"
+                    },
+                    "battle_lost": {
+                        "type": "integer"
+                    },
+                    "number_available_slots": {
+                        "type": "integer"
+                    },
+                    "is_BS": {
+                        "type": "boolean"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "pos": {
+                        "$ref": "#/components/schemas/Pos"
+                    },
+                    "missions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Mission"
+                        }
+                    },
+                    "rewards": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "battles_as_challenger": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "battles_as_challenged": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "progression": {
+                        "type": ["object", "null"]
+                    }
+                }
+            },
+            "Battle": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "challenger_id": {
+                        "type": "integer"
+                    },
+                    "challenged_id": {
+                        "type": "integer"
+                    },
+                    "has_challenger_won": {
+                        "type": ["boolean", "null"]
+                    },
+                    "has_challenger_accepted": {
+                        "type": "boolean"
+                    },
+                    "has_challenged_accepted": {
+                        "type": "boolean"
+                    },
+                    "challenger_init_date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "questions_id": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "challenger_summary": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "challenged_summary": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "challenger": {
+                        "$ref": "#/components/schemas/User"
+                    },
+                    "challenged": {
+                        "$ref": "#/components/schemas/User"
+                    }
+                }
+            },
+            "Checkpoint": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "module_id": {
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "questions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Question"
+                        }
+                    }
+                }
+            },
+            "Progression": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "last_lesson_id": {
+                        "type": ["integer", "null"]
+                    },
+                    "last_checkpoint_id": {
+                        "type": ["integer", "null"]
+                    },
+                    "idofquestionscorrectlyanswered": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "ProgressionCreateRequest": {
+                "type": "object",
+                "required": ["user_id"],
+                "properties": {
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "last_lesson_id": {
+                        "type": ["integer", "null"]
+                    },
+                    "last_checkpoint_id": {
+                        "type": ["integer", "null"]
+                    },
+                    "idofquestionscorrectlyanswered": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            },
+            "ProgressionUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "last_lesson_id": {
+                        "type": ["integer", "null"]
+                    },
+                    "last_checkpoint_id": {
+                        "type": ["integer", "null"]
+                    },
+                    "idofquestionscorrectlyanswered": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            },
+            "UserMission": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "mission_id": {
+                        "type": "integer"
+                    },
+                    "is_completed": {
+                        "type": "boolean"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "end_date": {
+                        "type": ["string", "null"],
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "mission": {
+                        "$ref": "#/components/schemas/Mission"
+                    }
+                }
+            },
+            "UserMissionCreateRequest": {
+                "type": "object",
+                "required": ["user_id", "mission_id"],
+                "properties": {
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "mission_id": {
+                        "type": "integer"
+                    },
+                    "is_completed": {
+                        "type": "boolean"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "end_date": {
+                        "type": ["string", "null"],
+                        "format": "date-time"
+                    }
+                }
+            },
+            "UserMissionUpdateRequest": {
+                "type": "object",
+                "properties": {
+                    "is_completed": {
+                        "type": "boolean"
+                    },
+                    "start_date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "end_date": {
+                        "type": ["string", "null"],
+                        "format": "date-time"
+                    }
+                }
+            }
+        }
+    }
+}
