@@ -110,3 +110,22 @@ export const battleService = {
     return await response.json()
   }
 }
+
+export const fetchQuestions = () => {
+  return fetch(`${API_BASE_URL}/questions`, {})
+
+
+}
+
+export  const fetchProgression = async (userid) => {
+const progression = await fetch(`${API_BASE_URL}/progression/${userid}`, {})
+  const data = await progression.json()
+return data.data
+
+}
+
+export const fetchModules = async (moduleId) => {
+const module = await fetch(`${API_BASE_URL}/modules/${moduleId}`, {})
+const data = await module.json()
+return data.data
+}

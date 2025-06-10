@@ -16,12 +16,13 @@
       ></button>
 
       <!-- Boutons de checkpoint avec progression individuelle -->
-      <div
-          v-for="(lesson, index) in lessons"
+      <RouterLink
+          v-for="(lesson,index) in lessons"
           :key="index"
+          :to="`/lesson/${lesson.id}`"
           class="lesson-container"
           :style="getButtonPosition(index)"
-          @click="handleLessonClick(index)"
+
       >
         <!-- Cercle de progression pour chaque leçon -->
         <svg class="lesson-progress-circle" width="50" height="50">
@@ -60,7 +61,7 @@
         <p class="lesson-label">
           {{ lesson.title }}
         </p>
-      </div>
+      </RouterLink>
     </div>
 
     <!-- Modal Checkpoint - Affiché par-dessus -->
@@ -102,19 +103,12 @@
 </template>
 
 <script>
+import {fetchProgression, fetchModules} from "@/services/api.js";
 export default {
   name: 'FormationView',
   data() {
     return {
-      lessons: [
-        {id: 1, status: 'completed', progress: 100, title: 'Onboarding'},
-        {id: 2, status: 'completed', progress: 100, title: 'Onboarding'},
-        {id: 3, status: 'in-progress', progress: 65, title: 'Onboarding'},
-        {id: 4, status: 'in-progress', progress: 30, title: 'Module 4'},
-        {id: 5, status: 'not-started', progress: 0, title: 'Module 5'},
-        {id: 6, status: 'not-started', progress: 0, title: 'Module 6'},
-        {id: 7, status: 'in-progress', progress: 80, title: 'Module 7'},
-      ],
+      lessons: [],
       containerWidth: 0,
       containerHeight: 0,
       isCheckpointModalVisible: false,
@@ -124,7 +118,8 @@ export default {
         totalQuestions: 15,
         timeLimit: '20 minutes',
         passScore: 70
-      }
+      },
+      progression:{},
     }
   },
 
@@ -139,13 +134,22 @@ export default {
     }
   },
 
-  mounted() {
+  async mounted() {
     // Utilisation de nextTick pour s'assurer que le DOM est rendu
-    this.$nextTick(() => {
+    await this.$nextTick(() => {
       this.updateContainerDimensions();
       // Garde le resize listener au cas où la fenêtre change
       window.addEventListener('resize', this.updateContainerDimensions);
     });
+    // Charge les modules et remplit le tableau lessons dynamiquement !
+    const loadedmodule = await this.loadModules();
+    // Si tu veux garder le format avec status/progress : adapte ici.
+    this.lessons = loadedmodule.lessons.map((lesson, idx) => ({
+      ...lesson,
+      status: 'not-started', // ou récupère depuis ton API ou progression
+      progress: 0,
+      title: lesson.title || `Lesson ${idx + 1}`
+    }));
   },
 
   methods: {
@@ -226,8 +230,35 @@ export default {
         }
       }
     },
+    async loadProgression () {
+      const res = await fetch('http://localhost:8000/api/user', {
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json'
+        }
+      })
+      if (!res.ok) throw new Error('Unauthenticated user (401)')
+
+      const connectedUser = await res.json()
+      const progression = await fetchProgression(connectedUser.id)
+      this.progression = progression //pas sûr que ça serve à qqch
+      return progression
+    },
+
+    async loadModules () {
+      const progression = await this.loadProgression()
+      const moduleToDisplayId = progression.last_checkpoint_id+1
+      const module = await fetchModules(moduleToDisplayId)
+      const numberOfLessons = module.lessons.length
+
+      console.log(module)
+      return module
+    }
   }
 }
+
+
+
 </script>
 
 <style>
