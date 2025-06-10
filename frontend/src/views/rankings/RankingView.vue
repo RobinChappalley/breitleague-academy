@@ -134,7 +134,6 @@
         <div class="popup-watches">
           <div class="watches-header">
             <h3>TOP 3 WATCHES</h3>
-            <button class="see-all-watches-btn">See all</button>
           </div>
           <div class="watches-grid">
             <div v-for="watch in selectedPlayer?.topWatches" :key="watch.id" class="watch-item">
