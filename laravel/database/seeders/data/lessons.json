@@ -8,9 +8,73 @@
     },
     {
         "id": 2,
-        "title": "Brand Identity & Vision",
+        "title": "Inspiration and Positioning",
         "description": "Understand Breitling’s brand values, mission, and how it connects with today’s conscious consumers.",
         "module_id": 1,
         "order_position": 2
+    },
+    {
+        "id": 3,
+        "title": "Understanding the Collection",
+        "description": "Explore Breitling’s diverse watch collections and learn how each line reflects the brand’s values, heritage, and innovation.",
+        "module_id": 1,
+        "order_position": 3
+    },
+    {
+        "id": 4,
+        "title": "Storytelling",
+        "description": "Master the art of storytelling by understanding how to convey Breitling’s unique narrative and emotional appeal to customers.",
+        "module_id": 1,
+        "order_position": 4
+    },
+    {
+        "id": 5,
+        "title": "Core collections",
+        "description": "Deep dive into Breitling’s core collections—understand their key features, design inspirations, and target audiences.",
+        "module_id": 1,
+        "order_position": 5
+    },
+    {
+        "id": 6,
+        "title": "Novelties 1",
+        "description": "Discover the latest Breitling novelties and learn how to present them effectively to meet customer expectations and market trends.",
+        "module_id": 2,
+        "order_position": 1
+    },
+    {
+        "id": 7,
+        "title": "Novelties 3",
+        "description": "Stay updated on the newest innovations and product launches within Breitling’s lineup to elevate your product knowledge.",
+        "module_id": 2,
+        "order_position": 2
+    },
+
+    {
+        "id": 8,
+        "title": "Presenting the Collection",
+        "description": "Learn best practices for presenting the Breitling collection in-store or online, creating an engaging and premium customer experience.",
+        "module_id": 3,
+        "order_position": 1
+    },
+    {
+        "id": 9,
+        "title": "Marketing",
+        "description": "Explore Breitling’s marketing strategies—understand key campaigns, brand partnerships, and how to leverage them in your sales approach.",
+        "module_id": 3,
+        "order_position": 2
+    },
+    {
+        "id": 10,
+        "title": "Made in Breitling",
+        "description": "Uncover the craftsmanship, technical expertise, and manufacturing excellence that define the “Made in Breitling” standard.",
+        "module_id": 3,
+        "order_position": 3
+    },
+    {
+        "id": 11,
+        "title": "Sustainability",
+        "description": "Understand Breitling’s commitment to sustainability and how its practices align with the values of today’s environmentally conscious customers.",
+        "module_id": 3,
+        "order_position": 4
     }
 ]
