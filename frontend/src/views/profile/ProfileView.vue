@@ -90,38 +90,6 @@
             </div>
           </div>
         </div>
-
-        <!-- User Info Section -->
-        <div class="user-info-section">
-          <div class="info-item">
-            <span class="info-label">E-mail:</span>
-            <span class="info-value">{{ user.email || 'Non renseigné' }}</span>
-          </div>
-          <div class="info-item clickable">
-            <span class="info-label">Update password</span>
-            <span class="info-action">→</span>
-          </div>
-          <div class="info-item clickable">
-            <span class="info-label">Edit profile photo </span>
-            <span class="info-action">→</span>
-          </div>
-          <div class="info-item clickable">
-            <span class="info-label">Notification parameter</span>
-            <span class="info-action">→</span>
-          </div>
-          <div class="info-item clickable">
-            <span class="info-label">Privacy</span>
-            <span class="info-action">→</span>
-          </div>
-        </div>
-
-        <!-- FAQ Section -->
-        <div class="faq-section">
-          <div class="faq-header">
-            <span>FAQ</span>
-            <span class="arrow">→</span>
-          </div>
-        </div>
       </div>
       <!-- LOGOUT BUTTON -->
       <div style="text-align: center; margin-top: 2rem">
