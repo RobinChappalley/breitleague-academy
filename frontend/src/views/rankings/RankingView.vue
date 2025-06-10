@@ -62,7 +62,9 @@
             </div>
           </div>
 
-          <div class="score">{{ player.score.toLocaleString() }}</div>
+          <div class="score">
+            {{ player.score.toLocaleString('fr-CH').replace(/\u202F/g, "'") }} PTS
+          </div>
         </div>
 
         <!-- See All Button -->
@@ -87,7 +89,9 @@
           </div>
         </div>
 
-        <div class="score">{{ currentUser.score.toLocaleString() }}</div>
+        <div class="score">
+          {{ currentUser.score.toLocaleString('fr-CH').replace(/\u202F/g, "'") }} PTS
+        </div>
       </div>
     </div>
 
@@ -111,7 +115,9 @@
         </div>
 
         <div class="popup-score">
-          <div class="score-value">{{ selectedPlayer?.score.toLocaleString() }} PTS</div>
+          <div class="score-value">
+            {{ selectedPlayer?.score.toLocaleString('fr-CH').replace(/\u202F/g, "'") }} PTS PTS
+          </div>
         </div>
 
         <div class="popup-stats">

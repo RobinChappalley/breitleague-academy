@@ -49,7 +49,9 @@
         <!-- Score Section -->
         <div class="score-section">
           <div class="score-label">SCORE</div>
-          <div class="score-value">{{ (user.elo_score || 0).toLocaleString() }} PTS</div>
+          <div class="score-value">
+            {{ (user.elo_score || 0).toLocaleString('fr-CH').replace(/\u202F/g, "'") }} PTS
+          </div>
         </div>
 
         <!-- Stats Section -->
