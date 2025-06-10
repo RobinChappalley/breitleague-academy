@@ -1,5 +1,4 @@
 <template>
-  <div>{{loadModules()}}</div>
   <div class="formation-image-container">
     <div class="top-action-buttons">
       <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
@@ -18,7 +17,7 @@
 
       <!-- Boutons de checkpoint avec progression individuelle -->
       <div
-          v-for="(lesson, index) in lessons"
+          v-for="(lesson,index) in lessons"
           :key="index"
           class="lesson-container"
           :style="getButtonPosition(index)"
@@ -108,15 +107,7 @@ export default {
   name: 'FormationView',
   data() {
     return {
-      lessons: [
-        {id: 1, status: 'completed', progress: 100, title: 'Onboarding'},
-        {id: 2, status: 'completed', progress: 100, title: 'Onboarding'},
-        {id: 3, status: 'in-progress', progress: 65, title: 'Onboarding'},
-        {id: 4, status: 'in-progress', progress: 30, title: 'Module 4'},
-        {id: 5, status: 'not-started', progress: 0, title: 'Module 5'},
-        {id: 6, status: 'not-started', progress: 0, title: 'Module 6'},
-        {id: 7, status: 'in-progress', progress: 80, title: 'Module 7'},
-      ],
+      lessons: [],
       containerWidth: 0,
       containerHeight: 0,
       isCheckpointModalVisible: false,
@@ -142,13 +133,22 @@ export default {
     }
   },
 
-  mounted() {
+  async mounted() {
     // Utilisation de nextTick pour s'assurer que le DOM est rendu
-    this.$nextTick(() => {
+    await this.$nextTick(() => {
       this.updateContainerDimensions();
       // Garde le resize listener au cas où la fenêtre change
       window.addEventListener('resize', this.updateContainerDimensions);
     });
+    // Charge les modules et remplit le tableau lessons dynamiquement !
+    const loadedmodule = await this.loadModules();
+    // Si tu veux garder le format avec status/progress : adapte ici.
+    this.lessons = loadedmodule.lessons.map((lesson, idx) => ({
+      ...lesson,
+      status: 'not-started', // ou récupère depuis ton API ou progression
+      progress: 0,
+      title: lesson.title || `Lesson ${idx + 1}`
+    }));
   },
 
   methods: {
@@ -246,8 +246,12 @@ export default {
 
     async loadModules () {
       const progression = await this.loadProgression()
-      const moduleToDisplay = progression.last_checkpoint_id+1
-      const module = await fetchModules(progression.id)
+      const moduleToDisplayId = progression.last_checkpoint_id+1
+      const module = await fetchModules(moduleToDisplayId)
+      const numberOfLessons = module.lessons.length
+
+      console.log(module)
+      return module
     }
   }
 }

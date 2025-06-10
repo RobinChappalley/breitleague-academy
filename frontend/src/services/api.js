@@ -125,5 +125,7 @@ return data.data
 }
 
 export const fetchModules = async (moduleId) => {
-  console.log(moduleId)
+const module = await fetch(`${API_BASE_URL}/modules/${moduleId}`, {})
+const data = await module.json()
+return data.data
 }
