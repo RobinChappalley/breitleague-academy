@@ -16,7 +16,9 @@
         <div class="profile-avatar-container">
           <div class="profile-avatar">
             <div class="avatar-placeholder">
-              <span>{{ getUserInitial() }}</span>
+              <img :src="getUserInitial()" alt="User's Avatar" class="avatar-image" />
+
+              <!--<span>{{ getUserInitial() }}</span>-->
               <!-- L'initiale au centre -->
             </div>
           </div>
@@ -58,11 +60,11 @@
         <div class="stats-section">
           <div class="stat-item">
             <div class="stat-value">{{ user.battle_won || 0 }}</div>
-            <div class="stat-label">Victoires</div>
+            <div class="stat-label">Victories</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ user.battle_lost || 0 }}</div>
-            <div class="stat-label">Défaites</div>
+            <div class="stat-label">Defeats</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ winRate }}%</div>
@@ -92,23 +94,23 @@
         <!-- User Info Section -->
         <div class="user-info-section">
           <div class="info-item">
-            <span class="info-label">Email:</span>
+            <span class="info-label">E-mail:</span>
             <span class="info-value">{{ user.email || 'Non renseigné' }}</span>
           </div>
           <div class="info-item clickable">
-            <span class="info-label">Modifier le mot de passe</span>
+            <span class="info-label">Update password</span>
             <span class="info-action">→</span>
           </div>
           <div class="info-item clickable">
-            <span class="info-label">Changer d'avatar</span>
+            <span class="info-label">Edit profile photo </span>
             <span class="info-action">→</span>
           </div>
           <div class="info-item clickable">
-            <span class="info-label">Paramètres de notification</span>
+            <span class="info-label">Notification parameter</span>
             <span class="info-action">→</span>
           </div>
           <div class="info-item clickable">
-            <span class="info-label">Confidentialité</span>
+            <span class="info-label">Privacy</span>
             <span class="info-action">→</span>
           </div>
         </div>
@@ -160,7 +162,7 @@ const loadUserProfile = async () => {
     isLoading.value = true
     error.value = null
 
-    console.log('🔄 Load logged-in user...')
+    console.log("🔄 Chargement de l'utilisateur connecté...")
 
     // 1️⃣ Récupérer l'utilisateur connecté
     const res = await fetch('http://localhost:8000/api/user', {
@@ -170,7 +172,7 @@ const loadUserProfile = async () => {
       }
     })
 
-    if (!res.ok) throw new Error('Unauthenticated user (401)')
+    if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
 
     const connectedUser = await res.json()
     console.log('✅ Utilisateur connecté:', connectedUser)
@@ -180,13 +182,14 @@ const loadUserProfile = async () => {
     console.log('📦 Réponse API user:', response)
 
     user.value = response.data || response
-    console.log('✅ Full user loaded:', user.value)
+    console.log('✅ User complet chargé:', user.value)
 
     // Charger les rewards
     await loadUserRewards(user.value.id)
   } catch (err) {
     error.value = `Erreur lors du chargement: ${err.message}`
     console.error('❌ Erreur API:', err)
+    router.push('/login')
   } finally {
     isLoading.value = false
   }
@@ -198,15 +201,15 @@ const loadUserRewards = async (userId) => {
     console.log('📦 Réponse rewards:', response)
 
     userRewards.value = response.data || []
-    console.log('✅ Rewards loaded:', userRewards.value)
+    console.log('✅ Rewards chargés:', userRewards.value)
   } catch (err) {
-    console.log('⚠️ No rewards found :', err.message)
+    console.log('⚠️ Pas de rewards trouvés:', err.message)
     userRewards.value = []
   }
 }
 
 const getUserInitial = () => {
-  if (user.value.avatar) return user.value.avatar
+  if (user.value.avatar) return `http://localhost:8000/${user.value.avatar}`
   if (user.value.username) return user.value.username[0].toUpperCase()
   return 'U'
 }
@@ -217,35 +220,20 @@ const goToCollection = () => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('🚀 ProfileView mounted, loading ...')
+  console.log('🚀 ProfileView monté, chargement des données...')
   loadUserProfile()
 })
 const logout = async () => {
   try {
-    // Lire le token CSRF depuis le cookie
-    const csrfTokenFromCookie = decodeURIComponent(
-      document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('XSRF-TOKEN='))
-        ?.split('=')[1] ?? ''
-    )
-
-    await fetch('http://localhost:8000/logout', {
+    await fetch('/logout', {
       method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-XSRF-TOKEN': csrfTokenFromCookie
-      }
+      credentials: 'include'
     })
-
-    // Nettoyer le localStorage
-    localStorage.removeItem('isLoggedIn')
 
     // Redirige vers la page de login
     router.push('/login')
   } catch (err) {
-    console.error('❌ Error when logged out :', err)
+    console.error('❌ Erreur lors du logout:', err)
   }
 }
 </script>
@@ -341,6 +329,13 @@ const logout = async () => {
   font-weight: bold;
   color: white;
   text-transform: uppercase;
+}
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
 }
 
 .edit-icon {
