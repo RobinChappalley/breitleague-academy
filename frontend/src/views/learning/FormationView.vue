@@ -16,12 +16,13 @@
       ></button>
 
       <!-- Boutons de checkpoint avec progression individuelle -->
-      <div
+      <RouterLink
           v-for="(lesson,index) in lessons"
           :key="index"
+          :to="`/lesson/${lesson.id}`"
           class="lesson-container"
           :style="getButtonPosition(index)"
-          @click="handleLessonClick(index)"
+
       >
         <!-- Cercle de progression pour chaque leçon -->
         <svg class="lesson-progress-circle" width="50" height="50">
@@ -60,7 +61,7 @@
         <p class="lesson-label">
           {{ lesson.title }}
         </p>
-      </div>
+      </RouterLink>
     </div>
 
     <!-- Modal Checkpoint - Affiché par-dessus -->
@@ -102,7 +103,7 @@
 </template>
 
 <script>
-import {fetchProgression, userService, fetchModules} from "@/services/api.js";
+import {fetchProgression, fetchModules} from "@/services/api.js";
 export default {
   name: 'FormationView',
   data() {

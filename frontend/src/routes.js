@@ -43,5 +43,6 @@ export const routes = [
         return '/login'
       }
     }
-  }
+  },
+  {path:'/lesson/:id?', component: BattleQuizView, meta: { hideNavBar: false } },
 ]
