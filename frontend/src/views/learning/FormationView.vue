@@ -1,4 +1,5 @@
 <template>
+  <div>{{loadModules()}}</div>
   <div class="formation-image-container">
     <div class="top-action-buttons">
       <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
@@ -102,6 +103,7 @@
 </template>
 
 <script>
+import {fetchProgression, userService, fetchModules} from "@/services/api.js";
 export default {
   name: 'FormationView',
   data() {
@@ -124,7 +126,8 @@ export default {
         totalQuestions: 15,
         timeLimit: '20 minutes',
         passScore: 70
-      }
+      },
+      progression:{},
     }
   },
 
@@ -226,8 +229,31 @@ export default {
         }
       }
     },
+    async loadProgression () {
+      const res = await fetch('http://localhost:8000/api/user', {
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json'
+        }
+      })
+      if (!res.ok) throw new Error('Unauthenticated user (401)')
+
+      const connectedUser = await res.json()
+      const progression = await fetchProgression(connectedUser.id)
+      this.progression = progression //pas sûr que ça serve à qqch
+      return progression
+    },
+
+    async loadModules () {
+      const progression = await this.loadProgression()
+      const moduleToDisplay = progression.last_checkpoint_id+1
+      const module = await fetchModules(progression.id)
+    }
   }
 }
+
+
+
 </script>
 
 <style>
