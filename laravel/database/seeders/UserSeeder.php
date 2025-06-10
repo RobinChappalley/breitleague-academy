@@ -37,6 +37,11 @@ class UserSeeder extends Seeder
                 'last_checkpoint_id' => 0,
                 'idofquestionscorrectlyanswered' => [],
             ]);
+            // Attache le reward avec l'id 1
+            $user->rewards()->attach(1, [
+                'is_favourite' => false,
+                'acquired_at' => now(),
+            ]);
         }
     }
 }
