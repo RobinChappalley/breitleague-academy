@@ -13,7 +13,11 @@
             <p class="spec-item">Sizes: {{ selectedWatch.size }}</p>
             <p class="spec-item">
               Colors:
-              {{ Array.isArray(selectedWatch.colors) ? selectedWatch.colors.join(', ') : selectedWatch.colors }}
+              {{
+                Array.isArray(selectedWatch.colors)
+                  ? selectedWatch.colors.join(', ')
+                  : selectedWatch.colors
+              }}
             </p>
             <p class="spec-item">Bracelets: {{ selectedWatch.bracelet }}</p>
           </div>
@@ -23,7 +27,10 @@
         <div class="watch-image">
           <img
             v-if="selectedWatch.photo_name"
-            :src="`${backendUrl.replace(/\/$/, '')}/${selectedWatch.photo_name.replace(/^\/\//, '')}`"
+            :src="`${backendUrl.replace(/\/$/, '')}/${selectedWatch.photo_name.replace(
+              /^\/\//,
+              ''
+            )}`"
             :alt="selectedWatch.model"
             @load="handleImageLoad"
           />
@@ -51,7 +58,9 @@
         </div>
       </div>
 
-      <div v-else class="loading-state text-secondary">You haven't earned any rewards yet, so no watches are available.</div>
+      <div v-else class="loading-state text-secondary">
+        You haven't earned any rewards yet, so no watches are available.
+      </div>
     </div>
   </div>
 </template>
@@ -71,11 +80,11 @@ const fetchWatches = async () => {
     const res = await fetch(`${backendUrl}/api/v1/rewards`, { credentials: 'include' })
     const data = await res.json()
 
-    watches.value = data.data.map(watch => ({
+    watches.value = data.data.map((watch) => ({
       ...watch,
       colors: Array.isArray(watch.colors)
         ? watch.colors
-        : (watch.colors?.split(',').map(c => c.trim()) || []),
+        : watch.colors?.split(',').map((c) => c.trim()) || [],
       isFavorite: false
     }))
 
@@ -93,8 +102,8 @@ const fetchFavorites = async () => {
     const res = await fetch(`${backendUrl}/api/v1/user-rewards`, { credentials: 'include' })
     if (!res.ok) throw new Error('User not authenticated (401)')
     const data = await res.json()
-    favoriteIds.value = Array.isArray(data.data) ? data.data.map(entry => entry.reward_id) : []
-    watches.value.forEach(watch => {
+    favoriteIds.value = Array.isArray(data.data) ? data.data.map((entry) => entry.reward_id) : []
+    watches.value.forEach((watch) => {
       watch.isFavorite = favoriteIds.value.includes(watch.id)
     })
   } catch (err) {
@@ -126,7 +135,7 @@ const toggleFavorite = async (watch) => {
     if (response.ok) {
       watch.isFavorite = !isCurrentlyFavorite
       if (isCurrentlyFavorite) {
-        favoriteIds.value = favoriteIds.value.filter(id => id !== watch.id)
+        favoriteIds.value = favoriteIds.value.filter((id) => id !== watch.id)
       } else {
         favoriteIds.value.push(watch.id)
       }
@@ -155,7 +164,7 @@ onMounted(async () => {
 
 <style scoped>
 .collection-page {
-  background-color: #072C54;
+  background-color: #072c54;
   color: white;
   height: 100vh;
   display: flex;
@@ -168,7 +177,7 @@ onMounted(async () => {
 }
 
 .watch-details {
-  background-color: #072C54;
+  background-color: #072c54;
   padding-left: 2rem;
   padding-right: 2rem;
   display: flex;
@@ -197,7 +206,7 @@ onMounted(async () => {
 
 .description {
   margin-top: 1rem;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
   line-height: 1.4;
   max-width: 600px;
 }
@@ -216,7 +225,7 @@ onMounted(async () => {
 }
 
 .watches-grid {
-  background-color: #0D4F97;
+  background-color: #0d4f97;
   flex: 1;
   padding: 2rem;
   display: grid;
@@ -251,7 +260,7 @@ onMounted(async () => {
 }
 
 .is-favorite {
-  color: #FFD700;
+  color: #ffd700;
 }
 
 .no-watches {
@@ -261,7 +270,7 @@ onMounted(async () => {
   font-size: 1rem;
   grid-column: 1 / -1;
 }
-.error-state  {
+.error-state {
   text-align: center;
   color: #ff6b6b;
   padding: 2rem;
