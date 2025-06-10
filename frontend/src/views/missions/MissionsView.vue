@@ -21,14 +21,14 @@
         >
           <div class="mission-content">
             <div class="mission-info">
-              <h3 class="mission-title">{{ mission.title }}</h3>
+              <h3>{{ mission.title }}</h3>
               <div class="mission-progress">
                 <div 
                   class="progress-bar"
                   :style="{ width: mission.progress + '%' }"
                 ></div>
               </div>
-              <div class="progress-text">{{ mission.progress }}% Complete</div>
+              <div class="progress-text text-mini">{{ mission.progress }}% Complete</div>
             </div>
             
             <button 
@@ -43,7 +43,7 @@
               <div class="reward-watch">
                 <div class="watch-icon">⌚</div>
               </div>
-              <div class="reward-text">Reward</div>
+              <div class="reward-text btn-primary">Reward</div>
             </button>
           </div>
         </div>
@@ -151,15 +151,6 @@ const claimReward = (mission) => {
   margin-bottom: 2rem;
 }
 
-.missions-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #F7C72C;
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
 
 /* MISSIONS CONTAINER */
 .missions-container {
@@ -195,13 +186,7 @@ const claimReward = (mission) => {
   flex: 1;
 }
 
-.mission-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: white;
-  margin: 0 0 1rem 0;
-  line-height: 1.4;
-}
+
 
 .mission-progress {
   background: rgba(255, 255, 255, 0.2);
@@ -332,11 +317,6 @@ const claimReward = (mission) => {
     padding: 0 2rem;
   }
   
-  .missions-title {
-    font-size: 3.5rem;
-    letter-spacing: 3px;
-    margin-bottom: 1rem;
-  }
   
   .missions-header {
     margin-bottom: 3rem;
@@ -400,9 +380,7 @@ const claimReward = (mission) => {
     padding: 0 3rem;
   }
   
-  .missions-title {
-    font-size: 4rem;
-  }
+  
   
   .mission-card {
     padding: 2.5rem;
