@@ -487,20 +487,14 @@ const handleAction = async (challenge) => {
         opponent: {
           id: challenge.user?.id || challenge.id,
           name: challenge.name,
-          avatar: challenge.user?.avatar || challenge.name.charAt(0), // PASSER L'AVATAR COMPLET
+          avatar: challenge.user?.avatar, // PASSER L'AVATAR COMPLET
           flag: challenge.country
         },
         questions: selectedQuestions
       }))
       
-      console.log('💾 Questions RÉELLES avec bonnes réponses correctement identifiées!')
-      console.log('📊 Résumé:', selectedQuestions.map(q => ({
-        id: q.id,
-        question: q.content_default?.substring(0, 50) + '...',
-        choicesCount: q.choices.length,
-        correctAnswers: q.choices.filter(c => c.is_correct).length,
-        correctAnswerText: q.correct_answer_text
-      })))
+      console.log('💾 Battle data saved with opponent avatar:', challenge.user?.avatar)
+      console.log('💾 Battle data saved with opponent flag:', challenge.country)
       
       router.push('/battle-quiz')
       

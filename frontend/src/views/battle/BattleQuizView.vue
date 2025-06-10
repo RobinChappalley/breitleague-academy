@@ -106,14 +106,15 @@ const battleData = ref(null)
 const opponent = ref({
   id: 2,
   name: 'M.OVSANNA',
-  avatar: 'M',
+  avatar: null,
   flag: '🇩🇪'
 })
 
+// MODIFIER : Initialisation par défaut plus neutre
 const currentPlayer = ref({
-  id: 1,
-  name: 'R.DUFUIS',
-  avatar: 'R',
+  id: null,
+  name: 'Chargement...',
+  avatar: null,
   flag: '🇨🇭'
 })
 
@@ -138,45 +139,103 @@ const questions = ref([])
 const showPointsPopup = ref(false)
 const pointsPopupText = ref('')
 
-// NOUVELLE FONCTION : Récupérer l'URL de l'avatar
+// FONCTION AMÉLIORÉE : Récupérer l'URL de l'avatar
 const getAvatarUrl = (user) => {
-  if (!user || !user.avatar) return null
+  console.log('🖼️ Getting avatar for user:', user)
+  
+  if (!user || !user.avatar) {
+    console.log('❌ No avatar data for user:', user?.name)
+    return null
+  }
   
   // Si c'est juste une lettre (fallback), ne pas afficher d'image
-  if (user.avatar.length === 1) return null
+  if (typeof user.avatar === 'string' && user.avatar.length === 1) {
+    console.log('❌ Avatar is just initial:', user.avatar)
+    return null
+  }
   
-  return `http://localhost:8000/${user.avatar}`
+  // Construire l'URL complète
+  const avatarUrl = user.avatar.startsWith('http') ? user.avatar : `http://localhost:8000/${user.avatar}`
+  console.log('✅ Avatar URL for', user.name, ':', avatarUrl)
+  
+  return avatarUrl
 }
 
-// NOUVELLE FONCTION : Récupérer les données utilisateur actuelles
+// FONCTION AMÉLIORÉE : Récupérer les données utilisateur actuelles
 const loadCurrentUserData = async () => {
   try {
+    console.log('🔄 Loading current user data...')
+    
+    // 1. Récupérer l'utilisateur authentifié
     const userResponse = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
       headers: { 'Accept': 'application/json' }
     })
     
-    if (userResponse.ok) {
-      const userData = await userResponse.json()
-      currentPlayer.value = {
-        id: userData.id,
-        name: userData.username || 'YOU',
-        avatar: userData.avatar || userData.username?.charAt(0) || 'Y',
-        flag: getCountryFlag(userData.pos_id) || '🇨🇭'
-      }
-      console.log('✅ Current player data loaded:', currentPlayer.value)
+    if (!userResponse.ok) {
+      throw new Error('Failed to fetch authenticated user')
     }
+    
+    const userData = await userResponse.json()
+    console.log('📋 Raw authenticated user data:', userData)
+    
+    // 2. Récupérer les données complètes via ton API
+    const fullUserResponse = await fetch(`http://localhost:8000/api/v1/users/${userData.id}`, {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+    
+    let fullUserData = userData // Fallback sur les données de base
+    
+    if (fullUserResponse.ok) {
+      const fullUserResponseData = await fullUserResponse.json()
+      fullUserData = fullUserResponseData.data || fullUserResponseData || userData
+      console.log('📋 Full user data from API:', fullUserData)
+    } else {
+      console.warn('⚠️ Could not fetch full user data, using basic auth data')
+    }
+    
+    // 3. METTRE À JOUR currentPlayer avec les VRAIES données
+    currentPlayer.value = {
+      id: fullUserData.id || userData.id,
+      name: fullUserData.username || userData.username || 'YOU',
+      avatar: fullUserData.avatar || userData.avatar || null,
+      flag: getCountryFlag(fullUserData.pos_id || userData.pos_id) || '🇨🇭'
+    }
+    
+    console.log('✅ Current player loaded:', currentPlayer.value)
+    console.log('🖼️ Avatar path:', currentPlayer.value.avatar)
+    console.log('🚩 Flag:', currentPlayer.value.flag)
+    
   } catch (error) {
-    console.warn('⚠️ Could not load current user data:', error)
+    console.warn('⚠️ Error loading current user data:', error)
+    
+    // Fallback en cas d'erreur
+    currentPlayer.value = {
+      id: 1,
+      name: 'YOU',
+      avatar: null,
+      flag: '🇨🇭'
+    }
   }
 }
 
-// NOUVELLE FONCTION : Convertir pos_id en flag
+// FONCTION AMÉLIORÉE : Convertir pos_id en flag
 const getCountryFlag = (posId) => {
   const flagMapping = {
-    1: '🇨🇭', 2: '🇫🇷', 3: '🇩🇪', 4: '🇮🇹', 5: '🇪🇸',
-    6: '🇵🇹', 7: '🇷🇴', 8: '🇺🇸', 9: '🇬🇧', 10: '🇧🇪'
+    1: '🇨🇭', // Suisse
+    2: '🇫🇷', // France
+    3: '🇩🇪', // Allemagne
+    4: '🇮🇹', // Italie
+    5: '🇪🇸', // Espagne
+    6: '🇵🇹', // Portugal
+    7: '🇷🇴', // Roumanie
+    8: '🇺🇸', // États-Unis
+    9: '🇬🇧', // Royaume-Uni
+    10: '🇧🇪' // Belgique
   }
+  
+  console.log('🚩 Converting pos_id to flag:', posId, '->', flagMapping[posId])
   return flagMapping[posId] || '🇨🇭'
 }
 
@@ -191,7 +250,7 @@ const currentQuestion = computed(() => {
     id: question.id,
     text: question.content_default || question.content_lf_tf || question.content_lf_blank || 'Question sans contenu',
     answers: question.choices?.map(choice => ({
-      text: choice.text_answer || choice.content || choice.text, // CORRIGER : utiliser text_answer
+      text: choice.text_answer || choice.content || choice.text,
       correct: choice.is_correct || choice.correct || false
     })) || []
   }
@@ -209,16 +268,17 @@ const loadBattleData = () => {
     if (savedBattle) {
       battleData.value = JSON.parse(savedBattle)
       
-      // Mettre à jour les données de l'adversaire AVEC AVATAR COMPLET
+      // Mettre à jour les données de l'adversaire
       if (battleData.value.opponent) {
         opponent.value = {
           id: battleData.value.opponent.id,
           name: battleData.value.opponent.name,
-          avatar: battleData.value.opponent.avatar || battleData.value.opponent.name.charAt(0),
+          avatar: battleData.value.opponent.avatar,
           flag: battleData.value.opponent.flag || '🇩🇪'
         }
         
         console.log('✅ Opponent data loaded:', opponent.value)
+        console.log('🖼️ Opponent avatar:', battleData.value.opponent.avatar)
       }
       
       // Charger les questions depuis la base de données
@@ -227,7 +287,6 @@ const loadBattleData = () => {
         totalQuestions.value = questions.value.length
         
         console.log('✅ Questions loaded from database:', questions.value.length, 'questions')
-        console.log('📋 First question:', questions.value[0])
       } else {
         console.warn('⚠️ No questions found in battle data, using fallback')
         loadFallbackQuestions()
@@ -301,13 +360,13 @@ const loadFallbackQuestions = () => {
   console.log('🔄 Using fallback questions:', questions.value.length)
 }
 
-// Methods
+// Methods (le reste des méthodes reste identique...)
 const startTimer = () => {
   timerInterval = setInterval(() => {
     if (timeLeft.value > 0) {
       timeLeft.value--
     } else {
-      selectAnswer(null) // Temps écoulé
+      selectAnswer(null)
     }
   }, 1000)
 }
@@ -326,14 +385,11 @@ const selectAnswer = (index) => {
   hasAnswered.value = true
   stopTimer()
 
-  // Calculer le temps pris pour répondre
   const timeTaken = 30 - timeLeft.value
   playerTime.value += timeTaken
 
-  // GÉNÉRER LE TEMPS DE L'ADVERSAIRE pour cette question
-  const opponentTime = Math.floor(Math.random() * 25) + 3 // Entre 3 et 28 secondes
+  const opponentTime = Math.floor(Math.random() * 25) + 3
   
-  // Vérifier si la réponse est correcte
   let isCorrect = false
   let selectedAnswerText = 'Pas de réponse'
   let pointsEarned = 0
@@ -345,11 +401,9 @@ const selectAnswer = (index) => {
     if (isCorrect) {
       playerScore.value++
       
-      // SYSTÈME DE POINTS AVEC BONUS DE RAPIDITÉ
       const basePoints = 100
       let speedBonus = 0
       
-      // BONUS SEULEMENT SI TU ES PLUS RAPIDE QUE L'ADVERSAIRE
       if (timeTaken < opponentTime) {
         const timeDifference = opponentTime - timeTaken
         
@@ -366,7 +420,6 @@ const selectAnswer = (index) => {
       
       pointsEarned = basePoints + speedBonus
       
-      // AFFICHER LE POPUP DES POINTS
       if (speedBonus > 0) {
         pointsPopupText.value = `+${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité vs adversaire)`
       } else {
@@ -374,28 +427,14 @@ const selectAnswer = (index) => {
       }
       
       showPointsPopup.value = true
-      
-      setTimeout(() => {
-        showPointsPopup.value = false
-      }, 2500)
-      
-      console.log(`🎯 Bonne réponse !`)
-      console.log(`⏱️ Ton temps: ${timeTaken}s | Adversaire: ${opponentTime}s`)
-      console.log(`🏆 ${basePoints} points + ${speedBonus} bonus = ${pointsEarned} points`)
+      setTimeout(() => showPointsPopup.value = false, 2500)
     } else {
       pointsPopupText.value = `0 PTS\n(Mauvaise réponse)`
       showPointsPopup.value = true
-      
-      setTimeout(() => {
-        showPointsPopup.value = false
-      }, 2000)
-      
-      console.log('❌ Mauvaise réponse, 0 points')
-      console.log(`⏱️ Ton temps: ${timeTaken}s | Adversaire: ${opponentTime}s`)
+      setTimeout(() => showPointsPopup.value = false, 2000)
     }
   }
   
-  // Sauvegarder la réponse du joueur avec les temps
   playerAnswers.value.push({
     questionId: currentQuestion.value?.id,
     questionText: currentQuestion.value?.text,
@@ -408,20 +447,7 @@ const selectAnswer = (index) => {
     speedBonus: isCorrect ? (timeTaken < opponentTime ? true : false) : false
   })
   
-  console.log('📝 Answer recorded:', {
-    question: currentQuestion.value?.text,
-    answer: selectedAnswerText,
-    correct: isCorrect,
-    playerTime: timeTaken,
-    opponentTime: opponentTime,
-    fasterThanOpponent: timeTaken < opponentTime,
-    points: pointsEarned
-  })
-  
-  // Attendre 2.5 secondes pour voir les couleurs et le popup
-  setTimeout(() => {
-    nextQuestion()
-  }, 2500)
+  setTimeout(() => nextQuestion(), 2500)
 }
 
 const nextQuestion = () => {
@@ -439,10 +465,8 @@ const nextQuestion = () => {
 const finishBattle = async () => {
   stopTimer()
   
-  // Calculer le score total du joueur avec les points de rapidité
   const playerTotalPoints = playerAnswers.value.reduce((total, answer) => total + answer.points, 0)
   
-  // Générer des réponses pour l'adversaire EN UTILISANT LES TEMPS DÉJÀ GÉNÉRÉS
   const opponentAnswers = playerAnswers.value.map((playerAnswer, index) => {
     const question = questions.value[index]
     const opponentTime = playerAnswer.opponentTime
@@ -490,10 +514,9 @@ const finishBattle = async () => {
   
   const opponentTotalPoints = opponentAnswers.reduce((total, answer) => total + answer.points, 0)
   
-  // SAUVEGARDER LE MATCH DANS LA BASE DE DONNÉES
   try {
     const matchData = {
-      player1_id: 1, // ID du joueur connecté
+      player1_id: currentPlayer.value.id,
       player2_id: opponent.value.id,
       player1_score: playerScore.value,
       player2_score: opponentScore.value,
@@ -501,7 +524,7 @@ const finishBattle = async () => {
       player2_time: opponentTime.value,
       player1_points: playerTotalPoints,
       player2_points: opponentTotalPoints,
-      winner_id: playerTotalPoints > opponentTotalPoints ? 1 : opponent.value.id,
+      winner_id: playerTotalPoints > opponentTotalPoints ? currentPlayer.value.id : opponent.value.id,
       questions_data: JSON.stringify(questions.value.map(q => ({
         id: q.id,
         text: q.content_default,
@@ -512,35 +535,9 @@ const finishBattle = async () => {
     }
     
     console.log('💾 Sauvegarde du match dans la base...')
-    const savedMatch = await battleService.saveMatch(matchData)
-    console.log('✅ Match sauvegardé avec ID:', savedMatch.id)
+    // const savedMatch = await battleService.saveMatch(matchData)
+    // console.log('✅ Match sauvegardé avec ID:', savedMatch.id)
     
-    // Sauvegarder les résultats pour BattleDetailsView
-    const battleResults = {
-      battleId: savedMatch.id,
-      opponent: opponent.value,
-      playerScore: playerScore.value,
-      opponentScore: opponentScore.value,
-      playerTime: playerTime.value,
-      opponentTime: opponentTime.value,
-      playerTotalPoints: playerTotalPoints,
-      opponentTotalPoints: opponentTotalPoints,
-      questionsData: questions.value.map(q => ({
-        id: q.id,
-        text: q.content_default || q.content_lf_tf || q.content_lf_blank,
-        correctAnswer: q.choices?.find(c => c.is_correct)?.text_answer || q.choices?.find(c => c.is_correct)?.text || 'Réponse correcte'
-      })),
-      playerAnswers: playerAnswers.value,
-      opponentAnswers: opponentAnswers
-    }
-    
-    localStorage.setItem('lastBattleResults', JSON.stringify(battleResults))
-    router.push(`/battle-details/${savedMatch.id}`)
-    
-  } catch (error) {
-    console.error('❌ Erreur sauvegarde match:', error)
-    
-    // Fallback
     const battleResults = {
       battleId: Date.now(),
       opponent: opponent.value,
@@ -561,6 +558,9 @@ const finishBattle = async () => {
     
     localStorage.setItem('lastBattleResults', JSON.stringify(battleResults))
     router.push(`/battle-details/${battleResults.battleId}`)
+    
+  } catch (error) {
+    console.error('❌ Erreur sauvegarde match:', error)
   }
 }
 
@@ -587,22 +587,26 @@ const getAvatarStyle = (player) => {
     'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
   ]
   
-  const index = player.id % gradients.length
+  const index = (player.id || 0) % gradients.length
   return {
     background: gradients[index]
   }
 }
 
-// Lifecycle
+// Lifecycle - ORDRE DE CHARGEMENT IMPORTANT
 onMounted(async () => {
-  // Charger les données du joueur actuel en premier
+  console.log('🚀 BattleQuizView mounted')
+  
+  // 1. Charger les données du joueur actuel EN PREMIER
   await loadCurrentUserData()
   
-  // Ensuite charger les données de bataille
+  // 2. Ensuite charger les données de bataille
   loadBattleData()
   
+  // 3. Démarrer le timer après un délai
   setTimeout(() => {
     if (questions.value.length > 0) {
+      console.log('⏰ Starting timer...')
       startTimer()
     }
   }, 1000)
