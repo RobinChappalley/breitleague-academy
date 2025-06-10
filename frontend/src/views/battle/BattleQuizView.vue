@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <!-- Question - avec protection contre les questions non chargées -->
+    <!-- Question -->
     <div class="question-container" v-if="currentQuestion">
       <h2 class="question-text">{{ currentQuestion.text }}</h2>
       
@@ -67,19 +67,29 @@
       <div class="loading-spinner"></div>
       <p>Chargement des questions...</p>
     </div>
+
+    <!-- Popup des points gagnés -->
+    <div 
+      v-if="showPointsPopup" 
+      class="points-popup"
+      :class="{ 'speed-bonus': pointsPopupText.includes('bonus') }"
+    >
+      {{ pointsPopupText }}
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { battleService } from '@/services/api'
 
 const router = useRouter()
 
 // Timer
 let timerInterval = null
 
-// Battle Data - récupérées depuis localStorage
+// Battle Data
 const battleData = ref(null)
 const opponent = ref({
   id: 2,
@@ -107,10 +117,14 @@ const playerScore = ref(0)
 const opponentScore = ref(0)
 const playerTime = ref(0)
 const opponentTime = ref(0)
-const playerAnswers = ref([]) // CORRIGER ICI - il manquait la parenthèse fermante
+const playerAnswers = ref([])
 
 // Questions depuis la base de données
 const questions = ref([])
+
+// Points popup
+const showPointsPopup = ref(false)
+const pointsPopupText = ref('')
 
 // Computed
 const currentQuestion = computed(() => {
@@ -118,12 +132,12 @@ const currentQuestion = computed(() => {
   
   const question = questions.value[currentQuestionIndex.value]
   
-  // Adapter la structure de ta base de données
+  // UTILISER LA VRAIE STRUCTURE DE TA BASE (text_answer)
   return {
     id: question.id,
     text: question.content_default || question.content_lf_tf || question.content_lf_blank || 'Question sans contenu',
     answers: question.choices?.map(choice => ({
-      text: choice.content || choice.text,
+      text: choice.text_answer || choice.content || choice.text, // CORRIGER : utiliser text_answer
       correct: choice.is_correct || choice.correct || false
     })) || []
   }
@@ -179,50 +193,50 @@ const loadFallbackQuestions = () => {
       id: 1,
       content_default: 'Quelle année Breitling a-t-elle été fondée ?',
       choices: [
-        { content: '1884', is_correct: true },
-        { content: '1885', is_correct: false },
-        { content: '1890', is_correct: false },
-        { content: '1900', is_correct: false }
+        { text_answer: '1884', is_correct: true },
+        { text_answer: '1885', is_correct: false },
+        { text_answer: '1890', is_correct: false },
+        { text_answer: '1900', is_correct: false }
       ]
     },
     {
       id: 2,
       content_default: 'Qui a fondé Breitling ?',
       choices: [
-        { content: 'Léon Breitling', is_correct: true },
-        { content: 'Gaston Breitling', is_correct: false },
-        { content: 'Willy Breitling', is_correct: false },
-        { content: 'Ernest Schneider', is_correct: false }
+        { text_answer: 'Léon Breitling', is_correct: true },
+        { text_answer: 'Gaston Breitling', is_correct: false },
+        { text_answer: 'Willy Breitling', is_correct: false },
+        { text_answer: 'Ernest Schneider', is_correct: false }
       ]
     },
     {
       id: 3,
       content_default: 'Quel est le calibre emblématique de Breitling ?',
       choices: [
-        { content: 'B01', is_correct: true },
-        { content: 'B09', is_correct: false },
-        { content: 'B20', is_correct: false },
-        { content: 'B13', is_correct: false }
+        { text_answer: 'B01', is_correct: true },
+        { text_answer: 'B09', is_correct: false },
+        { text_answer: 'B20', is_correct: false },
+        { text_answer: 'B13', is_correct: false }
       ]
     },
     {
       id: 4,
       content_default: 'Quelle est la montre iconique de Breitling depuis 1952 ?',
       choices: [
-        { content: 'Navitimer', is_correct: true },
-        { content: 'Superocean', is_correct: false },
-        { content: 'Avenger', is_correct: false },
-        { content: 'Premier', is_correct: false }
+        { text_answer: 'Navitimer', is_correct: true },
+        { text_answer: 'Superocean', is_correct: false },
+        { text_answer: 'Avenger', is_correct: false },
+        { text_answer: 'Premier', is_correct: false }
       ]
     },
     {
       id: 5,
       content_default: 'En quelle année le premier poussoir indépendant a-t-il été créé ?',
       choices: [
-        { content: '1915', is_correct: true },
-        { content: '1920', is_correct: false },
-        { content: '1934', is_correct: false },
-        { content: '1952', is_correct: false }
+        { text_answer: '1915', is_correct: true },
+        { text_answer: '1920', is_correct: false },
+        { text_answer: '1934', is_correct: false },
+        { text_answer: '1952', is_correct: false }
       ]
     }
   ]
@@ -237,8 +251,7 @@ const startTimer = () => {
     if (timeLeft.value > 0) {
       timeLeft.value--
     } else {
-      // Temps écoulé, passer à la question suivante
-      selectAnswer(null) // Aucune réponse sélectionnée
+      selectAnswer(null) // Temps écoulé
     }
   }, 1000)
 }
@@ -261,9 +274,13 @@ const selectAnswer = (index) => {
   const timeTaken = 30 - timeLeft.value
   playerTime.value += timeTaken
 
+  // GÉNÉRER LE TEMPS DE L'ADVERSAIRE pour cette question
+  const opponentTime = Math.floor(Math.random() * 25) + 3 // Entre 3 et 28 secondes
+  
   // Vérifier si la réponse est correcte
   let isCorrect = false
   let selectedAnswerText = 'Pas de réponse'
+  let pointsEarned = 0
   
   if (index !== null && currentQuestion.value?.answers[index]) {
     isCorrect = currentQuestion.value.answers[index].correct
@@ -271,30 +288,84 @@ const selectAnswer = (index) => {
     
     if (isCorrect) {
       playerScore.value++
+      
+      // SYSTÈME DE POINTS AVEC BONUS DE RAPIDITÉ
+      const basePoints = 100
+      let speedBonus = 0
+      
+      // BONUS SEULEMENT SI TU ES PLUS RAPIDE QUE L'ADVERSAIRE
+      if (timeTaken < opponentTime) {
+        const timeDifference = opponentTime - timeTaken
+        
+        if (timeDifference >= 15) {
+          speedBonus = 75
+        } else if (timeDifference >= 10) {
+          speedBonus = 50
+        } else if (timeDifference >= 5) {
+          speedBonus = 30
+        } else {
+          speedBonus = 15
+        }
+      }
+      
+      pointsEarned = basePoints + speedBonus
+      
+      // AFFICHER LE POPUP DES POINTS
+      if (speedBonus > 0) {
+        pointsPopupText.value = `+${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité vs adversaire)`
+      } else {
+        pointsPopupText.value = `+${pointsEarned} PTS\n(Adversaire était plus rapide)`
+      }
+      
+      showPointsPopup.value = true
+      
+      setTimeout(() => {
+        showPointsPopup.value = false
+      }, 2500)
+      
+      console.log(`🎯 Bonne réponse !`)
+      console.log(`⏱️ Ton temps: ${timeTaken}s | Adversaire: ${opponentTime}s`)
+      console.log(`🏆 ${basePoints} points + ${speedBonus} bonus = ${pointsEarned} points`)
+    } else {
+      pointsPopupText.value = `0 PTS\n(Mauvaise réponse)`
+      showPointsPopup.value = true
+      
+      setTimeout(() => {
+        showPointsPopup.value = false
+      }, 2000)
+      
+      console.log('❌ Mauvaise réponse, 0 points')
+      console.log(`⏱️ Ton temps: ${timeTaken}s | Adversaire: ${opponentTime}s`)
     }
   }
   
-  // Sauvegarder la réponse du joueur
+  // Sauvegarder la réponse du joueur avec les temps
   playerAnswers.value.push({
     questionId: currentQuestion.value?.id,
     questionText: currentQuestion.value?.text,
     selectedAnswer: selectedAnswerText,
     correct: isCorrect,
     time: timeTaken,
-    timeLeft: timeLeft.value
+    opponentTime: opponentTime,
+    timeLeft: timeLeft.value,
+    points: pointsEarned,
+    speedBonus: isCorrect ? (timeTaken < opponentTime ? true : false) : false
   })
   
   console.log('📝 Answer recorded:', {
     question: currentQuestion.value?.text,
     answer: selectedAnswerText,
     correct: isCorrect,
-    time: timeTaken
+    playerTime: timeTaken,
+    opponentTime: opponentTime,
+    fasterThanOpponent: timeTaken < opponentTime,
+    points: pointsEarned
   })
   
-  // Attendre un peu avant de passer à la question suivante
+  // Attendre 2.5 secondes pour voir les couleurs et le popup
   setTimeout(() => {
     nextQuestion()
-  }, 1500)
+  }, 2500)
 }
 
 const nextQuestion = () => {
@@ -305,61 +376,136 @@ const nextQuestion = () => {
     selectedAnswer.value = null
     startTimer()
   } else {
-    // Quiz terminé
     finishBattle()
   }
 }
 
-const finishBattle = () => {
+const finishBattle = async () => {
   stopTimer()
   
-  // Générer des réponses pour l'adversaire (mockées)
-  const opponentAnswers = questions.value.map((question, index) => {
-    const randomAnswer = Math.floor(Math.random() * 4)
-    const isCorrect = Math.random() > 0.3 // 70% de chance de réussir
-    const timeTaken = Math.floor(Math.random() * 20) + 5 // Entre 5 et 25 secondes
+  // Calculer le score total du joueur avec les points de rapidité
+  const playerTotalPoints = playerAnswers.value.reduce((total, answer) => total + answer.points, 0)
+  
+  // Générer des réponses pour l'adversaire EN UTILISANT LES TEMPS DÉJÀ GÉNÉRÉS
+  const opponentAnswers = playerAnswers.value.map((playerAnswer, index) => {
+    const question = questions.value[index]
+    const opponentTime = playerAnswer.opponentTime
     
-    if (isCorrect) opponentScore.value++
-    opponentTime.value += timeTaken
+    const isCorrect = Math.random() > 0.3
+    const randomAnswer = Math.floor(Math.random() * 4)
+    
+    let points = 0
+    if (isCorrect) {
+      opponentScore.value++
+      
+      const basePoints = 100
+      let speedBonus = 0
+      
+      if (opponentTime < playerAnswer.time) {
+        const timeDifference = playerAnswer.time - opponentTime
+        
+        if (timeDifference >= 15) {
+          speedBonus = 75
+        } else if (timeDifference >= 10) {
+          speedBonus = 50
+        } else if (timeDifference >= 5) {
+          speedBonus = 30
+        } else {
+          speedBonus = 15
+        }
+      }
+      
+      points = basePoints + speedBonus
+    }
+    
+    opponentTime.value += opponentTime
     
     return {
       questionId: question.id,
       questionText: question.content_default,
-      selectedAnswer: question.choices?.[randomAnswer]?.content || 'Réponse mockée',
+      selectedAnswer: question.choices?.[randomAnswer]?.text_answer || question.choices?.[randomAnswer]?.text || 'Réponse mockée',
       correct: isCorrect,
-      time: timeTaken,
-      timeLeft: Math.max(0, 30 - timeTaken)
+      time: opponentTime,
+      timeLeft: Math.max(0, 30 - opponentTime),
+      points: points,
+      speedBonus: isCorrect ? (opponentTime < playerAnswer.time ? true : false) : false
     }
   })
   
-  // Sauvegarder les résultats pour BattleDetailsView
-  const battleResults = {
-    battleId: battleData.value?.battleId || Date.now(),
-    opponent: opponent.value,
-    playerScore: playerScore.value,
-    opponentScore: opponentScore.value,
-    playerTime: playerTime.value,
-    opponentTime: opponentTime.value,
-    questionsData: questions.value.map(q => ({
-      id: q.id,
-      text: q.content_default || q.content_lf_tf || q.content_lf_blank,
-      correctAnswer: q.choices?.find(c => c.is_correct)?.content || 'Réponse correcte'
-    })),
-    playerAnswers: playerAnswers.value,
-    opponentAnswers: opponentAnswers
+  const opponentTotalPoints = opponentAnswers.reduce((total, answer) => total + answer.points, 0)
+  
+  // SAUVEGARDER LE MATCH DANS LA BASE DE DONNÉES
+  try {
+    const matchData = {
+      player1_id: 1, // ID du joueur connecté
+      player2_id: opponent.value.id,
+      player1_score: playerScore.value,
+      player2_score: opponentScore.value,
+      player1_time: playerTime.value,
+      player2_time: opponentTime.value,
+      player1_points: playerTotalPoints,
+      player2_points: opponentTotalPoints,
+      winner_id: playerTotalPoints > opponentTotalPoints ? 1 : opponent.value.id,
+      questions_data: JSON.stringify(questions.value.map(q => ({
+        id: q.id,
+        text: q.content_default,
+        correctAnswer: q.choices?.find(c => c.is_correct)?.text_answer || q.choices?.find(c => c.is_correct)?.text
+      }))),
+      player1_answers: JSON.stringify(playerAnswers.value),
+      player2_answers: JSON.stringify(opponentAnswers)
+    }
+    
+    console.log('💾 Sauvegarde du match dans la base...')
+    const savedMatch = await battleService.saveMatch(matchData)
+    console.log('✅ Match sauvegardé avec ID:', savedMatch.id)
+    
+    // Sauvegarder les résultats pour BattleDetailsView
+    const battleResults = {
+      battleId: savedMatch.id,
+      opponent: opponent.value,
+      playerScore: playerScore.value,
+      opponentScore: opponentScore.value,
+      playerTime: playerTime.value,
+      opponentTime: opponentTime.value,
+      playerTotalPoints: playerTotalPoints,
+      opponentTotalPoints: opponentTotalPoints,
+      questionsData: questions.value.map(q => ({
+        id: q.id,
+        text: q.content_default || q.content_lf_tf || q.content_lf_blank,
+        correctAnswer: q.choices?.find(c => c.is_correct)?.text_answer || q.choices?.find(c => c.is_correct)?.text || 'Réponse correcte'
+      })),
+      playerAnswers: playerAnswers.value,
+      opponentAnswers: opponentAnswers
+    }
+    
+    localStorage.setItem('lastBattleResults', JSON.stringify(battleResults))
+    router.push(`/battle-details/${savedMatch.id}`)
+    
+  } catch (error) {
+    console.error('❌ Erreur sauvegarde match:', error)
+    
+    // Fallback
+    const battleResults = {
+      battleId: Date.now(),
+      opponent: opponent.value,
+      playerScore: playerScore.value,
+      opponentScore: opponentScore.value,
+      playerTime: playerTime.value,
+      opponentTime: opponentTime.value,
+      playerTotalPoints: playerTotalPoints,
+      opponentTotalPoints: opponentTotalPoints,
+      questionsData: questions.value.map(q => ({
+        id: q.id,
+        text: q.content_default || q.content_lf_tf || q.content_lf_blank,
+        correctAnswer: q.choices?.find(c => c.is_correct)?.text_answer || q.choices?.find(c => c.is_correct)?.text || 'Réponse correcte'
+      })),
+      playerAnswers: playerAnswers.value,
+      opponentAnswers: opponentAnswers
+    }
+    
+    localStorage.setItem('lastBattleResults', JSON.stringify(battleResults))
+    router.push(`/battle-details/${battleResults.battleId}`)
   }
-  
-  localStorage.setItem('lastBattleResults', JSON.stringify(battleResults))
-  
-  console.log('🏁 Battle finished:', {
-    playerScore: playerScore.value,
-    opponentScore: opponentScore.value,
-    playerTime: playerTime.value,
-    opponentTime: opponentTime.value
-  })
-  
-  // Rediriger vers les détails
-  router.push(`/battle-details/${battleResults.battleId}`)
 }
 
 const getAnswerClass = (index) => {
@@ -395,12 +541,11 @@ const getAvatarStyle = (player) => {
 onMounted(() => {
   loadBattleData()
   
-  // Démarrer le timer seulement si on a des questions
   setTimeout(() => {
     if (questions.value.length > 0) {
       startTimer()
     }
-  }, 1000) // Laisser 1 seconde pour que l'utilisateur voie la question
+  }, 1000)
 })
 
 onUnmounted(() => {
@@ -571,25 +716,113 @@ onUnmounted(() => {
   cursor: not-allowed;
 }
 
+/* COULEURS DES RÉPONSES AMÉLIORÉES */
 .answer-btn.correct {
-  background: rgba(76, 175, 80, 0.3);
-  border-color: #4CAF50;
-  color: white;
+  background: rgba(76, 175, 80, 0.4) !important;
+  border-color: #4CAF50 !important;
+  color: white !important;
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+  animation: correctPulse 0.6s ease-out;
 }
 
 .answer-btn.incorrect {
-  background: rgba(244, 67, 54, 0.3);
-  border-color: #F44336;
-  color: white;
+  background: rgba(244, 67, 54, 0.4) !important;
+  border-color: #F44336 !important;
+  color: white !important;
+  box-shadow: 0 0 15px rgba(244, 67, 54, 0.5);
+  animation: incorrectShake 0.6s ease-out;
 }
 
 .answer-btn.correct-answer {
-  background: rgba(76, 175, 80, 0.2);
-  border-color: #4CAF50;
+  background: rgba(76, 175, 80, 0.2) !important;
+  border-color: #4CAF50 !important;
+  color: #4CAF50 !important;
+  animation: correctGlow 0.6s ease-out;
 }
 
 .answer-btn.disabled {
-  opacity: 0.5;
+  opacity: 0.4 !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ANIMATIONS */
+@keyframes correctPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 rgba(76, 175, 80, 0.5); }
+  50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(76, 175, 80, 0.8); }
+  100% { transform: scale(1); box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); }
+}
+
+@keyframes incorrectShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+@keyframes correctGlow {
+  0% { box-shadow: 0 0 0 rgba(76, 175, 80, 0); }
+  50% { box-shadow: 0 0 15px rgba(76, 175, 80, 0.6); }
+  100% { box-shadow: 0 0 10px rgba(76, 175, 80, 0.3); }
+}
+
+/* AFFICHAGE DES POINTS GAGNÉS */
+.points-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(247, 199, 44, 0.95);
+  color: #072C54;
+  padding: 1.5rem 2rem;
+  border-radius: 15px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  z-index: 1000;
+  animation: pointsShow 2.5s ease-out forwards;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  white-space: pre-line;
+  line-height: 1.3;
+  border: 3px solid #072C54;
+}
+
+.points-popup.speed-bonus {
+  background: linear-gradient(135deg, #4CAF50 0%, #F7C72C 100%);
+  color: white;
+  border-color: #4CAF50;
+  animation: speedBonusShow 2.5s ease-out forwards;
+}
+
+@keyframes speedBonusShow {
+  0% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(0.5) rotate(-10deg); 
+  }
+  20% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1.2) rotate(2deg); 
+  }
+  40% { 
+    transform: translate(-50%, -50%) scale(1.1) rotate(-1deg); 
+  }
+  60% { 
+    transform: translate(-50%, -50%) scale(1.05) rotate(0.5deg); 
+  }
+  80% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) scale(0.9) rotate(0deg); 
+  }
+}
+
+@keyframes pointsShow {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
 }
 
 /* LOADING STATE */
@@ -611,177 +844,6 @@ onUnmounted(() => {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}
-
-/* RESULTS MODAL */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  backdrop-filter: blur(5px);
-}
-
-.results-modal {
-  background: linear-gradient(135deg, #1e3a8a 0%, #072C54 100%);
-  border-radius: 20px;
-  padding: 2rem;
-  max-width: 500px;
-  width: 90%;
-  position: relative;
-  color: white;
-  border: 2px solid #F7C72C;
-  text-align: center;
-}
-
-.close-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: #F7C72C;
-  color: #072C54;
-  border: none;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.results-header h2 {
-  margin: 0 0 2rem 0;
-  font-size: 2rem;
-  color: #F7C72C;
-}
-
-.results-comparison {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-}
-
-.player-result,
-.opponent-result {
-  text-align: center;
-  flex: 1;
-}
-
-.player-result .avatar,
-.opponent-result .avatar {
-  width: 60px;
-  height: 60px;
-  font-size: 1.5rem;
-  margin: 0 auto 1rem auto;
-}
-
-.player-result h3,
-.opponent-result h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.1rem;
-}
-
-.score {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #F7C72C;
-  margin-bottom: 0.5rem;
-}
-
-.time {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.vs {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #F7C72C;
-  margin: 0 1rem;
-}
-
-.winner-announcement {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  padding: 1rem;
-  border-radius: 12px;
-}
-
-.winner-announcement.winner {
-  background: rgba(76, 175, 80, 0.2);
-  color: #4CAF50;
-}
-
-.winner-announcement.loser {
-  background: rgba(244, 67, 54, 0.2);
-  color: #F44336;
-}
-
-.winner-announcement.tie {
-  background: rgba(255, 193, 7, 0.2);
-  color: #FFC107;
-}
-
-.points-earned {
-  margin-bottom: 2rem;
-}
-
-.points-label {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 0.5rem;
-}
-
-.points-value {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #F7C72C;
-}
-
-.results-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-
-.btn-rematch,
-.btn-return {
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 1rem;
-}
-
-.btn-rematch {
-  background: #F7C72C;
-  color: #072C54;
-}
-
-.btn-rematch:hover {
-  background: #E6B625;
-  transform: translateY(-2px);
-}
-
-.btn-return {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-.btn-return:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
 }
 
 /* RESPONSIVE */
@@ -865,19 +927,6 @@ onUnmounted(() => {
     width: 80px;
     height: 80px;
     font-size: 2.5rem;
-  }
-  
-  .results-comparison {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .vs {
-    order: 2;
-  }
-  
-  .results-actions {
-    flex-direction: column;
   }
 }
 </style>
