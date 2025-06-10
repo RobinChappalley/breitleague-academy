@@ -246,7 +246,7 @@ const loadBattlesFromDB = async () => {
       .map((user, index) => ({
         id: user.id,
         name: user.username,
-        country: getCountryCode(user.pos_id),
+        country: getCountryCode(user),
         timeLeft: '24h left',
         status: index < 2 ? 'invitation' : (index === 2 ? 'play' : 'waiting'),
         user: user
@@ -260,7 +260,7 @@ const loadBattlesFromDB = async () => {
       .map((user, index) => ({
         id: user.id + 100,
         name: user.username,
-        country: getCountryCode(user.pos_id),
+        country: getCountryCode(user),
         timeLeft: `${Math.floor(Math.random() * 20) + 1}h left`,
         status: index === 0 ? 'play' : 'waiting',
         user: user
@@ -273,7 +273,7 @@ const loadBattlesFromDB = async () => {
       .map((user, index) => ({
         id: user.id + 200,
         name: user.username,
-        country: getCountryCode(user.pos_id),
+        country: getCountryCode(user),
         points: index === 0 ? 300 : -100,
         user: user
       }))
@@ -291,12 +291,18 @@ const loadBattlesFromDB = async () => {
 }
 
 // Fonction pour convertir pos_id en code pays
-const getCountryCode = (posId) => {
-  const countryMapping = {
-    1: 'CH', 2: 'FR', 3: 'DE', 4: 'IT', 5: 'ES', 
-    6: 'PT', 7: 'RO', 8: 'US', 9: 'GB', 10: 'BE'
+const getCountryCode = (user) => {
+  // 1. Essayer d'abord depuis user.pos.country_flag
+  if (user.pos && user.pos.country_flag) {
+    return user.pos.country_flag
   }
-  return countryMapping[posId] || 'FR'
+  
+  // 2. Fallback sur le mapping pos_id
+  const countryMapping = {
+    1: '🇨🇭', 2: '🇫🇷', 3: '🇩🇪', 4: '🇮🇹', 5: '🇪🇸', 
+    6: '🇵🇹', 7: '🇷🇴', 8: '🇺🇸', 9: '🇬🇧', 10: '🇧🇪'
+  }
+  return countryMapping[user.pos_id] || '🇫🇷'
 }
 
 // Fonction fallback
@@ -543,7 +549,7 @@ const invitePlayer = () => {
   const newChallenge = {
     id: Date.now(),
     name: invitedPlayerName.value,
-    country: selectedUser ? getCountryCode(selectedUser.pos_id) : 'US',
+    country: selectedUser ? getCountryCode(selectedUser) : 'US',
     timeLeft: '24h left',
     status: 'waiting',
     user: selectedUser

@@ -2,22 +2,7 @@
   <div class="battle-quiz-page">
     <!-- Battle Header Info -->
     <div class="battle-header">
-      <div class="opponent-info">
-        <div class="avatar" :style="getAvatarStyle(opponent)">
-          <img 
-            v-if="opponent.avatar && opponent.avatar !== opponent.name?.charAt(0)" 
-            :src="getAvatarUrl(opponent)" 
-            :alt="opponent.name"
-            class="avatar-image"
-          />
-          <span v-else class="avatar-initial">{{ opponent.name?.charAt(0) || 'O' }}</span>
-        </div>
-        <div class="opponent-details">
-          <h3>{{ opponent.name }}</h3>
-          <span class="flag">{{ opponent.flag }}</span>
-        </div>
-      </div>
-      <div class="vs-indicator">VS</div>
+      <!-- UTILISATEUR AUTHENTIFIÉ À GAUCHE -->
       <div class="player-info">
         <div class="avatar" :style="getAvatarStyle(currentPlayer)">
           <img 
@@ -31,6 +16,25 @@
         <div class="player-details">
           <h3>{{ currentPlayer.name }}</h3>
           <span class="flag">{{ currentPlayer.flag }}</span>
+        </div>
+      </div>
+      
+      <div class="vs-indicator">VS</div>
+      
+      <!-- ADVERSAIRE À DROITE -->
+      <div class="opponent-info">
+        <div class="opponent-details">
+          <h3>{{ opponent.name }}</h3>
+          <span class="flag">{{ opponent.flag }}</span>
+        </div>
+        <div class="avatar" :style="getAvatarStyle(opponent)">
+          <img 
+            v-if="opponent.avatar && opponent.avatar !== opponent.name?.charAt(0)" 
+            :src="getAvatarUrl(opponent)" 
+            :alt="opponent.name"
+            class="avatar-image"
+          />
+          <span v-else class="avatar-initial">{{ opponent.name?.charAt(0) || 'O' }}</span>
         </div>
       </div>
     </div>
@@ -161,7 +165,7 @@ const getAvatarUrl = (user) => {
   return avatarUrl
 }
 
-// FONCTION AMÉLIORÉE : Récupérer les données utilisateur actuelles
+// FONCTION CORRIGÉE : Récupérer les données utilisateur actuelles
 const loadCurrentUserData = async () => {
   try {
     console.log('🔄 Loading current user data...')
@@ -179,7 +183,7 @@ const loadCurrentUserData = async () => {
     const userData = await userResponse.json()
     console.log('📋 Raw authenticated user data:', userData)
     
-    // 2. Récupérer les données complètes via ton API
+    // 2. Récupérer les données complètes via ton API (AVEC POS)
     const fullUserResponse = await fetch(`http://localhost:8000/api/v1/users/${userData.id}`, {
       credentials: 'include',
       headers: { 'Accept': 'application/json' }
@@ -200,12 +204,12 @@ const loadCurrentUserData = async () => {
       id: fullUserData.id || userData.id,
       name: fullUserData.username || userData.username || 'YOU',
       avatar: fullUserData.avatar || userData.avatar || null,
-      flag: getCountryFlag(fullUserData.pos_id || userData.pos_id) || '🇨🇭'
+      flag: getUserFlag(fullUserData) || '🇨🇭' // UTILISER LA NOUVELLE FONCTION
     }
     
     console.log('✅ Current player loaded:', currentPlayer.value)
     console.log('🖼️ Avatar path:', currentPlayer.value.avatar)
-    console.log('🚩 Flag:', currentPlayer.value.flag)
+    console.log('🚩 Flag from pos:', fullUserData.pos?.country_flag)
     
   } catch (error) {
     console.warn('⚠️ Error loading current user data:', error)
@@ -220,7 +224,27 @@ const loadCurrentUserData = async () => {
   }
 }
 
-// FONCTION AMÉLIORÉE : Convertir pos_id en flag
+// NOUVELLE FONCTION : Récupérer le drapeau depuis la relation pos
+const getUserFlag = (userData) => {
+  // 1. Essayer d'abord depuis pos.country_flag (la vraie source)
+  if (userData.pos && userData.pos.country_flag) {
+    console.log('✅ Flag from pos.country_flag:', userData.pos.country_flag)
+    return userData.pos.country_flag
+  }
+  
+  // 2. Fallback sur le mapping pos_id si pas de country_flag
+  if (userData.pos_id) {
+    const flagFromPosId = getCountryFlag(userData.pos_id)
+    console.log('⚠️ Fallback flag from pos_id mapping:', flagFromPosId)
+    return flagFromPosId
+  }
+  
+  // 3. Fallback final
+  console.log('❌ No flag found, using default')
+  return '🇨🇭'
+}
+
+// GARDER LA FONCTION DE MAPPING COMME FALLBACK
 const getCountryFlag = (posId) => {
   const flagMapping = {
     1: '🇨🇭', // Suisse
@@ -637,11 +661,31 @@ onUnmounted(() => {
   margin-bottom: 2rem;
 }
 
-.opponent-info,
+/* UTILISATEUR AUTHENTIFIÉ (GAUCHE) */
 .player-info {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.player-details {
+  text-align: left;
+}
+
+/* ADVERSAIRE (DROITE) */
+.opponent-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.opponent-details {
+  text-align: right;
+  order: -1; /* Place le texte avant l'avatar */
 }
 
 .avatar {
@@ -657,6 +701,7 @@ onUnmounted(() => {
   border: 3px solid #F7C72C;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .avatar-image {
@@ -689,6 +734,7 @@ onUnmounted(() => {
   font-weight: 700;
   color: #F7C72C;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
 }
 
 /* PROGRESS */
@@ -980,16 +1026,36 @@ onUnmounted(() => {
   
   .battle-header {
     padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  /* Mobile : garder la même logique mais en vertical */
+  .player-info,
+  .opponent-info {
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .opponent-info {
+    flex-direction: row-reverse; /* Avatar à droite, texte à gauche */
+  }
+  
+  .opponent-details {
+    text-align: left; /* Réajuster l'alignement sur mobile */
+    order: 0;
+  }
+  
+  .vs-indicator {
+    font-size: 1.5rem;
+    order: 1;
   }
   
   .avatar {
     width: 50px;
     height: 50px;
     font-size: 1.2rem;
-  }
-  
-  .vs-indicator {
-    font-size: 1.5rem;
   }
   
   .question-text {
