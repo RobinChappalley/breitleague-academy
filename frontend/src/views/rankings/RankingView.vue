@@ -136,8 +136,25 @@
             <h3>TOP 3 WATCHES</h3>
           </div>
           <div class="watches-grid">
-            <div v-for="watch in selectedPlayer?.topWatches" :key="watch.id" class="watch-item">
-              <div class="watch-placeholder">⌚</div>
+            <div
+              v-for="watch in selectedPlayer?.topWatches"
+              :key="watch.id"
+              class="watch-item"
+              :title="watch.name"
+            >
+              <div class="watch-placeholder avatar-placeholder">
+                <template v-if="watch.photo">
+                  <img
+                    :src="getRewardImageUrl(watch.photo)"
+                    :alt="watch.name"
+                    class="avatar-image"
+                  />
+                </template>
+                <template v-else>
+                  <span>{{ watch.name }}</span>
+                </template>
+              </div>
+
               <div class="watch-name">{{ watch.name }}</div>
             </div>
           </div>
@@ -267,7 +284,16 @@ const loadUsersRanking = async () => {
         since: `Reseller since ${user.signup_year}`,
         battleWin: user.battle_won || 0,
         battleLost: user.battle_lost || 0,
-        topWatches: [] // on met vide pour l’instant si tu n’as pas l’info
+        topWatches: user.rewards
+          ? user.rewards
+              .filter((reward) => reward.pivot?.is_favourite)
+              .slice(0, 3)
+              .map((reward) => ({
+                id: reward.id,
+                name: reward.model,
+                photo: reward.photo_name
+              }))
+          : []
       }))
       // On trie par elo_score DESC
       .sort((a, b) => b.score - a.score)
@@ -279,6 +305,10 @@ const loadUsersRanking = async () => {
   } catch (err) {
     console.error('❌ Erreur API users ranking:', err.message)
   }
+}
+
+const getRewardImageUrl = (photoName) => {
+  return `http://localhost:8000/${photoName}`
 }
 
 const currentUser = ref({
