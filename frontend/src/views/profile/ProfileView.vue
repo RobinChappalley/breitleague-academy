@@ -124,7 +124,9 @@ const winRate = computed(() => {
 })
 
 const topRewards = computed(() => {
-  return userRewards.value.slice(0, 3)
+  return userRewards.value
+    .filter((reward) => reward.pivot?.is_favourite) // 👈 filtre les favoris
+    .slice(0, 3) // top 3
 })
 
 // Méthodes
