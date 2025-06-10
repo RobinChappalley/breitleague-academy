@@ -165,13 +165,14 @@ const loadUserProfile = async () => {
 
 const loadUserRewards = async (userId) => {
   try {
-    const response = await userService.getUserRewards(userId)
-    console.log('📦 Réponse rewards:', response)
+    const response = await userService.getUser(userId)
+    const user = response.data
 
-    userRewards.value = response.data || []
-    console.log('✅ Rewards chargés:', userRewards.value)
+    userRewards.value = user.rewards || []
+
+    console.log('👤 Utilisateur chargé:', user)
   } catch (err) {
-    console.log('⚠️ Pas de rewards trouvés:', err.message)
+    console.error('❌ Erreur lors du chargement de l’utilisateur:', err.message)
     userRewards.value = []
   }
 }
