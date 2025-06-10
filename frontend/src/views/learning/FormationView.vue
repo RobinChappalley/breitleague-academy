@@ -316,7 +316,7 @@ export default {
 }
 
 .lesson-container {
-  position: relative; /* Changé de absolute à relative */
+  position: relative;
 }
 
 .lesson-progress-circle {
@@ -374,6 +374,7 @@ export default {
   transform: translateY(-50%);
   color: whitesmoke;
   font-weight: bold;
+  min-width: 150px;
 }
 
 .action-btn {
