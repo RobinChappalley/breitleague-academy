@@ -487,7 +487,7 @@ const handleAction = async (challenge) => {
         opponent: {
           id: challenge.user?.id || challenge.id,
           name: challenge.name,
-          avatar: challenge.user?.avatar || challenge.name.charAt(0),
+          avatar: challenge.user?.avatar || challenge.name.charAt(0), // PASSER L'AVATAR COMPLET
           flag: challenge.country
         },
         questions: selectedQuestions

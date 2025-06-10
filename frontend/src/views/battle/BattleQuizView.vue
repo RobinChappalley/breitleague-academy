@@ -4,7 +4,13 @@
     <div class="battle-header">
       <div class="opponent-info">
         <div class="avatar" :style="getAvatarStyle(opponent)">
-          {{ opponent.avatar }}
+          <img 
+            v-if="opponent.avatar && opponent.avatar !== opponent.name?.charAt(0)" 
+            :src="getAvatarUrl(opponent)" 
+            :alt="opponent.name"
+            class="avatar-image"
+          />
+          <span v-else class="avatar-initial">{{ opponent.name?.charAt(0) || 'O' }}</span>
         </div>
         <div class="opponent-details">
           <h3>{{ opponent.name }}</h3>
@@ -14,7 +20,13 @@
       <div class="vs-indicator">VS</div>
       <div class="player-info">
         <div class="avatar" :style="getAvatarStyle(currentPlayer)">
-          {{ currentPlayer.avatar }}
+          <img 
+            v-if="currentPlayer.avatar && currentPlayer.avatar !== currentPlayer.name?.charAt(0)" 
+            :src="getAvatarUrl(currentPlayer)" 
+            :alt="currentPlayer.name"
+            class="avatar-image"
+          />
+          <span v-else class="avatar-initial">{{ currentPlayer.name?.charAt(0) || 'Y' }}</span>
         </div>
         <div class="player-details">
           <h3>{{ currentPlayer.name }}</h3>
@@ -126,6 +138,48 @@ const questions = ref([])
 const showPointsPopup = ref(false)
 const pointsPopupText = ref('')
 
+// NOUVELLE FONCTION : Récupérer l'URL de l'avatar
+const getAvatarUrl = (user) => {
+  if (!user || !user.avatar) return null
+  
+  // Si c'est juste une lettre (fallback), ne pas afficher d'image
+  if (user.avatar.length === 1) return null
+  
+  return `http://localhost:8000/${user.avatar}`
+}
+
+// NOUVELLE FONCTION : Récupérer les données utilisateur actuelles
+const loadCurrentUserData = async () => {
+  try {
+    const userResponse = await fetch('http://localhost:8000/api/user', {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+    
+    if (userResponse.ok) {
+      const userData = await userResponse.json()
+      currentPlayer.value = {
+        id: userData.id,
+        name: userData.username || 'YOU',
+        avatar: userData.avatar || userData.username?.charAt(0) || 'Y',
+        flag: getCountryFlag(userData.pos_id) || '🇨🇭'
+      }
+      console.log('✅ Current player data loaded:', currentPlayer.value)
+    }
+  } catch (error) {
+    console.warn('⚠️ Could not load current user data:', error)
+  }
+}
+
+// NOUVELLE FONCTION : Convertir pos_id en flag
+const getCountryFlag = (posId) => {
+  const flagMapping = {
+    1: '🇨🇭', 2: '🇫🇷', 3: '🇩🇪', 4: '🇮🇹', 5: '🇪🇸',
+    6: '🇵🇹', 7: '🇷🇴', 8: '🇺🇸', 9: '🇬🇧', 10: '🇧🇪'
+  }
+  return flagMapping[posId] || '🇨🇭'
+}
+
 // Computed
 const currentQuestion = computed(() => {
   if (questions.value.length === 0) return null
@@ -155,14 +209,16 @@ const loadBattleData = () => {
     if (savedBattle) {
       battleData.value = JSON.parse(savedBattle)
       
-      // Mettre à jour les données de l'adversaire
+      // Mettre à jour les données de l'adversaire AVEC AVATAR COMPLET
       if (battleData.value.opponent) {
         opponent.value = {
           id: battleData.value.opponent.id,
           name: battleData.value.opponent.name,
           avatar: battleData.value.opponent.avatar || battleData.value.opponent.name.charAt(0),
-          flag: battleData.value.opponent.flag
+          flag: battleData.value.opponent.flag || '🇩🇪'
         }
+        
+        console.log('✅ Opponent data loaded:', opponent.value)
       }
       
       // Charger les questions depuis la base de données
@@ -538,7 +594,11 @@ const getAvatarStyle = (player) => {
 }
 
 // Lifecycle
-onMounted(() => {
+onMounted(async () => {
+  // Charger les données du joueur actuel en premier
+  await loadCurrentUserData()
+  
+  // Ensuite charger les données de bataille
   loadBattleData()
   
   setTimeout(() => {
@@ -592,6 +652,21 @@ onUnmounted(() => {
   font-size: 1.5rem;
   border: 3px solid #F7C72C;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
+}
+
+.avatar-initial {
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
 }
 
 .opponent-details h3,
