@@ -73,21 +73,24 @@
         </div>
 
         <!-- Top 3 Watches Section -->
-        <div class="watches-section">
-          <div class="watches-header">
-            <h2>TOP 3 REWARDS</h2>
-            <button class="see-all-btn" @click="goToCollection">See all</button>
-          </div>
-          <div class="watches-grid">
-            <div
-              v-for="reward in topRewards"
-              :key="reward.id"
-              class="watch-item"
-              :title="reward.model"
-            >
-              <div class="watch-placeholder">⌚</div>
-              <div class="watch-name">{{ reward.model?.substring(0, 15) }}...</div>
+        <div class="watches-grid">
+          <div
+            v-for="reward in topRewards"
+            :key="reward.id"
+            class="watch-item"
+            :title="reward.model"
+            @click="goToCollection"
+          >
+            <div class="watch-placeholder avatar-placeholder">
+              <template v-if="reward.photo_name">
+                <img :src="getRewardImage(reward)" :alt="reward.model" class="avatar-image" />
+              </template>
+              <template v-else>
+                <span style="font-size: 2rem; color: white">{{ getRewardImage(reward) }}</span>
+              </template>
             </div>
+
+            <div class="watch-name">{{ reward.model }}</div>
           </div>
         </div>
       </div>
@@ -183,9 +186,9 @@ const getUserInitial = () => {
   return 'U'
 }
 
-const getRewardImage = () => {
-  if (user.value.avatar) return `http://localhost:8000/${user.value.avatar}`
-  if (user.value.username) return user.value.username[0].toUpperCase()
+const getRewardImage = (reward) => {
+  if (reward.photo_name) return `http://localhost:8000/${reward.photo_name}`
+  if (reward.model) return reward.model[0].toUpperCase()
   return 'U'
 }
 
@@ -296,7 +299,6 @@ const logout = async () => {
 .avatar-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -524,6 +526,7 @@ const logout = async () => {
   justify-content: center;
   min-height: 80px;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .watch-item:hover {
@@ -538,7 +541,7 @@ const logout = async () => {
 }
 
 .watch-name {
-  font-size: 0.7rem;
+  font-size: 1rem;
   color: rgba(255, 255, 255, 0.8);
 }
 
