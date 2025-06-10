@@ -183,6 +183,12 @@ const getUserInitial = () => {
   return 'U'
 }
 
+const getRewardImage = () => {
+  if (user.value.avatar) return `http://localhost:8000/${user.value.avatar}`
+  if (user.value.username) return user.value.username[0].toUpperCase()
+  return 'U'
+}
+
 const goToCollection = () => {
   router.push('/collection')
 }
