@@ -429,7 +429,7 @@ console.log('RankingView component loaded')
 }
 
 .filter-btn:first-child {
-  border-radius: 8px 0 0 8px;
+  border-radius: 8px;
 }
 
 .filter-btn.active {
@@ -439,13 +439,16 @@ console.log('RankingView component loaded')
 
 .dropdown {
   position: relative;
+  width: 18rem;
 }
 
 .dropdown-btn {
   border-radius: 0 8px 8px 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .dropdown-icon {
@@ -463,6 +466,7 @@ console.log('RankingView component loaded')
   overflow: hidden;
   z-index: 10;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  width: 100%;
 }
 
 .dropdown-menu a {
