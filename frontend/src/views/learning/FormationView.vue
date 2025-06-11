@@ -1,14 +1,23 @@
 <template>
-  <div class="formation-image-container">
+  <div class="formation-image-container" :style="backgroundStyle">
     <div class="top-action-buttons">
+      <!-- Bouton temporaire pour tester -->
+      <button class="action-btn" @click="changeModule('next')">Next Module (Test)</button>
+      <button class="action-btn" @click="changeModule('previous')">Previous Module (Test)</button>
+
       <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
       <RouterLink class="action-btn" to="/missions">Missions</RouterLink>
     </div>
 
     <div ref="watchContainer" class="formation-watch-container">
-      <img alt="watch aviators" src="/backgrounds/aviators-watch.png" class="lesson-watch"
-           @load="updateContainerDimensions">
-
+      <!-- Image de la montre avec transition -->
+      <img
+          :alt="`${currentModule?.title || 'Breitling'} watch`"
+          :src="currentWatchImage"
+          class="lesson-watch"
+          :class="{ 'watch-transitioning': isWatchTransitioning }"
+          @load="updateContainerDimensions"
+      >
       <!-- Bouton spécial checkpoint -->
       <button
           class="checkpoint-button special-button"
@@ -139,6 +148,10 @@ export default {
           background: 'var(--aviators-horizontal)'
         },
       },
+      defaultImages: {
+        watch: '/backgrounds/aviators-watch.png',
+        background: 'var(--aviators-horizontal)'
+      },
     }
   },
 
@@ -160,22 +173,10 @@ export default {
       return this.moduleImages[moduleId]?.watch || this.defaultImages.watch;
     },
 
-    nextWatchImage() {
-      const moduleId = this.nextModule?.id;
-      return this.moduleImages[moduleId]?.watch || this.defaultImages.watch;
-    },
-
     currentBackgroundImage() {
       const moduleId = this.currentModule?.id;
       return this.moduleImages[moduleId]?.background || this.defaultImages.background;
     },
-
-    nextBackgroundImage() {
-      const moduleId = this.nextModule?.id;
-      return this.moduleImages[moduleId]?.background || this.defaultImages.background;
-    },
-
-    // Style dynamique pour le background
     backgroundStyle() {
       return {
         backgroundImage: this.currentBackgroundImage
@@ -314,9 +315,45 @@ export default {
       const module = await fetchModule(moduleToDisplayId)
       return module
     },
+
     async loadAllModules() {
       this.modules = await fetchModules()
-    }
+    },
+    async changeModule(direction = 'next') {
+      if (this.isWatchTransitioning) return;
+
+      console.log('Changing module:', direction);
+
+      // 1. Calculer le prochain index
+      let nextIndex;
+      if (direction === 'next') {
+        nextIndex = (this.currentModuleIndex + 1) % this.modules.length;
+      } else {
+        nextIndex = this.currentModuleIndex === 0 ? this.modules.length - 1 : this.currentModuleIndex - 1;
+      }
+
+      console.log('Current index:', this.currentModuleIndex, 'Next index:', nextIndex);
+
+      // 2. Démarrer la transition
+      this.isWatchTransitioning = true;
+
+      // 3. Attendre l'animation, puis changer
+      setTimeout(() => {
+        this.currentModuleIndex = nextIndex;
+
+        // Mettre à jour les lessons du nouveau module
+        const newModule = this.modules[nextIndex];
+        this.lessons = newModule.lessons.map((lesson, idx) => ({
+          ...lesson,
+          status: 'not-started',
+          progress: 0,
+          title: lesson.title || `Lesson ${idx + 1}`
+        }));
+
+        this.isWatchTransitioning = false;
+        console.log('Module changed to:', newModule.title);
+      }, 1000);
+    },
   }
 }
 
