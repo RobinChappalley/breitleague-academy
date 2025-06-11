@@ -152,5 +152,211 @@
         "battle_lost": 5,
         "number_available_slots": 2,
         "is_BS": true
+    },
+
+    {
+        "id": 12,
+        "username": "user12",
+        "email": "user12@example.com",
+        "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
+        "pos_id": 12,
+        "signup_year": 2023,
+        "avatar": "img/profile_photo/user12.jpg",
+        "elo_score": 0,
+        "battle_won": 0,
+        "battle_lost": 0,
+        "number_available_slots": 3,
+        "is_BS": false
+    },
+    {
+        "id": 13,
+        "username": "user13",
+        "email": "user13@example.com",
+        "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
+        "pos_id": 13,
+        "signup_year": 2022,
+        "avatar": "img/profile_photo/user13.jpg",
+        "elo_score": 0,
+        "battle_won": 0,
+        "battle_lost": 0,
+        "number_available_slots": 2,
+        "is_BS": false
+    },
+    {
+        "id": 14,
+        "username": "user14",
+        "email": "user14@example.com",
+        "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
+        "pos_id": 14,
+        "signup_year": 2020,
+        "avatar": "img/profile_photo/user14.jpg",
+        "elo_score": 0,
+        "battle_won": 0,
+        "battle_lost": 0,
+        "number_available_slots": 4,
+        "is_BS": false
+    },
+    {
+        "id": 15,
+        "username": "user15",
+        "email": "user15@example.com",
+        "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
+        "pos_id": 15,
+        "signup_year": 2016,
+        "avatar": "img/profile_photo/user15.jpg",
+        "elo_score": 0,
+        "battle_won": 0,
+        "battle_lost": 0,
+        "number_available_slots": 5,
+        "is_BS": false
+    },
+    {
+        "id": 16,
+        "username": "user16",
+        "email": "user16@example.com",
+        "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
+        "pos_id": 16,
+        "signup_year": 2022,
+        "avatar": "img/profile_photo/user16.jpg",
+        "elo_score": 0,
+        "battle_won": 0,
+        "battle_lost": 0,
+        "number_available_slots": 3,
+        "is_BS": false
+    },
+    {
+        "id": 17,
+        "username": "user17",
+        "email": "user17@example.com",
+        "elo_score": 24608,
+        "battle_won": 38,
+        "battle_lost": 12,
+        "is_BS": true
+    },
+    {
+        "id": 18,
+        "username": "user18",
+        "email": "user18@example.com",
+        "elo_score": 22430,
+        "battle_won": 46,
+        "battle_lost": 18,
+        "is_BS": true
+    },
+    {
+        "id": 19,
+        "username": "user19",
+        "email": "user19@example.com",
+        "elo_score": 22382,
+        "battle_won": 52,
+        "battle_lost": 14,
+        "is_BS": true
+    },
+    {
+        "id": 20,
+        "username": "user20",
+        "email": "user20@example.com",
+        "elo_score": 30347,
+        "battle_won": 75,
+        "battle_lost": 29,
+        "is_BS": true
+    },
+    {
+        "id": 21,
+        "username": "user21",
+        "email": "user21@example.com",
+        "elo_score": 22003,
+        "battle_won": 40,
+        "battle_lost": 24,
+        "is_BS": true
+    },
+    {
+        "id": 22,
+        "username": "user22",
+        "email": "user22@example.com",
+        "elo_score": 39648,
+        "battle_won": 71,
+        "battle_lost": 27,
+        "is_BS": true
+    },
+    {
+        "id": 23,
+        "username": "user23",
+        "email": "user23@example.com",
+        "elo_score": 16782,
+        "battle_won": 29,
+        "battle_lost": 16,
+        "is_BS": true
+    },
+    {
+        "id": 24,
+        "username": "user24",
+        "email": "user24@example.com",
+        "elo_score": 16790,
+        "battle_won": 39,
+        "battle_lost": 9,
+        "is_BS": true
+    },
+    {
+        "id": 25,
+        "username": "user25",
+        "email": "user25@example.com",
+        "elo_score": 12643,
+        "battle_won": 28,
+        "battle_lost": 16,
+        "is_BS": true
+    },
+    {
+        "id": 26,
+        "username": "user26",
+        "email": "user26@example.com",
+        "elo_score": 48399,
+        "battle_won": 103,
+        "battle_lost": 65,
+        "is_BS": true
+    },
+    {
+        "id": 27,
+        "username": "user27",
+        "email": "user27@example.com",
+        "elo_score": 39959,
+        "battle_won": 97,
+        "battle_lost": 27,
+        "is_BS": true
+    },
+    {
+        "id": 28,
+        "username": "user28",
+        "email": "user28@example.com",
+        "elo_score": 28820,
+        "battle_won": 68,
+        "battle_lost": 34,
+        "is_BS": true
+    },
+    {
+        "id": 29,
+        "username": "user29",
+        "email": "user29@example.com",
+        "elo_score": 27529,
+        "battle_won": 44,
+        "battle_lost": 37,
+        "is_BS": true
+    },
+    {
+        "id": 30,
+        "username": "user30",
+        "email": "user30@example.com",
+        "elo_score": 46245,
+        "battle_won": 91,
+        "battle_lost": 43,
+        "is_BS": true
+    },
+    {
+        "id": 31,
+        "username": "user31",
+        "email": "user31@example.com",
+        "elo_score": 12805,
+        "battle_won": 25,
+        "battle_lost": 9,
+        "is_BS": true
     }
 ]
