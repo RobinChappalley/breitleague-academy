@@ -52,7 +52,7 @@ class User extends Authenticatable
     public function missions()
     {
         return $this->belongsToMany(Mission::class, 'user_missions')
-            ->withPivot('is_completed', 'start_date', 'end_date')
+            ->withPivot('id', 'is_completed', 'start_date', 'end_date')
             ->withTimestamps();
     }
 

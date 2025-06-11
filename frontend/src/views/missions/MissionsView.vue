@@ -85,12 +85,51 @@ const visibleMissions = computed(() => {
     })
 })
 
-const claimReward = (mission) => {
+const claimReward = async (mission) => {
   if (mission.progress === 100 && !mission.completed) {
-    mission.completed = true
-    console.log(`Reward claimed for mission: ${mission.title}`)
+    try {
+      const resAddReward = await fetch('http://localhost:8000/api/v1/user-rewards', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({
+          reward_id: mission.reward_id,
+          user_id: user.value.id,
+          is_favourite: false,
+          acquired_at: new Date().toISOString()
+        })
+      })
+
+      if (!resAddReward.ok) {
+        throw new Error("Erreur lors de l'ajout du reward")
+      }
+
+      // DELETE la user-mission
+      const resDeleteMission = await fetch(
+        `http://localhost:8000/api/v1/user-missions/${mission.pivot.id}`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: {
+            Accept: 'application/json'
+          }
+        }
+      )
+      if (!resDeleteMission.ok) {
+        throw new Error('Erreur lors de la suppression de la mission')
+      }
+
+      // Mettre à jour la mission localement
+      mission.completed = true
+    } catch (error) {
+      console.error('❌ Erreur lors de claimReward:', error)
+    }
   }
 }
+
 const getAllMissions = async () => {
   try {
     isLoading.value = true
@@ -98,6 +137,7 @@ const getAllMissions = async () => {
 
     console.log("Chargement de l'utilisateur connecté...")
 
+    //Récupérer l'utilisateur connecté
     const res = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
       headers: {
@@ -108,16 +148,16 @@ const getAllMissions = async () => {
     if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
 
     const connectedUser = await res.json()
-    console.log('Utilisateur connecté:', connectedUser)
 
+    //Charger infos complètes du user
     const response = await userService.getUser(connectedUser.id)
-    console.log('Réponse API user:', response)
 
     user.value = response.data || response
-    console.log('User complet chargé:', user.value)
 
+    //Charger les missions
     const userMissions = user.value.missions || []
 
+    // 4️⃣ Pour chaque mission, aller chercher le reward lié + ajouter user_mission_id
     const missionsWithRewards = await Promise.all(
       userMissions.map(async (mission) => {
         try {
@@ -136,7 +176,9 @@ const getAllMissions = async () => {
             return {
               ...mission,
               reward: null,
-              progress: mission.pivot.is_completed === 1 ? 100 : 0 // AJOUT
+              progress: mission.pivot.is_completed === 1 ? 100 : 0,
+              completed: mission.pivot.is_completed === 1,
+              user_mission_id: mission.pivot.id // clé du pivot UserMission !
             }
           }
 
@@ -145,23 +187,26 @@ const getAllMissions = async () => {
           return {
             ...mission,
             reward: rewardData.data,
-            progress: mission.pivot.is_completed === 1 ? 100 : 0 // AJOUT
+            progress: mission.pivot.is_completed === 1 ? 100 : 0,
+            completed: mission.pivot.is_completed === 1,
+            user_mission_id: mission.pivot.id
           }
         } catch (err) {
           console.error(`Erreur en récupérant reward ${mission.reward_id}:`, err)
           return {
             ...mission,
             reward: null,
-            progress: mission.pivot.is_completed === 1 ? 100 : 0 // AJOUT
+            progress: mission.pivot.is_completed === 1 ? 100 : 0,
+            completed: mission.pivot.is_completed === 1,
+            user_mission_id: mission.pivot.id
           }
         }
       })
     )
 
+    // Stocker missions enrichies
     missions.value = missionsWithRewards
-    console.log('Missions avec rewards:', missions.value)
   } catch (err) {
-    console.error('Erreur lors du chargement des missions:', err)
     error.value = err
   } finally {
     isLoading.value = false
