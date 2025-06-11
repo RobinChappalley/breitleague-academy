@@ -330,54 +330,99 @@ const loadOutgoingChallenges = (loadedUsers) => {
   }
 }
 
-// NOUVELLE FONCTION : Charger les batailles terminées
+// FONCTION MODIFIÉE : Charger les batailles terminées avec anciennes parties par défaut
 const loadFinishedBattles = (loadedUsers) => {
   try {
-    // 1. Récupérer les batailles terminées depuis localStorage
+    // 1. Récupérer les batailles terminées récentes depuis localStorage
     const savedFinishedBattles = JSON.parse(localStorage.getItem('finishedBattles') || '[]')
-    console.log('📋 Batailles terminées depuis localStorage:', savedFinishedBattles)
+    console.log('📋 Batailles récentes depuis localStorage:', savedFinishedBattles)
     
-    // 2. Ajouter quelques batailles par défaut si la liste est vide
-    let defaultBattles = []
-    if (savedFinishedBattles.length === 0) {
-      defaultBattles = loadedUsers
-        .filter(user => user.id !== currentUserId.value)
-        .slice(6, 8)
-        .map((user, index) => ({
-          id: user.id + 200,
-          name: user.username,
-          country: getCountryCode(user),
-          points: index === 0 ? 300 : -100,
-          user: user,
-          timestamp: Date.now() - (index + 1) * 86400000, // Il y a 1-2 jours
-          playerWon: index === 0
-        }))
+    // 2. TOUJOURS créer quelques anciennes parties par défaut (pour avoir du contenu)
+    const defaultOldBattles = loadedUsers
+      .filter(user => user.id !== currentUserId.value)
+      .slice(6, 10) // Prendre 4 utilisateurs pour les anciennes parties
+      .map((user, index) => ({
+        id: user.id + 200,
+        name: user.username,
+        country: getCountryCode(user),
+        points: [300, -70, 300, -100][index], // Alternance victoires/défaites
+        user: user,
+        timestamp: Date.now() - (index + 3) * 86400000, // Il y a 3-6 jours
+        playerWon: [true, false, true, false][index],
+        isDefault: true // Marquer comme partie par défaut
+      }))
+    
+    // 3. Fallback si pas assez d'utilisateurs chargés
+    let fallbackOldBattles = []
+    if (defaultOldBattles.length < 4) {
+      const mockNames = ['P.DUJARDIN', 'L.ANEX', 'M.GARCIA', 'S.JONES', 'A.MILLER']
+      const mockCountries = ['🇫🇷', '🇫🇷', '🇪🇸', '🇺🇸', '🇬🇧']
+      
+      fallbackOldBattles = mockNames.slice(0, 4 - defaultOldBattles.length).map((name, index) => ({
+        id: 300 + index,
+        name: name,
+        country: mockCountries[index] || '🇫🇷',
+        points: [300, -70, 300, -100][index],
+        user: null,
+        timestamp: Date.now() - (index + 3) * 86400000,
+        playerWon: [true, false, true, false][index],
+        isDefault: true
+      }))
     }
     
-    // 3. Combiner les données : batailles récentes en premier
+    // 4. Combiner : nouvelles parties EN PREMIER, puis anciennes parties par défaut
     finishedBattles.value = [
-      ...savedFinishedBattles,
-      ...defaultBattles
-    ].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)) // Trier par timestamp décroissant
+      ...savedFinishedBattles.map(battle => ({ ...battle, isDefault: false })), // Nouvelles parties
+      ...defaultOldBattles, // Anciennes parties des vrais utilisateurs
+      ...fallbackOldBattles // Fallback si besoin
+    ]
+      .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)) // Trier par timestamp décroissant
+      .slice(0, 10) // Garder maximum 10 parties
     
     console.log('✅ Batailles terminées chargées:', finishedBattles.value.length)
+    console.log('- Nouvelles parties:', savedFinishedBattles.length)
+    console.log('- Anciennes parties par défaut:', defaultOldBattles.length + fallbackOldBattles.length)
     
   } catch (error) {
     console.error('❌ Erreur lors du chargement des batailles terminées:', error)
     
-    // Fallback : données par défaut
+    // Fallback complet : seulement des données par défaut
     finishedBattles.value = [
       {
         id: 7,
         name: 'P.DUJARDIN',
-        country: 'FR',
-        points: 300
+        country: '🇫🇷',
+        points: 300,
+        playerWon: true,
+        timestamp: Date.now() - 3 * 86400000,
+        isDefault: true
       },
       {
         id: 8,
         name: 'L.ANEX',
-        country: 'FR',
-        points: -100
+        country: '🇫🇷',
+        points: -100,
+        playerWon: false,
+        timestamp: Date.now() - 4 * 86400000,
+        isDefault: true
+      },
+      {
+        id: 9,
+        name: 'M.GARCIA',
+        country: '🇪🇸',
+        points: 300,
+        playerWon: true,
+        timestamp: Date.now() - 5 * 86400000,
+        isDefault: true
+      },
+      {
+        id: 10,
+        name: 'S.JONES',
+        country: '🇺🇸',
+        points: -70,
+        playerWon: false,
+        timestamp: Date.now() - 6 * 86400000,
+        isDefault: true
       }
     ]
   }
@@ -705,9 +750,153 @@ const handleAction = async (challenge) => {
   }
 }
 
-const viewBattle = (id) => {
-  console.log('Viewing battle', id)
-  router.push(`/battle-details/${id}`)
+const viewBattle = (battleId) => {
+  console.log('Viewing battle', battleId)
+  
+  // Trouver la bataille correspondante
+  const battle = finishedBattles.value.find(b => b.id === battleId)
+  
+  if (battle && battle.isDefault) {
+    // Si c'est une bataille par défaut, générer des données cohérentes
+    console.log('🎲 Génération de données cohérentes pour bataille par défaut:', battle.name)
+    
+    // Récupérer l'utilisateur actuel pour les données du joueur
+    const getCurrentUser = async () => {
+      try {
+        const userResponse = await fetch('http://localhost:8000/api/user', {
+          credentials: 'include',
+          headers: { 'Accept': 'application/json' }
+        })
+        
+        if (userResponse.ok) {
+          const userData = await userResponse.json()
+          return userData
+        }
+      } catch (error) {
+        console.warn('Could not fetch current user:', error)
+      }
+      
+      // Fallback
+      return { id: 1, username: 'YOU', avatar: null }
+    }
+    
+    getCurrentUser().then(currentUser => {
+      // Générer des questions cohérentes
+      const mockQuestions = [
+        {
+          id: 1,
+          text: 'Which Breitling collection is known for its aviation heritage?',
+          correctAnswer: 'Navitimer'
+        },
+        {
+          id: 2,
+          text: 'What year was Breitling founded?',
+          correctAnswer: '1884'
+        },
+        {
+          id: 3,
+          text: 'Which movement powers the Breitling B01?',
+          correctAnswer: 'In-house chronograph'
+        },
+        {
+          id: 4,
+          text: 'What is the water resistance of the Superocean?',
+          correctAnswer: '500m'
+        },
+        {
+          id: 5,
+          text: 'Which Breitling watch was worn by astronauts?',
+          correctAnswer: 'Cosmonaute'
+        }
+      ]
+      
+      // Déterminer qui a gagné selon les points de la bataille
+      const playerWon = battle.points > 0
+      const playerScore = playerWon ? 4 : 2  // Sur 5 questions
+      const opponentScore = playerWon ? 2 : 4
+      
+      // Générer des réponses cohérentes pour le joueur
+      const playerAnswers = mockQuestions.map((question, index) => {
+        const isCorrect = index < playerScore // Les X premières sont correctes
+        const time = Math.random() * 20 + 5 // Entre 5 et 25 secondes
+        
+        let selectedAnswer
+        if (isCorrect) {
+          selectedAnswer = question.correctAnswer
+        } else {
+          // Générer une mauvaise réponse
+          const wrongAnswers = ['Wrong Answer A', 'Wrong Answer B', 'Wrong Answer C']
+          selectedAnswer = wrongAnswers[index % 3]
+        }
+        
+        return {
+          correct: isCorrect,
+          text: selectedAnswer,
+          time: time
+        }
+      })
+      
+      // Générer des réponses cohérentes pour l'adversaire
+      const opponentAnswers = mockQuestions.map((question, index) => {
+        const isCorrect = index < opponentScore // Les X premières sont correctes
+        const time = Math.random() * 20 + 5 // Entre 5 et 25 secondes
+        
+        let selectedAnswer
+        if (isCorrect) {
+          selectedAnswer = question.correctAnswer
+        } else {
+          // Générer une mauvaise réponse différente du joueur
+          const wrongAnswers = ['Different Wrong A', 'Different Wrong B', 'Different Wrong C']
+          selectedAnswer = wrongAnswers[index % 3]
+        }
+        
+        return {
+          correct: isCorrect,
+          text: selectedAnswer,
+          time: time
+        }
+      })
+      
+      // Calculer les temps totaux
+      const playerTotalTime = playerAnswers.reduce((total, answer) => total + answer.time, 0)
+      const opponentTotalTime = opponentAnswers.reduce((total, answer) => total + answer.time, 0)
+      
+      // Calculer les scores finaux
+      const playerFinalScore = playerScore * 100 + Math.max(0, (150 - playerTotalTime) * 2)
+      const opponentFinalScore = opponentScore * 100 + Math.max(0, (150 - opponentTotalTime) * 2)
+      
+      // Créer les données cohérentes pour BattleDetailsView
+      const mockBattleResults = {
+        battleId: battleId,
+        opponent: {
+          id: battle.user?.id || battleId,
+          name: battle.name,
+          avatar: battle.user?.avatar || null,
+          flag: battle.country
+        },
+        playerScore: playerScore,
+        opponentScore: opponentScore,
+        playerTime: playerTotalTime,
+        opponentTime: opponentTotalTime,
+        playerTotalPoints: Math.round(playerFinalScore),
+        opponentTotalPoints: Math.round(opponentFinalScore),
+        questionsData: mockQuestions,
+        playerAnswers: playerAnswers,
+        opponentAnswers: opponentAnswers
+      }
+      
+      console.log('📋 Données générées pour bataille par défaut:', mockBattleResults)
+      
+      // Sauvegarder temporairement pour BattleDetailsView
+      localStorage.setItem('lastBattleResults', JSON.stringify(mockBattleResults))
+      
+      // Rediriger vers battle-details
+      router.push(`/battle-details/${battleId}`)
+    })
+  } else {
+    // Si c'est une vraie bataille ou pas trouvée, redirection normale
+    router.push(`/battle-details/${battleId}`)
+  }
 }
 
 // NOUVELLE FONCTION : Nettoyer les anciennes invitations (optionnel)
