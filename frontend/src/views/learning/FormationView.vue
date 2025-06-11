@@ -858,6 +858,56 @@ export default {
 
 }
 
+.watch-slide-leave-active.spin-right {
+  animation: watch-spin-out-right 0.7s forwards;
+}
+.watch-slide-leave-active.spin-left {
+  animation: watch-spin-out-left 0.7s forwards;
+}
+
+/* Pour arrivée/entrée */
+.watch-slide-enter-active.spin-right {
+  animation: watch-spin-in-right 0.7s forwards;
+}
+.watch-slide-enter-active.spin-left {
+  animation: watch-spin-in-left 0.7s forwards;
+}
+
+/* Keyframes pour tourner à droite */
+@keyframes watch-spin-out-right {
+  to {
+    opacity: 0;
+    transform: rotate(2turn) scale(0.7); /* tourne complet à droite */
+  }
+}
+@keyframes watch-spin-in-right {
+  from {
+    opacity: 0;
+    transform: translateY(-40px) rotate(-1turn) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+/* ...et idem pour la gauche : */
+@keyframes watch-spin-out-left {
+  to {
+    opacity: 0;
+    transform: rotate(-2turn) scale(0.7); /* tourne complet à gauche */
+  }
+}
+@keyframes watch-spin-in-left {
+  from {
+    opacity: 0;
+    transform: translateY(-40px) rotate(1turn) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.2s;
 }
@@ -869,5 +919,4 @@ export default {
 .fade-leave-from, .fade-enter-to {
   opacity: 1;
 }
-
 </style>
