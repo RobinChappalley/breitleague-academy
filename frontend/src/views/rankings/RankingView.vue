@@ -133,7 +133,7 @@
 
         <div class="popup-watches">
           <div class="watches-header">
-            <h3>FAVORITES WATCHES</h3>
+            <h3>FAVORITE WATCHES</h3>
           </div>
           <div class="watches-grid">
             <div
