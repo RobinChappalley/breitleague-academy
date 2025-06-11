@@ -4,13 +4,13 @@
       <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
       <RouterLink class="action-btn" to="/missions">Missions</RouterLink>
     </div>
-    
+
     <div ref="watchContainer" class="formation-watch-container">
       <img alt="watch aviators" src="/backgrounds/aviators-watch.png" class="lesson-watch"
            @load="updateContainerDimensions">
 
       <!-- Bouton spécial checkpoint -->
-      <button 
+      <button
         class="checkpoint-button special-button"
         @click="showCheckpointModal"
       ></button>
@@ -68,19 +68,19 @@
     <div v-if="isCheckpointModalVisible" class="modal-overlay" @click="closeCheckpointModal">
       <div class="checkpoint-modal" @click.stop>
         <button class="close-btn" @click="closeCheckpointModal">✕</button>
-        
+
         <div class="modal-header">
           <h2 class="modal-title">CHECKPOINT</h2>
           <h3 class="modal-subtitle">ONBOARDING</h3>
         </div>
-        
+
         <div class="modal-content">
           <p class="modal-text">
-            Welcome to your checkpoint assessment. This test will evaluate your understanding 
-            of the material covered in this module. You'll need to answer {{ checkpointData.totalQuestions }} 
+            Welcome to your checkpoint assessment. This test will evaluate your understanding
+            of the material covered in this module. You'll need to answer {{ checkpointData.totalQuestions }}
             questions with a minimum score of {{ checkpointData.passScore }}% to pass.
           </p>
-          
+
           <div class="modal-rules">
             <h4>Test Rules:</h4>
             <ul>
@@ -91,7 +91,7 @@
             </ul>
           </div>
         </div>
-        
+
         <div class="modal-actions">
           <button class="btn-start-test" @click="startCheckpointTest">
             START TEST
@@ -103,11 +103,14 @@
 </template>
 
 <script>
-import {fetchProgression, fetchModules} from "@/services/api.js";
+import {fetchProgression, fetchModules, fetchModule} from "@/services/api.js";
 export default {
   name: 'FormationView',
   data() {
     return {
+      modules : [],
+      currentModuleIndex: 0,
+      isTransitioning: false,
       lessons: [],
       containerWidth: 0,
       containerHeight: 0,
@@ -124,33 +127,55 @@ export default {
   },
 
   computed: {
-    numberOfButtons() {
-      return this.lessons.length;
+    currentModule() {
+      if (!this.modules.length) return null;
+      return this.modules[this.currentModuleIndex];
     },
+    nextModuleData() {
+      if (!this.modules.length) return null;
+      const nextIndex = (this.currentModuleIndex + 1) % this.modules.length;
+      return this.modules[nextIndex];
+    },
+      numberOfButtons() {
+        return this.currentModule.lessons?.length
+      },
 
-    // Circumférence du cercle (rayon = 20, cohérent avec le SVG)
-    circumference() {
-      return 2 * Math.PI * 20;
+      // Circumférence du cercle (rayon = 20, cohérent avec le SVG)
+      circumference() {
+        return 2 * Math.PI * 20;
+      }
     }
-  },
+  ,
 
   async mounted() {
-    // Utilisation de nextTick pour s'assurer que le DOM est rendu
     await this.$nextTick(() => {
       this.updateContainerDimensions();
-      // Garde le resize listener au cas où la fenêtre change
       window.addEventListener('resize', this.updateContainerDimensions);
     });
-    // Charge les modules et remplit le tableau lessons dynamiquement !
-    const loadedmodule = await this.loadModules();
-    // Si tu veux garder le format avec status/progress : adapte ici.
-    this.lessons = loadedmodule.lessons.map((lesson, idx) => ({
+
+    // 1. Charger tous les modules (simple)
+    await this.loadAllModules();
+
+    // 2. Charger le module spécifique avec ses lessons
+    const loadedModule = await this.loadModule();
+
+    // 3. Trouver l'index du module actuel dans la liste
+    const moduleIndex = this.modules.findIndex(m => m.id === loadedModule.id);
+    if (moduleIndex !== -1) {
+      this.currentModuleIndex = moduleIndex;
+      // Remplacer le module simple par le module complet avec lessons
+      this.modules[moduleIndex] = loadedModule;
+    }
+
+    // 4. Mapper les lessons avec status/progress
+    this.lessons = loadedModule.lessons.map((lesson, idx) => ({
       ...lesson,
-      status: 'not-started', // ou récupère depuis ton API ou progression
+      status: 'not-started',
       progress: 0,
       title: lesson.title || `Lesson ${idx + 1}`
     }));
-  },
+  }
+,
 
   methods: {
     updateContainerDimensions() {
@@ -245,19 +270,16 @@ export default {
       return progression
     },
 
-    async loadModules () {
+    async loadModule () {
       const progression = await this.loadProgression()
       const moduleToDisplayId = progression.last_checkpoint_id+1
-      const module = await fetchModules(moduleToDisplayId)
-      const numberOfLessons = module.lessons.length
-
-      console.log(module)
+      const module = await fetchModule(moduleToDisplayId)
       return module
-    }
+    },
+    async loadAllModules () {
+      this.modules = await fetchModules()}
   }
 }
-
-
 
 </script>
 
