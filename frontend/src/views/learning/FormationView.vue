@@ -10,14 +10,18 @@
     </div>
 
     <div ref="watchContainer" class="formation-watch-container">
+
       <!-- Image de la montre avec transition -->
-      <img
-          :alt="`${currentModule?.title || 'Breitling'} watch`"
-          :src="currentWatchImage"
-          class="lesson-watch"
-          :class="{ 'watch-transitioning': isWatchTransitioning }"
-          @load="updateContainerDimensions"
-      >
+      <transition name="watch-slide" mode="out-in">
+        <img
+            v-if="currentWatchImage"
+            :key="currentWatchImage"
+            :alt="`${currentModule?.title || 'Breitling'} watch`"
+            :src="currentWatchImage"
+            class="lesson-watch"
+            @load="updateContainerDimensions"
+        >
+      </transition>
       <!-- Bouton spécial checkpoint -->
       <button
           class="checkpoint-button special-button"
@@ -248,6 +252,7 @@ export default {
       const currentAngle = startAngle - (index * angleStep);
       const angleRad = (currentAngle * Math.PI) / 180;
 
+      //-30 pour que le texte reste dans l'écran sur mobile
       const radiusPixels = this.containerWidth-30;
       const centerX = 0;
       const centerY = this.containerHeight / 2;
@@ -731,4 +736,31 @@ export default {
     font-size: 1rem;
   }
 }
+/* Animation pour la montre qui sort : rotation autour du centre + disparition */
+.watch-slide-leave-active {
+  animation: watch-spin-out 0.7s forwards cubic-bezier(.83,-0.33,.2,1.2);
+  z-index: 2;
+}
+@keyframes watch-spin-out {
+100% {
+  opacity: 0;
+  transform: rotate(180deg)
+  /* disparait et se rétrécit */
+}
+}
+
+/* Animation pour la montre qui entre : descend du haut vers son centre */
+.watch-slide-enter-active {
+  animation: watch-slide-down-in 0.7s forwards cubic-bezier(.83,-0.33,.2,1.2);
+  z-index: 3;
+}
+@keyframes watch-slide-down-in {
+
+  0% {
+    opacity: 1;
+    transform: rotate(-180deg);
+  }
+
+}
+
 </style>
