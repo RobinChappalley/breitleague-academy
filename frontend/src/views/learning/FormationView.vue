@@ -1,9 +1,9 @@
 <template>
   <div class="formation-image-container" :style="backgroundStyle">
     <div class="top-action-buttons">
-    <div class="progress-bar">
-      <ProgressBar />
-    </div>
+      <div class="progress-bar">
+        <ProgressBar/>
+      </div>
       <!-- Bouton temporaire pour tester -->
       <button class="action-btn" @click="changeModule('next')">Next Module (Test)</button>
       <button class="action-btn" @click="changeModule('previous')">Previous Module (Test)</button>
@@ -15,7 +15,7 @@
     <div ref="watchContainer" class="formation-watch-container">
 
       <!-- Image de la montre avec transition -->
-      <transition name="watch-slide"  mode="out-in" @after-enter="onWatchTransitionEnd">
+      <transition name="watch-slide" mode="out-in" @after-enter="onWatchTransitionEnd">
         <img
             v-if="currentWatchImage"
             :key="currentWatchImage"
@@ -28,10 +28,49 @@
       <!-- Bouton spécial checkpoint -->
       <transition name="fade">
         <div v-if="showLessonPoints">
-          <button
-              class="checkpoint-button special-button"
-              @click="showCheckpointModal"
-          ></button>
+          <div v-if="isCheckpointModalVisible" class="modal-overlay" @click="closeCheckpointModal">
+            <div class="checkpoint-modal" @click.stop>
+              <button class="close-btn" @click="closeCheckpointModal">✕</button>
+
+              <div class="modal-header">
+                <h2 class="modal-title">CHECKPOINT</h2>
+                <h3 class="modal-subtitle">ONBOARDING</h3>
+              </div>
+
+              <div class="modal-content">
+                <p class="modal-text">
+
+                  Welcome to your checkpoint assessment. This test will evaluate your understanding of the
+                  material covered in this module. You'll need to answer
+                  {{ checkpointData.totalQuestions }} questions with a minimum score of
+                  {{ checkpointData.passScore }}% to pass.
+
+                </p>
+
+                <div class="modal-rules">
+                  <h4>Test Rules:</h4>
+                  <ul>
+                    <li>Time limit: {{ checkpointData.timeLimit }}</li>
+                    <li>{{ checkpointData.totalQuestions }} multiple choice questions</li>
+                    <li>Minimum {{ checkpointData.passScore }}% required to pass</li>
+                    <li>You can retake the test if needed</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="modal-actions">
+                <button class="btn-start-test" @click="startCheckpointTest">START TEST</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ✅ AJOUTÉ : Le composant StartModuleModal -->
+          <StartModuleModal
+              :isVisible="showStartModal"
+              :moduleData="selectedModule"
+              @close="handleModalClose"
+              @module-started="handleModuleStarted"
+          />
 
           <!-- Boutons de checkpoint avec progression individuelle -->
           <RouterLink
@@ -82,78 +121,14 @@
           </RouterLink>
         </div>
       </transition>
-=======
-        </div>
-
-    <div ref="watchContainer" class="formation-watch-container">
-     
-      <!-- Bouton spécial checkpoint -->
-      <button class="checkpoint-button special-button" @click="showCheckpointModal"></button>
-
-      <!-- ✅ CORRIGÉ : Div au lieu de RouterLink + appel openStartModal -->
-      <div
-        v-for="(lesson, index) in lessons"
-        :key="index"
-        class="lesson-container"
-        :style="getButtonPosition(index)"
-        @click="openStartModal(lesson)"
-      >
-      
-
-        
     </div>
-
-    <!-- Modal Checkpoint - Affiché par-dessus -->
-    <div v-if="isCheckpointModalVisible" class="modal-overlay" @click="closeCheckpointModal">
-      <div class="checkpoint-modal" @click.stop>
-        <button class="close-btn" @click="closeCheckpointModal">✕</button>
-
-        <div class="modal-header">
-          <h2 class="modal-title">CHECKPOINT</h2>
-          <h3 class="modal-subtitle">ONBOARDING</h3>
-        </div>
-
-        <div class="modal-content">
-          <p class="modal-text">
-
-            Welcome to your checkpoint assessment. This test will evaluate your understanding of the
-            material covered in this module. You'll need to answer
-            {{ checkpointData.totalQuestions }} questions with a minimum score of
-            {{ checkpointData.passScore }}% to pass.
-
-          </p>
-
-          <div class="modal-rules">
-            <h4>Test Rules:</h4>
-            <ul>
-              <li>Time limit: {{ checkpointData.timeLimit }}</li>
-              <li>{{ checkpointData.totalQuestions }} multiple choice questions</li>
-              <li>Minimum {{ checkpointData.passScore }}% required to pass</li>
-              <li>You can retake the test if needed</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="modal-actions">
-          <button class="btn-start-test" @click="startCheckpointTest">START TEST</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ✅ AJOUTÉ : Le composant StartModuleModal -->
-    <StartModuleModal
-      :isVisible="showStartModal"
-      :moduleData="selectedModule"
-      @close="handleModalClose"
-      @module-started="handleModuleStarted"
-    />
   </div>
 </template>
 
 <script>
 
 
-import { fetchProgression, fetchModule, fetchModules } from '@/services/api.js'
+import {fetchProgression, fetchModule, fetchModules} from '@/services/api.js'
 import StartModuleModal from './startModuleModal.vue'
 import ProgressBar from '@/components/layout/ProgressBar.vue'
 
@@ -264,7 +239,7 @@ export default {
 
     // 2. Charger le module spécifique avec ses lessons
     const loadedModule = await this.loadModule();
-
+    console.log(loadedModule);
     // 3. Trouver l'index du module actuel dans la liste
     const moduleIndex = this.modules.findIndex(m => m.id === loadedModule.id);
     if (moduleIndex !== -1) {
@@ -289,11 +264,9 @@ export default {
       if (container) {
         this.containerWidth = container.offsetWidth
         this.containerHeight = container.offsetHeight
-        console.log(`📏 Container: ${this.containerWidth}x${this.containerHeight}`)
       }
     },
 
-    // ✅ NOUVEAU : Méthode pour générer des lessons par défaut
     getDefaultLessons() {
       return [
         {
@@ -341,7 +314,7 @@ export default {
 
     getButtonPosition(index) {
       if (this.containerWidth === 0) {
-        return { display: 'none' }
+        return {display: 'none'}
       }
 
       const arcDegrees = 150
@@ -411,37 +384,36 @@ export default {
       this.selectedModule = null
     },
 
-    async loadProgression() {
-      const res = await fetch('http://localhost:8000/api/user', {
-        credentials: 'include',
-        headers: {
-          Accept: 'application/json'
-
     handleModuleStarted(data) {
       console.log('Module started:', data)
       // Redirection vers la première leçon
       this.$router.push(`/LearningFlowView.vue`)
     },
 
-
+    async loadProgression() {
+      const res = await fetch('http://localhost:8000/api/user', {
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json'
         }
+      })
+      const connectedUser = await res.json()
+      const progression = await fetchProgression(connectedUser.id)
+      this.progression = progression
+      return progression
 
-        console.log(`🔄 Loading progression for user ID: ${connectedUser.id}`)
-        const progression = await fetchProgression(connectedUser.id)
-        console.log('✅ Progression loaded:', progression)
-
-        this.progression = progression
-        return progression
-      } catch (error) {
-        console.error('❌ Error loading progression:', error)
-        return null
-      }
     },
-
 
     async loadModule() {
       const progression = await this.loadProgression()
-      const moduleToDisplayId = progression.last_checkpoint_id + 1
+      let moduleToDisplayId =0
+      if (progression.last_checkpoint_id == 3) {
+         moduleToDisplayId = 1
+
+      } else {
+       moduleToDisplayId = progression.last_checkpoint_id + 1
+      }
+      console.log(progression.last_checkpoint_id)
       const module = await fetchModule(moduleToDisplayId)
       return module
     },
@@ -509,22 +481,6 @@ export default {
   }
 }
 
-        const module = await fetchModules(moduleToDisplayId)
-        console.log('✅ Module loaded:', module)
-
-        return module
-      } catch (error) {
-        console.error('❌ Error loading modules:', error)
-        console.log('🔄 Falling back to default lessons')
-
-        // Retourner des lessons par défaut en cas d'erreur
-        return {
-          lessons: this.getDefaultLessons()
-        }
-      }
-    }
-  }
-}
 </script>
 <style>
 :root {
