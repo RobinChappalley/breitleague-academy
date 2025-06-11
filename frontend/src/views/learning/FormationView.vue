@@ -1,9 +1,10 @@
 <template>
   <div class="formation-image-container" :style="backgroundStyle">
+    <div class="progress-bar">
+      <ProgressBar/>
+    </div>
     <div class="top-action-buttons">
-      <div class="progress-bar">
-        <ProgressBar/>
-      </div>
+
       <!-- Bouton temporaire pour tester -->
       <button class="action-btn" @click="changeModule('next')">Next Module (Test)</button>
       <button class="action-btn" @click="changeModule('previous')">Previous Module (Test)</button>
