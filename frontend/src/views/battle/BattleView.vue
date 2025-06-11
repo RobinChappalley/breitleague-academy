@@ -253,7 +253,6 @@ const loadBattlesFromDB = async () => {
       }))
 
     // OUTGOING CHALLENGES - MAXIMUM 5 (représentent les slots occupés)
-    // Simuler quelques battles en cours (par exemple 2 sur 5 slots)
     outgoingChallenges.value = loadedUsers
       .filter(user => user.id !== currentUserId.value)
       .slice(4, 6) // Prendre seulement 2 utilisateurs pour simuler 2 slots occupés
@@ -266,17 +265,8 @@ const loadBattlesFromDB = async () => {
         user: user
       }))
 
-    // FINISHED BATTLES
-    finishedBattles.value = loadedUsers
-      .filter(user => user.id !== currentUserId.value)
-      .slice(6, 8)
-      .map((user, index) => ({
-        id: user.id + 200,
-        name: user.username,
-        country: getCountryCode(user),
-        points: index === 0 ? 300 : -100,
-        user: user
-      }))
+    // FINISHED BATTLES - NOUVEAU : Charger depuis localStorage + données de base
+    loadFinishedBattles(loadedUsers)
 
     console.log('✅ Slots occupés:', outgoingChallenges.value.length, '/5')
     console.log('✅ Slots libres:', 5 - outgoingChallenges.value.length, '/5')
@@ -287,6 +277,61 @@ const loadBattlesFromDB = async () => {
     loadMockData()
   } finally {
     isLoading.value = false
+  }
+}
+
+// NOUVELLE FONCTION : Charger les batailles terminées
+const loadFinishedBattles = (loadedUsers) => {
+  try {
+    // 1. Récupérer les batailles terminées depuis localStorage
+    const savedFinishedBattles = JSON.parse(localStorage.getItem('finishedBattles') || '[]')
+    console.log('📋 Batailles terminées depuis localStorage:', savedFinishedBattles)
+    
+    // 2. Ajouter quelques batailles par défaut si la liste est vide
+    let defaultBattles = []
+    if (savedFinishedBattles.length === 0) {
+      defaultBattles = loadedUsers
+        .filter(user => user.id !== currentUserId.value)
+        .slice(6, 8)
+        .map((user, index) => ({
+          id: user.id + 200,
+          name: user.username,
+          country: getCountryCode(user),
+          points: index === 0 ? 300 : -100,
+          user: user,
+          timestamp: Date.now() - (index + 1) * 86400000, // Il y a 1-2 jours
+          playerWon: index === 0
+        }))
+    }
+    
+    // 3. Combiner les données : batailles récentes en premier
+    finishedBattles.value = [
+      ...savedFinishedBattles,
+      ...defaultBattles
+    ].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)) // Trier par timestamp décroissant
+    
+    console.log('✅ Batailles terminées chargées:', finishedBattles.value.length)
+    
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement des batailles terminées:', error)
+    
+    // Fallback : données par défaut
+    finishedBattles.value = [
+      {
+        id: 7,
+        name: 'P.DUJARDIN',
+        country: '🇫🇷',
+        points: 300,
+        playerWon: true
+      },
+      {
+        id: 8,
+        name: 'L.ANEX',
+        country: '🇫🇷',
+        points: -100,
+        playerWon: false
+      }
+    ]
   }
 }
 
@@ -579,6 +624,16 @@ const closeInvitationModal = () => {
 onMounted(() => {
   loadBattlesFromDB()
 })
+
+// NOUVELLE FONCTION : Recharger les finished battles quand on revient sur la page
+const refreshFinishedBattles = () => {
+  if (allUsers.value.length > 0) {
+    loadFinishedBattles(allUsers.value)
+  }
+}
+
+// Exposer la fonction pour pouvoir la réutiliser
+window.refreshFinishedBattles = refreshFinishedBattles
 
 console.log('BattleView component loaded')
 

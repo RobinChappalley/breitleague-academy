@@ -542,6 +542,10 @@ const finishBattle = async () => {
     // Créer un ID unique pour la bataille
     const battleId = Date.now()
     
+    // Calculer les points de victoire/défaite
+    const isPlayerWinner = playerTotalPoints > opponentTotalPoints
+    const pointsChange = isPlayerWinner ? +300 : (playerTotalPoints === opponentTotalPoints ? +100 : -70)
+    
     // Préparer les données pour BattleDetailsView
     const battleResults = {
       battleId: battleId,
@@ -569,10 +573,33 @@ const finishBattle = async () => {
       }))
     }
     
-    console.log('💾 Sauvegarde des résultats de bataille:', battleResults)
+    // NOUVEAU : Préparer les données pour la section "Finished Battles"
+    const finishedBattleData = {
+      id: battleId,
+      name: opponent.value.name,
+      country: opponent.value.flag,
+      points: pointsChange,
+      user: opponent.value,
+      timestamp: Date.now(),
+      playerWon: isPlayerWinner
+    }
     
-    // Sauvegarder dans localStorage
+    console.log('💾 Sauvegarde des résultats de bataille:', battleResults)
+    console.log('🏆 Sauvegarde de la bataille terminée:', finishedBattleData)
+    
+    // Sauvegarder dans localStorage pour BattleDetailsView
     localStorage.setItem('lastBattleResults', JSON.stringify(battleResults))
+    
+    // NOUVEAU : Sauvegarder dans localStorage pour BattleView (finished battles)
+    const existingFinishedBattles = JSON.parse(localStorage.getItem('finishedBattles') || '[]')
+    existingFinishedBattles.unshift(finishedBattleData) // Ajouter au début
+    
+    // Garder seulement les 10 dernières batailles
+    if (existingFinishedBattles.length > 10) {
+      existingFinishedBattles.splice(10)
+    }
+    
+    localStorage.setItem('finishedBattles', JSON.stringify(existingFinishedBattles))
     
     // Rediriger vers battle-details avec l'ID
     console.log('🔄 Redirection vers battle-details avec ID:', battleId)
