@@ -8,85 +8,85 @@
     <!-- Main Content -->
     <div class="lessons-content">
       <div class="lessons-container">
-        <h2 class="section-title">LESSONS RESSOURCES</h2>
+        <h1 class="section-title">LESSONS RESSOURCES</h1>
         
         <!-- Onboarding Section -->
         <div class="section">
-          <h3 class="section-subtitle">ONBOARDING</h3>
+          <h2 class="section-subtitle">ONBOARDING</h2>
           
           <div class="lessons-grid">
             <div class="lesson-item" @click="openLesson('history')">
-              <span class="lesson-name">History</span>
-              <button class="read-btn">Read</button>
+              <p>History</p>
+              <button class="read-btn btn-primary">Read</button>
             </div>
             
             <div class="lesson-item" @click="openLesson('inspiration-positioning')">
-              <span class="lesson-name">Inspiration and Positioning</span>
-              <button class="read-btn">Read</button>
+              <p>Inspiration and Positioning</p>
+              <button class="read-btn btn-primary">Read</button>
             </div>
             
             <div class="lesson-item" @click="openLesson('understanding-collection')">
-              <span class="lesson-name">Understanding the Collection</span>
-              <button class="read-btn">Read</button>
+              <p>Understanding the Collection</p>
+              <button class="read-btn btn-primary">Read</button>
             </div>
             
             <div class="lesson-item" @click="openLesson('storytelling')">
-              <span class="lesson-name">Storytelling</span>
-              <button class="read-btn">Read</button>
+              <p>Storytelling</p>
+              <button class="read-btn btn-primary">Read</button>
             </div>
             
             <div class="lesson-item" @click="openLesson('main-collections')">
-              <span class="lesson-name">Main Collections</span>
-              <button class="read-btn">Read</button>
+              <p>Main Collections</p>
+              <button class="read-btn btn-primary">Read</button>
             </div>
           </div>
         </div>
 
         <!-- Novelties Section -->
         <div class="section">
-          <h3 class="section-subtitle">NOVELTIES</h3>
+          <h2 class="section-subtitle">NOVELTIES</h2>
           
           <div class="lessons-grid">
             <div class="lesson-item" @click="openLesson('novelties-1')">
-              <span class="lesson-name">Novelties 1</span>
-              <button class="read-btn">Read</button>
+              <p>Novelties 1</p>
+              <button class="read-btn btn-primary">Read</button>
             </div>
             
             <div class="lesson-item" @click="openLesson('novelties-2')">
-              <span class="lesson-name">Novelties 2</span>
-              <button class="read-btn">Read</button>
+              <p>Novelties 2</p>
+              <button class="read-btn btn-primary">Read</button>
             </div>
             
             <div class="lesson-item" @click="openLesson('novelties-3')">
-              <span class="lesson-name">Novelties 3</span>
-              <button class="read-btn">Read</button>
+              <p>Novelties 3</p>
+              <button class="read-btn btn-primary">Read</button>
             </div>
           </div>
         </div>
 
         <!-- Second Onboarding Section -->
         <div class="section">
-          <h3 class="section-subtitle">ONBOARDING</h3>
+          <h2 class="section-subtitle">Discovery</h2>
           
           <div class="lessons-grid">
             <div class="lesson-item" @click="openLesson('history-2')">
-              <span class="lesson-name">History</span>
-              <button class="read-btn">Read</button>
+              <p>History</p>
+              <button class="read-btn btn-primary">Read</button>
             </div>
             
             <div class="lesson-item" @click="openLesson('inspiration-positioning-2')">
-              <span class="lesson-name">Inspiration and Positioning</span>
-              <button class="read-btn">Read</button>
+              <p>Inspiration and Positioning</p>
+              <button class="read-btn btn-primary">Read</button>
             </div>
             
             <div class="lesson-item" @click="openLesson('understanding-collection-2')">
-              <span class="lesson-name">Understanding the Collection</span>
-              <button class="read-btn">Read</button>
+              <p>Understanding the Collection</p>
+              <button class="read-btn btn-primary">Read</button>
             </div>
             
             <div class="lesson-item" @click="openLesson('storytelling-2')">
-              <span class="lesson-name">Storytelling</span>
-              <button class="read-btn">Read</button>
+              <p>Storytelling</p>
+              <button class="read-btn btn-primary">Read</button>
             </div>
           </div>
         </div>
@@ -121,7 +121,9 @@ console.log('LessonsListView component loaded')
   padding: 0;
   margin: 0;
 }
-
+p {
+  color: #072C54;
+}
 /* MAIN CONTENT */
 .lessons-content {
   padding: 3rem;
@@ -188,12 +190,6 @@ console.log('LessonsListView component loaded')
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
-.lesson-name {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #072C54;
-  flex: 1;
-}
 
 .read-btn {
   background: #F7C72C;

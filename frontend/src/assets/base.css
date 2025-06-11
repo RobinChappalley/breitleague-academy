@@ -113,10 +113,16 @@ h2 {
   font-weight: 600;
 }
 
+h3 {
+  font-family: 'ItalianPlate', sans-serif;
+  font-size: 26px;
+  font-weight: 400;
+  
+}
 /* Button – 28px, DemiBold */
 .btn-primary {
   font-family: 'ItalianPlate', sans-serif;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 600;
   text-transform: uppercase;
 }

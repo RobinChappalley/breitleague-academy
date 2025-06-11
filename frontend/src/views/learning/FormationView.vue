@@ -1,8 +1,8 @@
 <template>
   <div class="formation-image-container">
     <div class="top-action-buttons">
-      <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
-      <RouterLink class="action-btn" to="/missions">Missions</RouterLink>
+      <RouterLink class="action-btn btn-primary" to="/ressources">Read Ressources</RouterLink>
+      <RouterLink class="action-btn btn-primary" to="/missions">Missions</RouterLink>
     </div>
     
     <div ref="watchContainer" class="formation-watch-container">
@@ -15,14 +15,13 @@
         @click="showCheckpointModal"
       ></button>
 
-      <!-- Boutons de checkpoint avec progression individuelle -->
-      <RouterLink
+      <!-- ✅ CORRIGÉ : Div au lieu de RouterLink + appel openStartModal -->
+      <div
           v-for="(lesson,index) in lessons"
           :key="index"
-          :to="`/lesson/${lesson.id}`"
           class="lesson-container"
           :style="getButtonPosition(index)"
-
+          @click="openStartModal(lesson)"
       >
         <!-- Cercle de progression pour chaque leçon -->
         <svg class="lesson-progress-circle" width="50" height="50">
@@ -34,7 +33,6 @@
               fill="none"
           />
           <!-- Cercle de progression (seulement si en cours) -->
-          <!--I don't why it works with 28. but that's it! !-->
           <circle
               v-if="lesson.status === 'in-progress'"
               cx="25"
@@ -61,7 +59,7 @@
         <p class="lesson-label">
           {{ lesson.title }}
         </p>
-      </RouterLink>
+      </div>
     </div>
 
     <!-- Modal Checkpoint - Affiché par-dessus -->
@@ -99,13 +97,27 @@
         </div>
       </div>
     </div>
+
+    <!-- ✅ AJOUTÉ : Le composant StartModuleModal -->
+    <StartModuleModal 
+      :isVisible="showStartModal"
+      :moduleData="selectedModule"
+      @close="handleModalClose"
+      @module-started="handleModuleStarted"
+    />
   </div>
 </template>
 
 <script>
 import {fetchProgression, fetchModules} from "@/services/api.js";
+import StartModuleModal from './startModuleModal.vue';
+
 export default {
   name: 'FormationView',
+  components: {
+    StartModuleModal
+  },
+  
   data() {
     return {
       lessons: [],
@@ -119,7 +131,9 @@ export default {
         timeLimit: '20 minutes',
         passScore: 70
       },
-      progression:{},
+      progression: {},
+      showStartModal: false,
+      selectedModule: null,
     }
   },
 
@@ -134,22 +148,41 @@ export default {
     }
   },
 
+  // ✅ CORRIGÉ : Try-catch dans mounted() pour éviter les erreurs non gérées
   async mounted() {
-    // Utilisation de nextTick pour s'assurer que le DOM est rendu
-    await this.$nextTick(() => {
-      this.updateContainerDimensions();
-      // Garde le resize listener au cas où la fenêtre change
-      window.addEventListener('resize', this.updateContainerDimensions);
-    });
-    // Charge les modules et remplit le tableau lessons dynamiquement !
-    const loadedmodule = await this.loadModules();
-    // Si tu veux garder le format avec status/progress : adapte ici.
-    this.lessons = loadedmodule.lessons.map((lesson, idx) => ({
-      ...lesson,
-      status: 'not-started', // ou récupère depuis ton API ou progression
-      progress: 0,
-      title: lesson.title || `Lesson ${idx + 1}`
-    }));
+    try {
+      console.log('🚀 Component mounting...');
+      
+      // Utilisation de nextTick pour s'assurer que le DOM est rendu
+      await this.$nextTick(() => {
+        this.updateContainerDimensions();
+        // Garde le resize listener au cas où la fenêtre change
+        window.addEventListener('resize', this.updateContainerDimensions);
+      });
+      
+      console.log('📏 Container dimensions updated');
+      
+      // Charge les modules et remplit le tableau lessons dynamiquement !
+      const loadedModule = await this.loadModules();
+      console.log('📚 Module loaded:', loadedModule);
+      
+      // Si tu veux garder le format avec status/progress : adapte ici.
+      this.lessons = loadedModule.lessons.map((lesson, idx) => ({
+        ...lesson,
+        status: 'not-started', // ou récupère depuis ton API ou progression
+        progress: 0,
+        title: lesson.title || `Lesson ${idx + 1}`
+      }));
+      
+      console.log('✅ Lessons initialized:', this.lessons.length, 'lessons');
+      
+    } catch (error) {
+      console.error('❌ Error during component mounting:', error);
+      
+      // En cas d'erreur, utilise des lessons par défaut
+      console.log('🔄 Loading default lessons as fallback');
+      this.lessons = this.getDefaultLessons();
+    }
   },
 
   methods: {
@@ -158,7 +191,54 @@ export default {
       if (container) {
         this.containerWidth = container.offsetWidth;
         this.containerHeight = container.offsetHeight;
+        console.log(`📏 Container: ${this.containerWidth}x${this.containerHeight}`);
       }
+    },
+
+    // ✅ NOUVEAU : Méthode pour générer des lessons par défaut
+    getDefaultLessons() {
+      return [
+        {
+          id: 'history-lesson-1',
+          title: 'Breitling Origins',
+          description: 'Learn about the founding of Breitling in 1884',
+          estimated_duration: '15-20 min',
+          status: 'not-started',
+          progress: 0
+        },
+        {
+          id: 'history-lesson-2',
+          title: 'Aviation Heritage', 
+          description: 'Discover our deep connection with aviation',
+          estimated_duration: '15-20 min',
+          status: 'not-started',
+          progress: 0
+        },
+        {
+          id: 'history-lesson-3',
+          title: 'Chronograph Innovation',
+          description: 'The development of precision timing instruments',
+          estimated_duration: '15-20 min',
+          status: 'not-started',
+          progress: 0
+        },
+        {
+          id: 'history-lesson-4',
+          title: 'Iconic Timepieces',
+          description: 'Legendary watches that made history',
+          estimated_duration: '15-20 min',
+          status: 'not-started',
+          progress: 0
+        },
+        {
+          id: 'history-lesson-5',
+          title: 'Modern Legacy',
+          description: 'Breitling in the contemporary era',
+          estimated_duration: '15-20 min',
+          status: 'not-started',
+          progress: 0
+        }
+      ];
     },
 
     getButtonPosition(index) {
@@ -215,52 +295,105 @@ export default {
       this.$router.push('/checkpoint-quiz'); // Aller au quiz
     },
 
-    handleLessonClick(index) {
-      const lesson = this.lessons[index];
-      console.log(`Leçon ${index + 1} cliquée - Statut: ${lesson.status}, Progrès: ${lesson.progress}%`);
+    openStartModal(lesson) {
+      this.selectedModule = {
+        id: lesson.id,
+        title: lesson.title,
+        description: lesson.description || 'Ready to begin this training lesson?',
+        estimated_duration: lesson.estimated_duration || '15-20 min',
+        lessons: this.lessons
+      };
+      this.showStartModal = true;
+    },
 
-      if (lesson.status === 'not-started') {
-        lesson.status = 'in-progress';
-        lesson.progress = 25;
-      } else if (lesson.status === 'in-progress' && lesson.progress < 100) {
-        lesson.progress += 25;
-        if (lesson.progress >= 100) {
-          lesson.status = 'completed';
-          lesson.progress = 100;
+    handleModalClose() {
+      this.showStartModal = false;
+      this.selectedModule = null;
+    },
+
+    handleModuleStarted(data) {
+      console.log('Module started:', data);
+      // Redirection vers la première leçon
+      this.$router.push(`/LearningFlowView.vue`);
+    },
+
+    // ✅ CORRIGÉ : Gestion d'erreur complète + URLs corrigées
+    async loadProgression() {
+      try {
+        console.log('🔄 Loading user progression...');
+        
+        // ✅ CORRIGÉ : URL avec préfixe v1
+        const res = await fetch('http://localhost:8000/api/v1/users', {
+          credentials: 'include',
+          headers: {
+            Accept: 'application/json'
+          }
+        });
+
+        if (!res.ok) {
+          console.warn(`❌ Users API failed with status: ${res.status}`);
+          return null;
         }
+
+        const userData = await res.json();
+        console.log('✅ User data loaded:', userData);
+
+        // Gère les deux formats possibles de réponse
+        const connectedUser = Array.isArray(userData) ? userData[0] : userData;
+
+        if (!connectedUser || !connectedUser.id) {
+          console.warn('❌ No valid user found:', userData);
+          return null;
+        }
+
+        console.log(`🔄 Loading progression for user ID: ${connectedUser.id}`);
+        const progression = await fetchProgression(connectedUser.id);
+        console.log('✅ Progression loaded:', progression);
+        
+        this.progression = progression;
+        return progression;
+
+      } catch (error) {
+        console.error('❌ Error loading progression:', error);
+        return null;
       }
     },
-    async loadProgression () {
-      const res = await fetch('http://localhost:8000/api/user', {
-        credentials: 'include',
-        headers: {
-          Accept: 'application/json'
+
+    async loadModules() {
+      try {
+        console.log('🔄 Loading modules...');
+        
+        const progression = await this.loadProgression();
+        
+        // Si pas de progression, utilise les lessons par défaut
+        if (!progression || typeof progression.last_checkpoint_id === 'undefined') {
+          console.warn('⚠️ No valid progression found, using default lessons');
+          return {
+            lessons: this.getDefaultLessons()
+          };
         }
-      })
-      if (!res.ok) throw new Error('Unauthenticated user (401)')
 
-      const connectedUser = await res.json()
-      const progression = await fetchProgression(connectedUser.id)
-      this.progression = progression //pas sûr que ça serve à qqch
-      return progression
-    },
+        const moduleToDisplayId = progression.last_checkpoint_id + 1;
+        console.log(`🔄 Loading module ID: ${moduleToDisplayId}`);
+        
+        const module = await fetchModules(moduleToDisplayId);
+        console.log('✅ Module loaded:', module);
+        
+        return module;
 
-    async loadModules () {
-      const progression = await this.loadProgression()
-      const moduleToDisplayId = progression.last_checkpoint_id+1
-      const module = await fetchModules(moduleToDisplayId)
-      const numberOfLessons = module.lessons.length
-
-      console.log(module)
-      return module
+      } catch (error) {
+        console.error('❌ Error loading modules:', error);
+        console.log('🔄 Falling back to default lessons');
+        
+        // Retourner des lessons par défaut en cas d'erreur
+        return {
+          lessons: this.getDefaultLessons()
+        };
+      }
     }
   }
 }
-
-
-
 </script>
-
 <style>
 :root {
   --aviators-vertical: url('/backgrounds/aviators-vertical.png');
@@ -387,7 +520,7 @@ export default {
   border-radius: 16px;
   padding: 12px 18px;
   box-shadow: 0 3px 12px rgba(35, 35, 35, 0.16);
-  font-family: inherit;
+ 
   cursor: pointer;
   text-align: center;
   text-decoration: none; /* Pour enlever le souligné de lien */
