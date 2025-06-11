@@ -91,16 +91,14 @@ const fetchWatches = async () => {
 
     const res = await userService.getUser(data.id)
     console.log(res)
+    const dataUser = res.data
 
-    const dataUser = await res.json()
-    console.log(dataUser)
-
-    watches.value = dataUser.data.map((watch) => ({
-      ...watch,
-      colors: Array.isArray(watch.colors)
-        ? watch.colors
-        : watch.colors?.split(',').map((c) => c.trim()) || [],
-      isFavorite: false
+    watches.value = dataUser.rewards.map((reward) => ({
+      ...reward,
+      colors: Array.isArray(reward.colors)
+        ? reward.colors
+        : reward.colors?.split(',').map((c) => c.trim()) || [],
+      isFavorite: reward.pivot?.is_favourite === 1
     }))
 
     if (watches.value.length > 0) {
