@@ -15,7 +15,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('pos')->get();
+        $users = User::with('pos', 'rewards')->get();
 
         if ($users->count() > 0) {
             return UserResource::collection($users);

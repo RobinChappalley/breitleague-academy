@@ -13,7 +13,11 @@
             <p class="spec-item">Sizes: {{ selectedWatch.size }}</p>
             <p class="spec-item">
               Colors:
-              {{ Array.isArray(selectedWatch.colors) ? selectedWatch.colors.join(', ') : selectedWatch.colors }}
+              {{
+                Array.isArray(selectedWatch.colors)
+                  ? selectedWatch.colors.join(', ')
+                  : selectedWatch.colors
+              }}
             </p>
             <p class="spec-item">Bracelets: {{ selectedWatch.bracelet }}</p>
           </div>
@@ -23,7 +27,10 @@
         <div class="watch-image">
           <img
             v-if="selectedWatch.photo_name"
-            :src="`${backendUrl.replace(/\/$/, '')}/${selectedWatch.photo_name.replace(/^\/\//, '')}`"
+            :src="`${backendUrl.replace(/\/$/, '')}/${selectedWatch.photo_name.replace(
+              /^\/\//,
+              ''
+            )}`"
             :alt="selectedWatch.model"
             @load="handleImageLoad"
           />
@@ -51,12 +58,15 @@
         </div>
       </div>
 
-      <div v-else class="loading-state text-secondary">You haven't earned any rewards yet, so no watches are available.</div>
+      <div v-else class="loading-state text-secondary">
+        You haven't earned any rewards yet, so no watches are available.
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { userService } from '@/services/api'
 import { ref, onMounted } from 'vue'
 
 const backendUrl = 'http://localhost:8000'
@@ -66,41 +76,74 @@ const favoriteIds = ref([])
 const isLoading = ref(true)
 const error = ref(null)
 
+const errorWatches = ref(null)
+const errorFavorites = ref(null)
+
 const fetchWatches = async () => {
   try {
-    const res = await fetch(`${backendUrl}/api/v1/rewards`, { credentials: 'include' })
-    const data = await res.json()
+    errorWatches.value = null
 
-    watches.value = data.data.map(watch => ({
-      ...watch,
-      colors: Array.isArray(watch.colors)
-        ? watch.colors
-        : (watch.colors?.split(',').map(c => c.trim()) || []),
-      isFavorite: false
+    const fetchCurrentUser = await fetch('http://localhost:8000/api/user', {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+
+    const data = await fetchCurrentUser.json()
+
+    const res = await userService.getUser(data.id)
+    const dataUser = res.data
+
+    watches.value = dataUser.rewards.map((reward) => ({
+      ...reward,
+      userRewardId: reward.pivot?.id,
+      colors: Array.isArray(reward.colors)
+        ? reward.colors
+        : reward.colors?.split(',').map((c) => c.trim()) || [],
+      isFavorite: reward.pivot?.is_favourite === 1
     }))
 
     if (watches.value.length > 0) {
       selectedWatch.value = watches.value[0]
     }
   } catch (err) {
-    error.value = 'Error loading watches'
+    errorWatches.value = 'Error loading watches'
     console.error(err)
   }
 }
 
 const fetchFavorites = async () => {
   try {
-    const res = await fetch(`${backendUrl}/api/v1/user-rewards`, { credentials: 'include' })
-    if (!res.ok) throw new Error('User not authenticated (401)')
-    const data = await res.json()
-    favoriteIds.value = Array.isArray(data.data) ? data.data.map(entry => entry.reward_id) : []
-    watches.value.forEach(watch => {
+    errorFavorites.value = null
+
+    const fetchCurrentUser = await fetch('http://localhost:8000/api/user', {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+
+    const data = await fetchCurrentUser.json()
+
+    const res = await userService.getUser(data.id)
+    const dataUser = res.data
+
+    favoriteIds.value = Array.isArray(dataUser.rewards)
+      ? dataUser.rewards
+          .filter((reward) => reward.pivot?.is_favourite === 1)
+          .map((reward) => reward.id)
+      : []
+
+    watches.value.forEach((watch) => {
       watch.isFavorite = favoriteIds.value.includes(watch.id)
     })
   } catch (err) {
-    error.value = "You haven't earned any rewards yet, so no watches are available."
+    // Ici attention : ne pas dire "You haven't earned rewards" par défaut !
+    // On distingue "aucun favori" (normal) et "erreur réseau / auth" (anormal)
+    errorFavorites.value = 'Error loading favorites'
     favoriteIds.value = []
-    console.warn('⚠️ Missing or empty auth:', err.message)
+    console.warn('Missing or empty auth:', err.message)
   }
 }
 
@@ -114,24 +157,36 @@ const toggleFavorite = async (watch) => {
   }
 
   try {
-    const method = isCurrentlyFavorite ? 'DELETE' : 'POST'
-    const response = await fetch(`${backendUrl}/api/v1/user-rewards`, {
-      method,
+    // On définit bodyData ici
+    const bodyData = {
+      is_favourite: !isCurrentlyFavorite ? 1 : 0
+      // Si besoin, ajoute user_id ici :
+      // user_id: currentUserId.value
+    }
+
+    //On utilise bodyData dans le fetch
+    const response = await fetch(`${backendUrl}/api/v1/user-rewards/${watch.userRewardId}`, {
+      method: 'PUT',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reward_id: watch.id })
+      body: JSON.stringify(bodyData)
     })
 
+    // On affiche le résultat
     const result = await response.json()
+    console.log('PUT result', result)
+
     if (response.ok) {
+      // 4️⃣ On met à jour l'état local
       watch.isFavorite = !isCurrentlyFavorite
+
       if (isCurrentlyFavorite) {
-        favoriteIds.value = favoriteIds.value.filter(id => id !== watch.id)
+        favoriteIds.value = favoriteIds.value.filter((id) => id !== watch.id)
       } else {
-        favoriteIds.value.push(watch.id)
+        favoriteIds.value = [...favoriteIds.value, watch.id]
       }
     } else {
-      console.error('Favorites API error', result)
+      console.error('Favorites API error', response.status, result)
     }
   } catch (error) {
     console.error('Favorites network error', error)
@@ -155,7 +210,7 @@ onMounted(async () => {
 
 <style scoped>
 .collection-page {
-  background-color: #072C54;
+  background-color: #072c54;
   color: white;
   height: 100vh;
   display: flex;
@@ -168,7 +223,7 @@ onMounted(async () => {
 }
 
 .watch-details {
-  background-color: #072C54;
+  background-color: #072c54;
   padding-left: 2rem;
   padding-right: 2rem;
   display: flex;
@@ -197,7 +252,7 @@ onMounted(async () => {
 
 .description {
   margin-top: 1rem;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
   line-height: 1.4;
   max-width: 600px;
 }
@@ -216,7 +271,7 @@ onMounted(async () => {
 }
 
 .watches-grid {
-  background-color: #0D4F97;
+  background-color: #0d4f97;
   flex: 1;
   padding: 2rem;
   display: grid;
@@ -251,7 +306,7 @@ onMounted(async () => {
 }
 
 .is-favorite {
-  color: #FFD700;
+  color: #ffd700;
 }
 
 .no-watches {
@@ -261,7 +316,7 @@ onMounted(async () => {
   font-size: 1rem;
   grid-column: 1 / -1;
 }
-.error-state  {
+.error-state {
   text-align: center;
   color: #ff6b6b;
   padding: 2rem;

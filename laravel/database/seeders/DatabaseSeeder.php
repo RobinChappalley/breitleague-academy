@@ -26,8 +26,9 @@ class DatabaseSeeder extends Seeder
             QuestionSeeder::class,
             ChoiceSeeder::class,
             POSSeeder::class,
-            UserSeeder::class,
             RewardSeeder::class,
+            UserSeeder::class,
+
             MissionSeeder::class,
             UserMissionSeeder::class,
 
