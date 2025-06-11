@@ -801,7 +801,7 @@ const refreshAfterBattle = () => {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 2px;
-  text-shadow: 0 4px 8px rgba(247, 199, 44, 0.3);
+ 
 }
 
 /* SECTIONS */
