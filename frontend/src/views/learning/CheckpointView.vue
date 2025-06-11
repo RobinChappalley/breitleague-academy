@@ -49,7 +49,7 @@ const checkpointData = ref({
   title: 'Breitling Heritage & Foundations',
   description: 'Test your knowledge of Breitling\'s history, founding principles, and core values that shaped the brand into what it is today.',
   totalQuestions: 15,
-  timeLimit: '20 minutes',
+  timeLimit: '10 minutes',
   passScore: 70
 })
 
@@ -70,7 +70,6 @@ console.log('CheckpointView component loaded')
 .checkpoint-page {
   min-height: 100vh;
   width: 100%;
-  background: transparent; /* Plus besoin de background car le modal a le sien */
   padding: 0;
   margin: 0;
   position: relative;
