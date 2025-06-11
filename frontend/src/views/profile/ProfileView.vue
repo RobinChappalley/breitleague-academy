@@ -74,7 +74,7 @@
 
         <!-- Top 3 Watches Section -->
         <div>
-          <h3>FAVORITES WATCHES</h3>
+          <h3>FAVORITE WATCHES</h3>
         </div>
         <div class="watches-grid">
           <div
@@ -203,20 +203,35 @@ const goToCollection = () => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('ProfileView monté, chargement des données...')
+  console.log('🚀 ProfileView mounted, loading ...')
   loadUserProfile()
 })
 const logout = async () => {
   try {
-    await fetch('/logout', {
+    // Lire le token CSRF depuis le cookie
+    const csrfTokenFromCookie = decodeURIComponent(
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1] ?? ''
+    )
+
+    await fetch('http://localhost:8000/logout', {
       method: 'POST',
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-XSRF-TOKEN': csrfTokenFromCookie
+      }
     })
+
+    // Nettoyer le localStorage
+    localStorage.removeItem('isLoggedIn')
 
     // Redirige vers la page de login
     router.push('/login')
   } catch (err) {
-    console.error('Erreur lors du logout:', err)
+    console.error('❌ Error when logged out :', err)
   }
 }
 </script>

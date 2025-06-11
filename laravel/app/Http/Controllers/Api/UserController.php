@@ -47,10 +47,7 @@ class UserController extends Controller
         //}
 
         $validated = $request->validate([
-            'avatar'   => ['nullable', 'string', 'max:255'],
-            'username' => ['nullable', 'string', 'max:255'],
-            'email'    => ['nullable', 'email', 'max:255'],
-            'password' => ['nullable', 'string', 'min:8'],
+            'is_BS'    => ['nullable', 'boolean'],
         ]);
 
         // Si le mot de passe est présent, le hasher

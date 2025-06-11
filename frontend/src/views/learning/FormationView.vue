@@ -4,56 +4,52 @@
       <RouterLink class="action-btn btn-primary" to="/ressources">Read Ressources</RouterLink>
       <RouterLink class="action-btn btn-primary" to="/missions">Missions</RouterLink>
     </div>
-    
+    <div class="progress-bar">
+      <ProgressBar />
+    </div>
+
     <div ref="watchContainer" class="formation-watch-container">
-      <img alt="watch aviators" src="/backgrounds/aviators-watch.png" class="lesson-watch"
-           @load="updateContainerDimensions">
+      <img
+        alt="watch aviators"
+        src="/backgrounds/aviators-watch.png"
+        class="lesson-watch"
+        @load="updateContainerDimensions"
+      />
 
       <!-- Bouton spécial checkpoint -->
-      <button 
-        class="checkpoint-button special-button"
-        @click="showCheckpointModal"
-      ></button>
+      <button class="checkpoint-button special-button" @click="showCheckpointModal"></button>
 
       <!-- ✅ CORRIGÉ : Div au lieu de RouterLink + appel openStartModal -->
       <div
-          v-for="(lesson,index) in lessons"
-          :key="index"
-          class="lesson-container"
-          :style="getButtonPosition(index)"
-          @click="openStartModal(lesson)"
+        v-for="(lesson, index) in lessons"
+        :key="index"
+        class="lesson-container"
+        :style="getButtonPosition(index)"
+        @click="openStartModal(lesson)"
       >
         <!-- Cercle de progression pour chaque leçon -->
         <svg class="lesson-progress-circle" width="50" height="50">
           <!-- Cercle de fond -->
-          <circle
-              cx="25"
-              cy="25"
-              r="20"
-              fill="none"
-          />
+          <circle cx="25" cy="25" r="20" fill="none" />
           <!-- Cercle de progression (seulement si en cours) -->
           <circle
-              v-if="lesson.status === 'in-progress'"
-              cx="25"
-              cy="28"
-              r="20"
-              fill="none"
-              stroke="white"
-              stroke-width="3"
-              :stroke-dasharray="circumference"
-              :stroke-dashoffset="getLessonProgressOffset(lesson.progress)"
-              stroke-linecap="round"
-              class="progress-stroke"
-              transform="rotate(-90 25 25)"
+            v-if="lesson.status === 'in-progress'"
+            cx="25"
+            cy="28"
+            r="20"
+            fill="none"
+            stroke="white"
+            stroke-width="3"
+            :stroke-dasharray="circumference"
+            :stroke-dashoffset="getLessonProgressOffset(lesson.progress)"
+            stroke-linecap="round"
+            class="progress-stroke"
+            transform="rotate(-90 25 25)"
           />
         </svg>
 
         <!-- Bouton de la leçon -->
-        <button
-            class="checkpoint-button dynamic-button"
-            :class="getLessonClass(lesson.status)"
-        >
+        <button class="checkpoint-button dynamic-button" :class="getLessonClass(lesson.status)">
           {{ index + 1 }}
         </button>
         <p class="lesson-label">
@@ -66,19 +62,20 @@
     <div v-if="isCheckpointModalVisible" class="modal-overlay" @click="closeCheckpointModal">
       <div class="checkpoint-modal" @click.stop>
         <button class="close-btn" @click="closeCheckpointModal">✕</button>
-        
+
         <div class="modal-header">
           <h2 class="modal-title">CHECKPOINT</h2>
           <h3 class="modal-subtitle">ONBOARDING</h3>
         </div>
-        
+
         <div class="modal-content">
           <p class="modal-text">
-            Welcome to your checkpoint assessment. This test will evaluate your understanding 
-            of the material covered in this module. You'll need to answer {{ checkpointData.totalQuestions }} 
-            questions with a minimum score of {{ checkpointData.passScore }}% to pass.
+            Welcome to your checkpoint assessment. This test will evaluate your understanding of the
+            material covered in this module. You'll need to answer
+            {{ checkpointData.totalQuestions }} questions with a minimum score of
+            {{ checkpointData.passScore }}% to pass.
           </p>
-          
+
           <div class="modal-rules">
             <h4>Test Rules:</h4>
             <ul>
@@ -89,17 +86,15 @@
             </ul>
           </div>
         </div>
-        
+
         <div class="modal-actions">
-          <button class="btn-start-test" @click="startCheckpointTest">
-            START TEST
-          </button>
+          <button class="btn-start-test" @click="startCheckpointTest">START TEST</button>
         </div>
       </div>
     </div>
 
     <!-- ✅ AJOUTÉ : Le composant StartModuleModal -->
-    <StartModuleModal 
+    <StartModuleModal
       :isVisible="showStartModal"
       :moduleData="selectedModule"
       @close="handleModalClose"
@@ -109,15 +104,17 @@
 </template>
 
 <script>
-import {fetchProgression, fetchModules} from "@/services/api.js";
-import StartModuleModal from './startModuleModal.vue';
+import { fetchProgression, fetchModules } from '@/services/api.js'
+import StartModuleModal from './startModuleModal.vue'
+import ProgressBar from '@/components/layout/ProgressBar.vue'
 
 export default {
   name: 'FormationView',
   components: {
-    StartModuleModal
+    StartModuleModal,
+    ProgressBar
   },
-  
+
   data() {
     return {
       lessons: [],
@@ -133,65 +130,64 @@ export default {
       },
       progression: {},
       showStartModal: false,
-      selectedModule: null,
+      selectedModule: null
     }
   },
 
   computed: {
     numberOfButtons() {
-      return this.lessons.length;
+      return this.lessons.length
     },
 
     // Circumférence du cercle (rayon = 20, cohérent avec le SVG)
     circumference() {
-      return 2 * Math.PI * 20;
+      return 2 * Math.PI * 20
     }
   },
 
   // ✅ CORRIGÉ : Try-catch dans mounted() pour éviter les erreurs non gérées
   async mounted() {
     try {
-      console.log('🚀 Component mounting...');
-      
+      console.log('🚀 Component mounting...')
+
       // Utilisation de nextTick pour s'assurer que le DOM est rendu
       await this.$nextTick(() => {
-        this.updateContainerDimensions();
+        this.updateContainerDimensions()
         // Garde le resize listener au cas où la fenêtre change
-        window.addEventListener('resize', this.updateContainerDimensions);
-      });
-      
-      console.log('📏 Container dimensions updated');
-      
+        window.addEventListener('resize', this.updateContainerDimensions)
+      })
+
+      console.log('📏 Container dimensions updated')
+
       // Charge les modules et remplit le tableau lessons dynamiquement !
-      const loadedModule = await this.loadModules();
-      console.log('📚 Module loaded:', loadedModule);
-      
+      const loadedModule = await this.loadModules()
+      console.log('📚 Module loaded:', loadedModule)
+
       // Si tu veux garder le format avec status/progress : adapte ici.
       this.lessons = loadedModule.lessons.map((lesson, idx) => ({
         ...lesson,
         status: 'not-started', // ou récupère depuis ton API ou progression
         progress: 0,
         title: lesson.title || `Lesson ${idx + 1}`
-      }));
-      
-      console.log('✅ Lessons initialized:', this.lessons.length, 'lessons');
-      
+      }))
+
+      console.log('✅ Lessons initialized:', this.lessons.length, 'lessons')
     } catch (error) {
-      console.error('❌ Error during component mounting:', error);
-      
+      console.error('❌ Error during component mounting:', error)
+
       // En cas d'erreur, utilise des lessons par défaut
-      console.log('🔄 Loading default lessons as fallback');
-      this.lessons = this.getDefaultLessons();
+      console.log('🔄 Loading default lessons as fallback')
+      this.lessons = this.getDefaultLessons()
     }
   },
 
   methods: {
     updateContainerDimensions() {
-      const container = this.$refs.watchContainer;
+      const container = this.$refs.watchContainer
       if (container) {
-        this.containerWidth = container.offsetWidth;
-        this.containerHeight = container.offsetHeight;
-        console.log(`📏 Container: ${this.containerWidth}x${this.containerHeight}`);
+        this.containerWidth = container.offsetWidth
+        this.containerHeight = container.offsetHeight
+        console.log(`📏 Container: ${this.containerWidth}x${this.containerHeight}`)
       }
     },
 
@@ -208,7 +204,7 @@ export default {
         },
         {
           id: 'history-lesson-2',
-          title: 'Aviation Heritage', 
+          title: 'Aviation Heritage',
           description: 'Discover our deep connection with aviation',
           estimated_duration: '15-20 min',
           status: 'not-started',
@@ -238,38 +234,38 @@ export default {
           status: 'not-started',
           progress: 0
         }
-      ];
+      ]
     },
 
     getButtonPosition(index) {
       if (this.containerWidth === 0) {
-        return {display: 'none'};
+        return { display: 'none' }
       }
 
-      const arcDegrees = 150;
-      const startAngle = 65;
-      const angleStep = arcDegrees / this.numberOfButtons;
-      const currentAngle = startAngle - (index * angleStep);
-      const angleRad = (currentAngle * Math.PI) / 180;
+      const arcDegrees = 150
+      const startAngle = 65
+      const angleStep = arcDegrees / this.numberOfButtons
+      const currentAngle = startAngle - index * angleStep
+      const angleRad = (currentAngle * Math.PI) / 180
 
-      const radiusPixels = this.containerWidth;
-      const centerX = 0;
-      const centerY = this.containerHeight / 2;
+      const radiusPixels = this.containerWidth
+      const centerX = 0
+      const centerY = this.containerHeight / 2
 
-      const x = centerX + radiusPixels * Math.cos(angleRad);
-      const y = centerY + radiusPixels * Math.sin(angleRad);
+      const x = centerX + radiusPixels * Math.cos(angleRad)
+      const y = centerY + radiusPixels * Math.sin(angleRad)
 
       return {
         position: 'absolute',
         left: `${x}px`,
         top: `${y}px`,
         transform: 'translate(-50%, -50%)'
-      };
+      }
     },
 
     getLessonProgressOffset(progress) {
-      const progressRatio = progress / 100;
-      return this.circumference * (1 - progressRatio);
+      const progressRatio = progress / 100
+      return this.circumference * (1 - progressRatio)
     },
 
     getLessonClass(status) {
@@ -277,22 +273,22 @@ export default {
         'lesson-completed': status === 'completed',
         'lesson-in-progress': status === 'in-progress',
         'lesson-not-started': status === 'not-started'
-      };
+      }
     },
 
     // Méthodes pour le modal checkpoint
     showCheckpointModal() {
-      this.isCheckpointModalVisible = true;
+      this.isCheckpointModalVisible = true
     },
 
     closeCheckpointModal() {
-      this.isCheckpointModalVisible = false;
+      this.isCheckpointModalVisible = false
     },
 
     // CORRIGÉ : Redirection vers le quiz
     startCheckpointTest() {
-      this.isCheckpointModalVisible = false; // Fermer le modal
-      this.$router.push('/checkpoint-quiz'); // Aller au quiz
+      this.isCheckpointModalVisible = false // Fermer le modal
+      this.$router.push('/checkpoint-quiz') // Aller au quiz
     },
 
     openStartModal(lesson) {
@@ -302,93 +298,91 @@ export default {
         description: lesson.description || 'Ready to begin this training lesson?',
         estimated_duration: lesson.estimated_duration || '15-20 min',
         lessons: this.lessons
-      };
-      this.showStartModal = true;
+      }
+      this.showStartModal = true
     },
 
     handleModalClose() {
-      this.showStartModal = false;
-      this.selectedModule = null;
+      this.showStartModal = false
+      this.selectedModule = null
     },
 
     handleModuleStarted(data) {
-      console.log('Module started:', data);
+      console.log('Module started:', data)
       // Redirection vers la première leçon
-      this.$router.push(`/LearningFlowView.vue`);
+      this.$router.push(`/LearningFlowView.vue`)
     },
 
     // ✅ CORRIGÉ : Gestion d'erreur complète + URLs corrigées
     async loadProgression() {
       try {
-        console.log('🔄 Loading user progression...');
-        
+        console.log('🔄 Loading user progression...')
+
         // ✅ CORRIGÉ : URL avec préfixe v1
         const res = await fetch('http://localhost:8000/api/v1/users', {
           credentials: 'include',
           headers: {
             Accept: 'application/json'
           }
-        });
+        })
 
         if (!res.ok) {
-          console.warn(`❌ Users API failed with status: ${res.status}`);
-          return null;
+          console.warn(`❌ Users API failed with status: ${res.status}`)
+          return null
         }
 
-        const userData = await res.json();
-        console.log('✅ User data loaded:', userData);
+        const userData = await res.json()
+        console.log('✅ User data loaded:', userData)
 
         // Gère les deux formats possibles de réponse
-        const connectedUser = Array.isArray(userData) ? userData[0] : userData;
+        const connectedUser = Array.isArray(userData) ? userData[0] : userData
 
         if (!connectedUser || !connectedUser.id) {
-          console.warn('❌ No valid user found:', userData);
-          return null;
+          console.warn('❌ No valid user found:', userData)
+          return null
         }
 
-        console.log(`🔄 Loading progression for user ID: ${connectedUser.id}`);
-        const progression = await fetchProgression(connectedUser.id);
-        console.log('✅ Progression loaded:', progression);
-        
-        this.progression = progression;
-        return progression;
+        console.log(`🔄 Loading progression for user ID: ${connectedUser.id}`)
+        const progression = await fetchProgression(connectedUser.id)
+        console.log('✅ Progression loaded:', progression)
 
+        this.progression = progression
+        return progression
       } catch (error) {
-        console.error('❌ Error loading progression:', error);
-        return null;
+        console.error('❌ Error loading progression:', error)
+        return null
       }
     },
 
     async loadModules() {
       try {
-        console.log('🔄 Loading modules...');
-        
-        const progression = await this.loadProgression();
-        
+        console.log('🔄 Loading modules...')
+
+        const progression = await this.loadProgression()
+
         // Si pas de progression, utilise les lessons par défaut
         if (!progression || typeof progression.last_checkpoint_id === 'undefined') {
-          console.warn('⚠️ No valid progression found, using default lessons');
+          console.warn('⚠️ No valid progression found, using default lessons')
           return {
             lessons: this.getDefaultLessons()
-          };
+          }
         }
 
-        const moduleToDisplayId = progression.last_checkpoint_id + 1;
-        console.log(`🔄 Loading module ID: ${moduleToDisplayId}`);
-        
-        const module = await fetchModules(moduleToDisplayId);
-        console.log('✅ Module loaded:', module);
-        
-        return module;
+        const moduleToDisplayId = progression.last_checkpoint_id + 1
+        console.log(`🔄 Loading module ID: ${moduleToDisplayId}`)
 
+        const module = await fetchModules(moduleToDisplayId)
+        console.log('✅ Module loaded:', module)
+
+        return module
       } catch (error) {
-        console.error('❌ Error loading modules:', error);
-        console.log('🔄 Falling back to default lessons');
-        
+        console.error('❌ Error loading modules:', error)
+        console.log('🔄 Falling back to default lessons')
+
         // Retourner des lessons par défaut en cas d'erreur
         return {
           lessons: this.getDefaultLessons()
-        };
+        }
       }
     }
   }
@@ -421,7 +415,7 @@ export default {
   position: relative;
   margin-left: 280px;
   @media screen and (max-width: 767px) {
-    margin-left: 0
+    margin-left: 0;
   }
 }
 
@@ -467,19 +461,19 @@ export default {
 
 .lesson-not-started {
   background-color: #808080;
-  border-color: #A9A9A9;
+  border-color: #a9a9a9;
   color: white;
 }
 
 .lesson-in-progress {
-  background-color: #4169E1;
+  background-color: #4169e1;
   border-color: white;
   color: white;
 }
 
 .lesson-completed {
   background-color: goldenrod;
-  border-color: #FFD700;
+  border-color: #ffd700;
   color: white;
 }
 
@@ -511,7 +505,7 @@ export default {
 
 .action-btn {
   /* styles identiques */
-  background: #F7C72C;
+  background: #f7c72c;
   color: #232323;
   font-size: 1rem;
   font-weight: bold;
@@ -520,7 +514,7 @@ export default {
   border-radius: 16px;
   padding: 12px 18px;
   box-shadow: 0 3px 12px rgba(35, 35, 35, 0.16);
- 
+
   cursor: pointer;
   text-align: center;
   text-decoration: none; /* Pour enlever le souligné de lien */
@@ -529,7 +523,7 @@ export default {
 }
 
 .action-btn:hover {
-  background: #FFD94A;
+  background: #ffd94a;
   box-shadow: 0 6px 24px rgba(35, 35, 35, 0.21);
 }
 
@@ -545,7 +539,7 @@ export default {
     gap: 18px;
   }
   @media screen and (max-width: 767px) {
-    gap: 10px
+    gap: 10px;
   }
 }
 
@@ -590,8 +584,8 @@ export default {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: #F7C72C;
-  color: #072C54;
+  background: #f7c72c;
+  color: #072c54;
   border: none;
   border-radius: 50%;
   width: 35px;
@@ -604,12 +598,12 @@ export default {
 }
 
 .close-btn:hover {
-  background: #E6B625;
+  background: #e6b625;
   transform: scale(1.1);
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #072C54 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #072c54 0%, #1e3a8a 100%);
   color: white;
   padding: 2.5rem 2rem;
   text-align: center;
@@ -618,7 +612,7 @@ export default {
 .modal-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #F7C72C;
+  color: #f7c72c;
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -634,7 +628,7 @@ export default {
 
 .modal-content {
   padding: 2.5rem 2rem;
-  color: #072C54;
+  color: #072c54;
 }
 
 .modal-text {
@@ -653,7 +647,7 @@ export default {
 
 .modal-rules h4 {
   margin: 0 0 1rem 0;
-  color: #072C54;
+  color: #072c54;
   font-weight: 600;
 }
 
@@ -673,8 +667,8 @@ export default {
 }
 
 .btn-start-test {
-  background: #F7C72C;
-  color: #072C54;
+  background: #f7c72c;
+  color: #072c54;
   border: none;
   border-radius: 15px;
   padding: 1.2rem 3rem;
@@ -689,7 +683,7 @@ export default {
 }
 
 .btn-start-test:hover {
-  background: #E6B625;
+  background: #e6b625;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(247, 199, 44, 0.4);
 }
@@ -700,15 +694,15 @@ export default {
     width: 95%;
     margin: 1rem;
   }
-  
+
   .modal-content {
     padding: 2rem 1.5rem;
   }
-  
+
   .modal-header {
     padding: 2rem 1.5rem;
   }
-  
+
   .modal-title {
     font-size: 2rem;
   }
@@ -718,15 +712,15 @@ export default {
   .modal-title {
     font-size: 1.8rem;
   }
-  
+
   .modal-subtitle {
     font-size: 1rem;
   }
-  
+
   .modal-text {
     font-size: 0.9rem;
   }
-  
+
   .btn-start-test {
     padding: 1rem 2rem;
     font-size: 1rem;

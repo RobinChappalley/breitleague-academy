@@ -66,9 +66,6 @@
             {{ player.score.toLocaleString('fr-CH').replace(/\u202F/g, "'") }} PTS
           </div>
         </div>
-
-        <!-- See All Button -->
-        <button class="see-all-btn" @click="seeAll" v-if="!showingAll">SEE ALL</button>
       </div>
     </div>
 
@@ -133,7 +130,7 @@
 
         <div class="popup-watches">
           <div class="watches-header">
-            <h3>FAVORITES WATCHES</h3>
+            <h3>FAVORITE WATCHES</h3>
           </div>
           <div class="watches-grid">
             <div
