@@ -98,6 +98,7 @@ const fetchWatches = async () => {
 
     watches.value = dataUser.rewards.map((reward) => ({
       ...reward,
+      userRewardId: reward.pivot?.id,
       colors: Array.isArray(reward.colors)
         ? reward.colors
         : reward.colors?.split(',').map((c) => c.trim()) || [],
@@ -157,24 +158,36 @@ const toggleFavorite = async (watch) => {
   }
 
   try {
-    const method = isCurrentlyFavorite ? 'DELETE' : 'POST'
-    const response = await fetch(`${backendUrl}/api/v1/user-rewards`, {
-      method,
+    // 1️⃣ On définit bodyData ici
+    const bodyData = {
+      is_favourite: !isCurrentlyFavorite ? 1 : 0
+      // Si besoin, ajoute user_id ici :
+      // user_id: currentUserId.value
+    }
+
+    // 2️⃣ On utilise bodyData dans le fetch
+    const response = await fetch(`${backendUrl}/api/v1/user-rewards/${watch.userRewardId}`, {
+      method: 'PUT',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reward_id: watch.id })
+      body: JSON.stringify(bodyData)
     })
 
+    // 3️⃣ On affiche le résultat
     const result = await response.json()
+    console.log('PUT result', result)
+
     if (response.ok) {
+      // 4️⃣ On met à jour l'état local
       watch.isFavorite = !isCurrentlyFavorite
+
       if (isCurrentlyFavorite) {
         favoriteIds.value = favoriteIds.value.filter((id) => id !== watch.id)
       } else {
-        favoriteIds.value.push(watch.id)
+        favoriteIds.value = [...favoriteIds.value, watch.id]
       }
     } else {
-      console.error('Favorites API error', result)
+      console.error('Favorites API error', response.status, result)
     }
   } catch (error) {
     console.error('Favorites network error', error)

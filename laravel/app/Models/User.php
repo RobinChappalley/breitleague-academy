@@ -84,7 +84,7 @@ class User extends Authenticatable
     public function rewards()
     {
         return $this->belongsToMany(Reward::class, 'user_rewards')
-            ->withPivot('is_favourite')
+            ->withPivot(['id', 'is_favourite', 'created_at', 'updated_at'])
             ->withTimestamps();
     }
 
