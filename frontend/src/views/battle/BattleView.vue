@@ -252,20 +252,10 @@ const loadBattlesFromDB = async () => {
         user: user
       }))
 
-    // OUTGOING CHALLENGES - MAXIMUM 5 (représentent les slots occupés)
-    outgoingChallenges.value = loadedUsers
-      .filter(user => user.id !== currentUserId.value)
-      .slice(4, 6) // Prendre seulement 2 utilisateurs pour simuler 2 slots occupés
-      .map((user, index) => ({
-        id: user.id + 100,
-        name: user.username,
-        country: getCountryCode(user),
-        timeLeft: `${Math.floor(Math.random() * 20) + 1}h left`,
-        status: index === 0 ? 'play' : 'waiting',
-        user: user
-      }))
+    // NOUVEAU : Charger les outgoing challenges depuis localStorage PUIS compléter avec des données par défaut
+    loadOutgoingChallenges(loadedUsers)
 
-    // FINISHED BATTLES - NOUVEAU : Charger depuis localStorage + données de base
+    // FINISHED BATTLES - Charger depuis localStorage + données de base
     loadFinishedBattles(loadedUsers)
 
     console.log('✅ Slots occupés:', outgoingChallenges.value.length, '/5')
@@ -277,6 +267,66 @@ const loadBattlesFromDB = async () => {
     loadMockData()
   } finally {
     isLoading.value = false
+  }
+}
+
+// FONCTION CORRIGÉE : Charger les outgoing challenges depuis localStorage
+const loadOutgoingChallenges = (loadedUsers) => {
+  try {
+    // 1. Récupérer les invitations sauvegardées
+    const savedOutgoingChallenges = JSON.parse(localStorage.getItem('outgoingChallenges') || '[]')
+    console.log('📋 Outgoing challenges depuis localStorage:', savedOutgoingChallenges)
+    
+    // 2. Filtrer les invitations valides (pas expirées, par exemple)
+    const validChallenges = savedOutgoingChallenges.filter(challenge => {
+      // Optionnel : supprimer les invitations de plus de 24h
+      const challengeTime = challenge.timestamp || 0
+      const hoursAgo = (Date.now() - challengeTime) / (1000 * 60 * 60)
+      return hoursAgo < 24 // Garder seulement les invitations de moins de 24h
+    })
+    
+    // 3. TOUJOURS avoir 2 invitations par défaut (slots 1 et 2)
+    const defaultChallenges = loadedUsers
+      .filter(user => user.id !== currentUserId.value)
+      .slice(4, 6) // Prendre 2 utilisateurs par défaut
+      .map((user, index) => ({
+        id: user.id + 100,
+        name: user.username,
+        country: getCountryCode(user),
+        timeLeft: `${Math.floor(Math.random() * 20) + 1}h left`,
+        status: index === 0 ? 'play' : 'waiting',
+        user: user,
+        timestamp: Date.now() - (index + 1) * 3600000, // Il y a quelques heures
+        persistent: false // Marquer comme données par défaut
+      }))
+    
+    // 4. Combiner : TOUJOURS 2 par défaut + les vraies invitations après
+    outgoingChallenges.value = [
+      ...defaultChallenges, // Slots 1 et 2 = toujours par défaut
+      ...validChallenges.map(challenge => ({ ...challenge, persistent: true })) // Vraies invitations à partir du slot 3
+    ].slice(0, 5) // Maximum 5 slots
+    
+    console.log('✅ Outgoing challenges chargés:', outgoingChallenges.value.length)
+    console.log('- Données par défaut (fixes):', defaultChallenges.length)
+    console.log('- Invitations persistantes:', validChallenges.length)
+    console.log('- Slots libres:', 5 - outgoingChallenges.value.length)
+    
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement des outgoing challenges:', error)
+    
+    // Fallback : 2 données par défaut
+    outgoingChallenges.value = loadedUsers
+      .filter(user => user.id !== currentUserId.value)
+      .slice(4, 6)
+      .map((user, index) => ({
+        id: user.id + 100,
+        name: user.username,
+        country: getCountryCode(user),
+        timeLeft: `${Math.floor(Math.random() * 20) + 1}h left`,
+        status: index === 0 ? 'play' : 'waiting',
+        user: user,
+        persistent: false
+      }))
   }
 }
 
@@ -320,16 +370,14 @@ const loadFinishedBattles = (loadedUsers) => {
       {
         id: 7,
         name: 'P.DUJARDIN',
-        country: '🇫🇷',
-        points: 300,
-        playerWon: true
+        country: 'FR',
+        points: 300
       },
       {
         id: 8,
         name: 'L.ANEX',
-        country: '🇫🇷',
-        points: -100,
-        playerWon: false
+        country: 'FR',
+        points: -100
       }
     ]
   }
@@ -430,6 +478,98 @@ const declineChallenge = (id) => {
   incomingChallenges.value = incomingChallenges.value.filter(c => c.id !== id)
 }
 
+const saveOutgoingChallenges = () => {
+  try {
+    // Sauvegarder seulement les vraies invitations (persistent: true)
+    const challengesToSave = outgoingChallenges.value
+      .filter(challenge => challenge.persistent === true)
+      .map(challenge => ({
+        id: challenge.id,
+        name: challenge.name,
+        country: challenge.country,
+        timeLeft: challenge.timeLeft,
+        status: challenge.status,
+        user: challenge.user,
+        timestamp: challenge.timestamp || Date.now(),
+        persistent: true
+      }))
+    
+    localStorage.setItem('outgoingChallenges', JSON.stringify(challengesToSave))
+    console.log('💾 Outgoing challenges sauvegardés:', challengesToSave.length)
+    
+  } catch (error) {
+    console.error('❌ Erreur lors de la sauvegarde des outgoing challenges:', error)
+  }
+}
+
+// FONCTION CORRIGÉE : Ajouter une battle = remplir un slot libre ET sauvegarder
+const invitePlayer = () => {
+  // 1. VÉRIFIER LES SLOTS (maximum 5)
+  if (outgoingChallenges.value.length >= 5) {
+    alert('🚫 All slots are full!')
+    return
+  }
+  
+  // 2. TROUVER LES UTILISATEURS DISPONIBLES
+  const availableUsers = allUsers.value.filter(user => 
+    user.id !== currentUserId.value &&
+    !incomingChallenges.value.some(c => c.user?.id === user.id) &&
+    !outgoingChallenges.value.some(c => c.user?.id === user.id)
+  )
+  
+  let selectedUser = null
+  
+  // 3. CHOISIR UN UTILISATEUR AU HASARD
+  if (availableUsers.length > 0) {
+    selectedUser = availableUsers[Math.floor(Math.random() * availableUsers.length)]
+    invitedPlayerName.value = selectedUser.username
+    console.log('🎲 Random user selected:', selectedUser.username)
+  } else {
+    const randomPlayers = ['M.GARCIA', 'T.SMITH', 'A.MILLER', 'S.JONES', 'C.WILSON']
+    invitedPlayerName.value = randomPlayers[Math.floor(Math.random() * randomPlayers.length)]
+    console.log('🎲 Fallback to mock user:', invitedPlayerName.value)
+  }
+  
+  // 4. CRÉER LA NOUVELLE BATTLE (remplit un slot)
+  const newChallenge = {
+    id: Date.now(),
+    name: invitedPlayerName.value,
+    country: selectedUser ? getCountryCode(selectedUser) : '🇺🇸',
+    timeLeft: '24h left',
+    status: 'waiting',
+    user: selectedUser,
+    timestamp: Date.now(),
+    persistent: true // IMPORTANT : Marquer comme invitation persistante
+  }
+  
+  // 5. CORRECTION : Ajouter la nouvelle invitation (elle ira au slot 3, 4 ou 5)
+  outgoingChallenges.value.push(newChallenge)
+  
+  console.log('✅ Slot filled! Slots used:', outgoingChallenges.value.length, '/5')
+  console.log('✅ Free slots remaining:', 5 - outgoingChallenges.value.length)
+  
+  // 6. SAUVEGARDER DANS LOCALSTORAGE
+  saveOutgoingChallenges()
+  
+  // 7. AFFICHER LE MODAL
+  showInvitationModal.value = true
+  
+  // 8. FERMER LE MODAL APRÈS 2 SECONDES
+  setTimeout(() => {
+    if (showInvitationModal.value) {
+      showInvitationModal.value = false
+    }
+  }, 2000)
+}
+
+// NOUVELLE FONCTION : Supprimer une invitation (optionnel)
+const removeOutgoingChallenge = (challengeId) => {
+  outgoingChallenges.value = outgoingChallenges.value.filter(c => c.id !== challengeId)
+  saveOutgoingChallenges()
+  console.log('🗑️ Challenge supprimé:', challengeId)
+}
+
+// FONCTION MISE À JOUR : Gérer les actions et sauvegarder les changements de statut
 const handleAction = async (challenge) => {
   if (challenge.status === 'play') {
     try {
@@ -547,6 +687,14 @@ const handleAction = async (challenge) => {
       console.log('💾 Battle data saved with opponent avatar:', challenge.user?.avatar)
       console.log('💾 Battle data saved with opponent flag:', challenge.country)
       
+      // NOUVEAU : Si c'est une vraie invitation et qu'on lance le jeu, la marquer comme "jouée"
+      if (challenge.persistent) {
+        challenge.status = 'played' // Changer le statut SEULEMENT pour les vraies invitations
+        challenge.timeLeft = 'Completed'
+        saveOutgoingChallenges() // Sauvegarder le changement
+      }
+      // Les invitations par défaut (persistent: false) gardent leur statut original
+      
       router.push('/battle-quiz')
       
     } catch (error) {
@@ -562,66 +710,23 @@ const viewBattle = (id) => {
   router.push(`/battle-details/${id}`)
 }
 
-// FONCTION MISE À JOUR : Ajouter une battle = remplir un slot
-const invitePlayer = () => {
-  // 1. VÉRIFIER LES SLOTS (maximum 5)
-  if (outgoingChallenges.value.length >= 5) {
-    alert('🚫 All slots are full!')
-    return
+// NOUVELLE FONCTION : Nettoyer les anciennes invitations (optionnel)
+const cleanupOldChallenges = () => {
+  const savedChallenges = JSON.parse(localStorage.getItem('outgoingChallenges') || '[]')
+  const validChallenges = savedChallenges.filter(challenge => {
+    const hoursAgo = (Date.now() - challenge.timestamp) / (1000 * 60 * 60)
+    return hoursAgo < 168 // Garder pendant 1 semaine maximum
+  })
+  
+  if (validChallenges.length !== savedChallenges.length) {
+    localStorage.setItem('outgoingChallenges', JSON.stringify(validChallenges))
+    console.log('🧹 Nettoyage des anciennes invitations:', savedChallenges.length - validChallenges.length, 'supprimées')
   }
-  
-  // 2. TROUVER LES UTILISATEURS DISPONIBLES
-  const availableUsers = allUsers.value.filter(user => 
-    user.id !== currentUserId.value &&
-    !incomingChallenges.value.some(c => c.user?.id === user.id) &&
-    !outgoingChallenges.value.some(c => c.user?.id === user.id)
-  )
-  
-  let selectedUser = null
-  
-  // 3. CHOISIR UN UTILISATEUR AU HASARD
-  if (availableUsers.length > 0) {
-    selectedUser = availableUsers[Math.floor(Math.random() * availableUsers.length)]
-    invitedPlayerName.value = selectedUser.username
-    console.log('🎲 Random user selected:', selectedUser.username)
-  } else {
-    const randomPlayers = ['M.GARCIA', 'T.SMITH', 'A.MILLER', 'S.JONES', 'C.WILSON']
-    invitedPlayerName.value = randomPlayers[Math.floor(Math.random() * randomPlayers.length)]
-    console.log('🎲 Fallback to mock user:', invitedPlayerName.value)
-  }
-  
-  // 4. CRÉER LA NOUVELLE BATTLE (remplit un slot)
-  const newChallenge = {
-    id: Date.now(),
-    name: invitedPlayerName.value,
-    country: selectedUser ? getCountryCode(selectedUser) : 'US',
-    timeLeft: '24h left',
-    status: 'waiting',
-    user: selectedUser
-  }
-  
-  // 5. AJOUTER IMMÉDIATEMENT = TRANSFORMER UNE INVITE-CARD EN BATTLE-CARD
-  outgoingChallenges.value.push(newChallenge)
-  console.log('✅ Slot filled! Slots used:', outgoingChallenges.value.length, '/5')
-  console.log('✅ Free slots remaining:', 5 - outgoingChallenges.value.length)
-  
-  // 6. AFFICHER LE MODAL
-  showInvitationModal.value = true
-  
-  // 7. FERMER LE MODAL APRÈS 2 SECONDES
-  setTimeout(() => {
-    if (showInvitationModal.value) {
-      showInvitationModal.value = false
-    }
-  }, 2000)
 }
 
-const closeInvitationModal = () => {
-  showInvitationModal.value = false
-}
-
-// Lifecycle
+// Lifecycle - MODIFIER pour nettoyer les anciennes invitations
 onMounted(() => {
+  cleanupOldChallenges() // Nettoyer d'abord
   loadBattlesFromDB()
 })
 
