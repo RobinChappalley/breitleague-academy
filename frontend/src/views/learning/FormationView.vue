@@ -21,6 +21,7 @@
             :key="currentWatchImage"
             :alt="`${currentModule?.title || 'Breitling'} watch`"
             :src="currentWatchImage"
+            :class="['lesson-watch', spinDirection === 'right' ? 'spin-right' : 'spin-left']"
             class="lesson-watch"
             @load="updateContainerDimensions"
         >
@@ -181,7 +182,7 @@ export default {
         backgroundDesktop: 'backgrounds/aviators-horizontal.png'
       },
       showLessonPoints: true,
-
+      spinDirection:'right',
       showStartModal: false,
       selectedModule: null
     }
@@ -425,7 +426,7 @@ export default {
     async changeModule(direction = 'next') {
       if (this.isWatchTransitioning) return;
       console.log(this.showLessonPoints);
-
+      this.spinDirection = direction === 'next' ? 'right' : 'left';
       this.showLessonPoints = false;
       console.log(this.showLessonPoints);
 
