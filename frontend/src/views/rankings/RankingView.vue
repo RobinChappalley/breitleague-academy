@@ -66,9 +66,6 @@
             {{ player.score.toLocaleString('fr-CH').replace(/\u202F/g, "'") }} PTS
           </div>
         </div>
-
-        <!-- See All Button -->
-        <button class="see-all-btn" @click="seeAll" v-if="!showingAll">SEE ALL</button>
       </div>
     </div>
 
@@ -133,12 +130,28 @@
 
         <div class="popup-watches">
           <div class="watches-header">
-            <h3>TOP 3 WATCHES</h3>
-            <button class="see-all-watches-btn">See all</button>
+            <h3>FAVORITE WATCHES</h3>
           </div>
           <div class="watches-grid">
-            <div v-for="watch in selectedPlayer?.topWatches" :key="watch.id" class="watch-item">
-              <div class="watch-placeholder">⌚</div>
+            <div
+              v-for="watch in selectedPlayer?.topWatches"
+              :key="watch.id"
+              class="watch-item"
+              :title="watch.name"
+            >
+              <div class="watch-placeholder avatar-placeholder">
+                <template v-if="watch.photo">
+                  <img
+                    :src="getRewardImageUrl(watch.photo)"
+                    :alt="watch.name"
+                    class="avatar-image"
+                  />
+                </template>
+                <template v-else>
+                  <span>{{ watch.name }}</span>
+                </template>
+              </div>
+
               <div class="watch-name">{{ watch.name }}</div>
             </div>
           </div>
@@ -251,14 +264,14 @@ const loadUsersRanking = async () => {
     if (!res.ok) throw new Error('Erreur lors du chargement des utilisateurs')
 
     const data = await res.json()
-    console.log('✅ Utilisateurs chargés:', data)
+    console.log('Utilisateurs chargés:', data)
 
     // Mapper les users pour les adapter à ton format Ranking
     rankingPlayers.value = data.data
       .filter((user) => user.is_BS === true)
       .map((user, index) => ({
         id: user.id,
-        rank: index + 1, // 👈 on trie + on met le rang
+        rank: index + 1, //on trie + on met le rang
         name: user.username.toUpperCase(),
         country: user.pos?.country || 'Unknown',
         score: user.elo_score || 0,
@@ -268,7 +281,16 @@ const loadUsersRanking = async () => {
         since: `Reseller since ${user.signup_year}`,
         battleWin: user.battle_won || 0,
         battleLost: user.battle_lost || 0,
-        topWatches: [] // on met vide pour l’instant si tu n’as pas l’info
+        topWatches: user.rewards
+          ? user.rewards
+              .filter((reward) => reward.pivot?.is_favourite)
+              .slice(0, 3)
+              .map((reward) => ({
+                id: reward.id,
+                name: reward.model,
+                photo: reward.photo_name
+              }))
+          : []
       }))
       // On trie par elo_score DESC
       .sort((a, b) => b.score - a.score)
@@ -278,8 +300,12 @@ const loadUsersRanking = async () => {
         rank: index + 1
       }))
   } catch (err) {
-    console.error('❌ Erreur API users ranking:', err.message)
+    console.error('Erreur API users ranking:', err.message)
   }
+}
+
+const getRewardImageUrl = (photoName) => {
+  return `http://localhost:8000/${photoName}`
 }
 
 const currentUser = ref({
@@ -339,13 +365,22 @@ const loadCurrentUser = async () => {
       since: `Reseller since ${userDataFull.signup_year || 'Unknown'}`,
       battleWin: userDataFull.battle_won || 0,
       battleLost: userDataFull.battle_lost || 0,
-      topWatches: [] // à remplir plus tard si dispo
+      topWatches: userDataFull.rewards
+        ? userDataFull.rewards
+            .filter((reward) => reward.pivot?.is_favourite)
+            .slice(0, 3)
+            .map((reward) => ({
+              id: reward.id,
+              name: reward.model,
+              photo: reward.photo_name
+            }))
+        : []
     }
     //console.log(fullUser.data.id)
 
-    console.log('✅ Utilisateur courant chargé :', currentUser.value)
+    console.log('Utilisateur courant chargé :', currentUser.value)
   } catch (err) {
-    console.error('❌ Erreur lors du chargement du currentUser:', err.message)
+    console.error('Erreur lors du chargement du currentUser:', err.message)
   }
 }
 
@@ -430,7 +465,7 @@ console.log('RankingView component loaded')
 }
 
 .filter-btn:first-child {
-  border-radius: 8px 0 0 8px;
+  border-radius: 8px;
 }
 
 .filter-btn.active {
@@ -440,13 +475,16 @@ console.log('RankingView component loaded')
 
 .dropdown {
   position: relative;
+  width: 18rem;
 }
 
 .dropdown-btn {
   border-radius: 0 8px 8px 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .dropdown-icon {
@@ -464,6 +502,7 @@ console.log('RankingView component loaded')
   overflow: hidden;
   z-index: 10;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  width: 100%;
 }
 
 .dropdown-menu a {
@@ -817,6 +856,11 @@ console.log('RankingView component loaded')
 .popup-watches {
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   padding-top: 2rem;
+}
+.popup-watches .watch-placeholder img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .watches-header {

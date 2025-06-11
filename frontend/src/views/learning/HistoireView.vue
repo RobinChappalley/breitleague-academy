@@ -20,15 +20,15 @@
     <div class="onboarding-section">
       <div class="onboarding-content">
         <div class="section-header">
-          <span class="section-tag">ONBOARDING</span>
-          <h2 class="section-title">HISTORY</h2>
+          <span class="section-tag text-secondary">ONBOARDING</span>
+          <h1 class="section-title">HISTORY</h1>
         </div>
 
         <div class="content-block">
-          <h3 class="content-subtitle">INTRODUCTION</h3>
-          <p class="content-text intro-bold">
+          <h2 class="content-subtitle">INTRODUCTION</h2>
+          <h3 class="content-text intro-bold">
             IT IS ESSENTIAL TO REVISIT OUR HISTORY TO EXPLAIN OUR HERITAGE AND UNDERSTAND THE BRAND'S NEW POSITIONING
-          </p>
+          </h3>
           
           <p class="content-text">
             In this presentation, you will see that while a brand's reputation is generally the result of a few decades of its history, this is not always the case.
@@ -42,7 +42,7 @@
             We will explore the brand's history in broad strokes to help you explain the foundations and legitimacy of our current positioning, and help you support your sales argument.
           </p>
 
-          <h4 class="subsection-title">MUCH MORE THAN A WATCH BRAND FOR AVIATORS</h4>
+          <h3 class="subsection-title">MUCH MORE THAN A WATCH BRAND FOR AVIATORS</h3>
           
           <p class="content-text">
             It all began with the founding of the brand in 1884 by Léon Breitling, whose goal was to develop the most efficient time measurement instruments.
@@ -55,8 +55,8 @@
 
         <!-- Second chapter -->
         <div class="content-block chapter-block">
-          <h3 class="content-subtitle">A HISTORY POPULATED BY INVENTORS</h3>
-          <h4 class="subsection-title">THE BREITLING FAMILY</h4>
+          <h2 class="content-subtitle">A HISTORY POPULATED BY INVENTORS</h2>
+          <h3 class="subsection-title">THE BREITLING FAMILY</h3>
           
           <p class="content-text">
             This section reviews the main actors who made Breitling one of the most iconic watch brands in the world. The three generations of the founding family — Léon, Gaston and Willy — were united by a common quest: the development of the world's best chronograph.
@@ -65,9 +65,9 @@
           <!-- Timeline -->
           <div class="timeline">
             <div class="timeline-item">
-              <div class="timeline-year">1884</div>
+              <div class="timeline-year text-secondary">1884</div>
               <div class="timeline-content">
-                <h5 class="timeline-title">LÉON BREITLING</h5>
+                <h5 class="timeline-title text-secondary">LÉON BREITLING</h5>
                 <p class="timeline-text">
                   Léon is the one who founded the brand in St. Imier in 1884. Given his success, he moved to La Chaux-de-Fonds to design instruments intended not to tell time, but to measure time: an important distinction.
                 </p>
@@ -75,9 +75,9 @@
             </div>
 
             <div class="timeline-item">
-              <div class="timeline-year">1905</div>
+              <div class="timeline-year text-secondary">1905</div>
               <div class="timeline-content">
-                <h5 class="timeline-title">COUNTDOWN/TACHYMETER</h5>
+                <h5 class="timeline-title text-secondary">COUNTDOWN/TACHYMETER</h5>
                 <p class="timeline-text">
                   In 1905, Léon presented a countdown/tachymeter with unprecedented precision, whose seconds hand completed a full rotation every four minutes, ensuring better visibility and the ability to calculate pace on the dial. Quickly adopted in sports, such as cycling or horse racing, this functionality was also appreciated by the police: the chronometer, called "Vitesse" (Speed), allowed measuring the speed of motorists and issuing the very first speeding tickets (yes, it's Breitling we have to thank for this innovation).
                 </p>
@@ -85,9 +85,9 @@
             </div>
 
             <div class="timeline-item">
-              <div class="timeline-year">1914</div>
+              <div class="timeline-year text-secondary">1914</div>
               <div class="timeline-content">
-                <h5 class="timeline-title">GASTON BREITLING</h5>
+                <h5 class="timeline-title text-secondary">GASTON BREITLING</h5>
                 <p class="timeline-text">
                   Gaston, who took over the company after Léon's death, continued his father's dream and continued to innovate to develop the best time measurement instruments.
                 </p>
@@ -95,9 +95,9 @@
             </div>
 
             <div class="timeline-item">
-              <div class="timeline-year">1915</div>
+              <div class="timeline-year text-secondary">1915</div>
               <div class="timeline-content">
-                <h5 class="timeline-title">1ST INDEPENDENT PUSHER</h5>
+                <h5 class="timeline-title text-secondary">1ST INDEPENDENT PUSHER</h5>
                 <p class="timeline-text">
                   It was his pioneering spirit that logically led him to equip his watches with a pusher to isolate the functionalities. Launched in 1915, the first independent pusher on a wristwatch separated the "start-stop" and "reset" function from the crown. In 1923, he further improved his control system by adding a "reset" function on the crown, allowing users to interrupt and resume timing, but also to record several successive times.
                 </p>
@@ -105,9 +105,9 @@
             </div>
 
             <div class="timeline-item">
-              <div class="timeline-year">1932</div>
+              <div class="timeline-year text-secondary">1932</div>
               <div class="timeline-content">
-                <h5 class="timeline-title">WILLY BREITLING</h5>
+                <h5 class="timeline-title text-secondary">WILLY BREITLING</h5>
                 <p class="timeline-text">
                   In 1932, at age 19, Willy Breitling took over the direction of the company, a few years after his father Gaston's death. His new perspective, sharpened by technical and commercial studies, proved crucial: Willy decided at the right time to focus his advertisements on the functionality of Breitling products but also on their elegance: this was a decisive turning point in the brand's history.
                 </p>
@@ -115,9 +115,9 @@
             </div>
 
             <div class="timeline-item">
-              <div class="timeline-year">1934</div>
+              <div class="timeline-year text-secondary">1934</div>
               <div class="timeline-content">
-                <h5 class="timeline-title">2ND INDEPENDENT PUSHER</h5>
+                <h5 class="timeline-title text-secondary">2ND INDEPENDENT PUSHER</h5>
                 <p class="timeline-text">
                   Willy was the inventor, no more no less, of the first modern chronograph, which earns him a place among the greatest names in watchmaking history. Even today, almost all chronographs produced in the world are influenced and inspired by Willy Breitling's invention, the second independent pusher at 4 o'clock to reset the chronograph.
                 </p>
@@ -126,7 +126,7 @@
           </div>
 
           <div class="highlight-box">
-            <h4 class="highlight-title">WHEN TO TALK ABOUT THESE HISTORICAL DATES?</h4>
+            <h3 class="highlight-title ">WHEN TO TALK ABOUT THESE HISTORICAL DATES?</h3>
             <p class="highlight-text">
               The three generations that succeeded each other at the head of Breitling are inexhaustible sources of anecdotes.
             </p>
@@ -136,7 +136,7 @@
           </div>
 
           <div class="conclusion-box">
-            <h4 class="conclusion-title">THE MODERN CHRONOGRAPH WAS BORN</h4>
+            <h3 class="conclusion-title">THE MODERN CHRONOGRAPH WAS BORN</h3>
             <p class="conclusion-text">
               The first modern chronograph was invented in 1934 by Willy Breitling, who was the grandson of the brand's founder and led the company until the 1970s. Today, more than 80 years later, his design and technology continue to influence the vast majority of chronographs produced around the world.
             </p>
@@ -217,8 +217,7 @@ console.log('HistoireView component loaded')
   color: #FFFFFF;
   padding: 0.4rem 0.8rem; /* Réduire padding mobile */
   border-radius: 4px;
-  font-size: 0.7rem; /* Réduire taille mobile */
-  font-weight: 600;
+  
   letter-spacing: 1px;
   margin-bottom: 0.8rem;
   text-transform: uppercase;
@@ -226,8 +225,7 @@ console.log('HistoireView component loaded')
 
 .section-title {
   color: #F7C72C;
-  font-size: 2rem; /* Réduire taille mobile */
-  font-weight: 700;
+  
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 1.5px;
@@ -248,8 +246,7 @@ console.log('HistoireView component loaded')
 
 .content-subtitle {
   color: #F7C72C;
-  font-size: 1.1rem;
-  font-weight: 600;
+ 
   margin-bottom: 1.5rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -257,8 +254,7 @@ console.log('HistoireView component loaded')
 
 .subsection-title {
   color: #F7C72C;
-  font-size: 1rem;
-  font-weight: 600;
+  
   margin: 1.5rem 0 1rem 0;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -266,15 +262,13 @@ console.log('HistoireView component loaded')
 
 .content-text {
   color: #FFFFFF;
-  font-size: 0.95rem;
-  line-height: 1.6;
+
   margin-bottom: 1.5rem;
   opacity: 0.95;
   text-align: left;
 }
 
 .intro-bold {
-  font-weight: 600;
   opacity: 1;
 }
 
@@ -306,23 +300,10 @@ console.log('HistoireView component loaded')
 
 .timeline-year {
   color: #F7C72C;
-  font-size: 1.1rem;
-  font-weight: 700;
+  
   min-width: 50px;
   margin-right: 2rem;
   position: relative;
-}
-
-.timeline-year::after {
-  content: '';
-  position: absolute;
-  right: -26px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 8px;
-  height: 8px;
-  background: #F7C72C;
-  border-radius: 50%;
 }
 
 .timeline-content {
@@ -331,8 +312,7 @@ console.log('HistoireView component loaded')
 
 .timeline-title {
   color: #F7C72C;
-  font-size: 0.9rem;
-  font-weight: 600;
+  
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -340,8 +320,6 @@ console.log('HistoireView component loaded')
 
 .timeline-text {
   color: #FFFFFF;
-  font-size: 0.9rem;
-  line-height: 1.6;
   opacity: 0.9;
 }
 
@@ -356,8 +334,6 @@ console.log('HistoireView component loaded')
 
 .highlight-title {
   color: #F7C72C;
-  font-size: 1rem;
-  font-weight: 600;
   margin-bottom: 1rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -365,7 +341,6 @@ console.log('HistoireView component loaded')
 
 .highlight-text {
   color: #FFFFFF;
-  font-size: 0.9rem;
   line-height: 1.6;
   margin-bottom: 1rem;
   opacity: 0.95;
@@ -386,8 +361,6 @@ console.log('HistoireView component loaded')
 
 .conclusion-title {
   color: #F7C72C;
-  font-size: 1.1rem;
-  font-weight: 600;
   margin-bottom: 1rem;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -395,7 +368,6 @@ console.log('HistoireView component loaded')
 
 .conclusion-text {
   color: #FFFFFF;
-  font-size: 1rem;
   line-height: 1.7;
   opacity: 0.95;
 }

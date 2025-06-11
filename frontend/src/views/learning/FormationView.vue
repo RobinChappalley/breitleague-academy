@@ -1,6 +1,9 @@
 <template>
   <div class="formation-image-container" :style="backgroundStyle">
     <div class="top-action-buttons">
+    <div class="progress-bar">
+      <ProgressBar />
+    </div>
       <!-- Bouton temporaire pour tester -->
       <button class="action-btn" @click="changeModule('next')">Next Module (Test)</button>
       <button class="action-btn" @click="changeModule('previous')">Previous Module (Test)</button>
@@ -79,6 +82,25 @@
           </RouterLink>
         </div>
       </transition>
+=======
+        </div>
+
+    <div ref="watchContainer" class="formation-watch-container">
+     
+      <!-- Bouton spécial checkpoint -->
+      <button class="checkpoint-button special-button" @click="showCheckpointModal"></button>
+
+      <!-- ✅ CORRIGÉ : Div au lieu de RouterLink + appel openStartModal -->
+      <div
+        v-for="(lesson, index) in lessons"
+        :key="index"
+        class="lesson-container"
+        :style="getButtonPosition(index)"
+        @click="openStartModal(lesson)"
+      >
+      
+
+        
     </div>
 
     <!-- Modal Checkpoint - Affiché par-dessus -->
@@ -93,9 +115,12 @@
 
         <div class="modal-content">
           <p class="modal-text">
-            Welcome to your checkpoint assessment. This test will evaluate your understanding
-            of the material covered in this module. You'll need to answer {{ checkpointData.totalQuestions }}
-            questions with a minimum score of {{ checkpointData.passScore }}% to pass.
+
+            Welcome to your checkpoint assessment. This test will evaluate your understanding of the
+            material covered in this module. You'll need to answer
+            {{ checkpointData.totalQuestions }} questions with a minimum score of
+            {{ checkpointData.passScore }}% to pass.
+
           </p>
 
           <div class="modal-rules">
@@ -110,20 +135,36 @@
         </div>
 
         <div class="modal-actions">
-          <button class="btn-start-test" @click="startCheckpointTest">
-            START TEST
-          </button>
+          <button class="btn-start-test" @click="startCheckpointTest">START TEST</button>
         </div>
       </div>
     </div>
+
+    <!-- ✅ AJOUTÉ : Le composant StartModuleModal -->
+    <StartModuleModal
+      :isVisible="showStartModal"
+      :moduleData="selectedModule"
+      @close="handleModalClose"
+      @module-started="handleModuleStarted"
+    />
   </div>
 </template>
 
 <script>
-import {fetchProgression, fetchModules, fetchModule} from "@/services/api.js";
+
+
+import { fetchProgression, fetchModules } from '@/services/api.js'
+import StartModuleModal from './startModuleModal.vue'
+import ProgressBar from '@/components/layout/ProgressBar.vue'
+
 
 export default {
   name: 'FormationView',
+  components: {
+    StartModuleModal,
+    ProgressBar
+  },
+
   data() {
     return {
       modules: [],
@@ -136,8 +177,8 @@ export default {
       checkpointData: {
         title: 'Breitling Heritage & Foundations',
         description: 'Test your knowledge of Breitling\'s history, founding principles, and core values that shaped the brand into what it is today.',
-        totalQuestions: 15,
-        timeLimit: '20 minutes',
+        totalQuestions: 22,
+        timeLimit: '10 minutes',
         passScore: 70
       },
       progression: {},
@@ -165,6 +206,9 @@ export default {
         backgroundDesktop: 'backgrounds/aviators-horizontal.png'
       },
       showLessonPoints: true,
+
+      showStartModal: false,
+      selectedModule: null
     }
   },
 
@@ -179,6 +223,7 @@ export default {
 
     // Circumférence du cercle (rayon = 20, cohérent avec le SVG)
     circumference() {
+
       return 2 * Math.PI * 20;
     },
     currentWatchImage() {
@@ -207,6 +252,7 @@ export default {
     }
   },
 
+  // ✅ CORRIGÉ : Try-catch dans mounted() pour éviter les erreurs non gérées
   async mounted() {
     await this.$nextTick(() => {
       this.updateContainerDimensions();
@@ -239,43 +285,91 @@ export default {
 
   methods: {
     updateContainerDimensions() {
-      const container = this.$refs.watchContainer;
+      const container = this.$refs.watchContainer
       if (container) {
-        this.containerWidth = container.offsetWidth;
-        this.containerHeight = container.offsetHeight;
+        this.containerWidth = container.offsetWidth
+        this.containerHeight = container.offsetHeight
+        console.log(`📏 Container: ${this.containerWidth}x${this.containerHeight}`)
       }
+    },
+
+    // ✅ NOUVEAU : Méthode pour générer des lessons par défaut
+    getDefaultLessons() {
+      return [
+        {
+          id: 'history-lesson-1',
+          title: 'Breitling Origins',
+          description: 'Learn about the founding of Breitling in 1884',
+          estimated_duration: '15-20 min',
+          status: 'not-started',
+          progress: 0
+        },
+        {
+          id: 'history-lesson-2',
+          title: 'Aviation Heritage',
+          description: 'Discover our deep connection with aviation',
+          estimated_duration: '15-20 min',
+          status: 'not-started',
+          progress: 0
+        },
+        {
+          id: 'history-lesson-3',
+          title: 'Chronograph Innovation',
+          description: 'The development of precision timing instruments',
+          estimated_duration: '15-20 min',
+          status: 'not-started',
+          progress: 0
+        },
+        {
+          id: 'history-lesson-4',
+          title: 'Iconic Timepieces',
+          description: 'Legendary watches that made history',
+          estimated_duration: '15-20 min',
+          status: 'not-started',
+          progress: 0
+        },
+        {
+          id: 'history-lesson-5',
+          title: 'Modern Legacy',
+          description: 'Breitling in the contemporary era',
+          estimated_duration: '15-20 min',
+          status: 'not-started',
+          progress: 0
+        }
+      ]
     },
 
     getButtonPosition(index) {
       if (this.containerWidth === 0) {
-        return {display: 'none'};
+        return { display: 'none' }
       }
 
-      const arcDegrees = 150;
-      const startAngle = 65;
-      const angleStep = arcDegrees / this.numberOfButtons;
-      const currentAngle = startAngle - (index * angleStep);
-      const angleRad = (currentAngle * Math.PI) / 180;
+      const arcDegrees = 150
+      const startAngle = 65
+      const angleStep = arcDegrees / this.numberOfButtons
+      const currentAngle = startAngle - index * angleStep
+      const angleRad = (currentAngle * Math.PI) / 180
 
       //-30 pour que le texte reste dans l'écran sur mobile
       const radiusPixels = this.containerWidth - 30;
       const centerX = 0;
       const centerY = this.containerHeight / 2;
 
-      const x = centerX + radiusPixels * Math.cos(angleRad);
-      const y = centerY + radiusPixels * Math.sin(angleRad);
+
+      const x = centerX + radiusPixels * Math.cos(angleRad)
+      const y = centerY + radiusPixels * Math.sin(angleRad)
 
       return {
         position: 'absolute',
         left: `${x}px`,
         top: `${y}px`,
         transform: 'translate(-50%, -50%)'
-      };
+      }
     },
 
     getLessonProgressOffset(progress) {
-      const progressRatio = progress / 100;
-      return this.circumference * (1 - progressRatio);
+      const progressRatio = progress / 100
+      return this.circumference * (1 - progressRatio)
     },
 
     getLessonClass(status) {
@@ -283,53 +377,67 @@ export default {
         'lesson-completed': status === 'completed',
         'lesson-in-progress': status === 'in-progress',
         'lesson-not-started': status === 'not-started'
-      };
+      }
     },
 
     // Méthodes pour le modal checkpoint
     showCheckpointModal() {
-      this.isCheckpointModalVisible = true;
+      this.isCheckpointModalVisible = true
     },
 
     closeCheckpointModal() {
-      this.isCheckpointModalVisible = false;
+      this.isCheckpointModalVisible = false
     },
 
     // CORRIGÉ : Redirection vers le quiz
     startCheckpointTest() {
-      this.isCheckpointModalVisible = false; // Fermer le modal
-      this.$router.push('/checkpoint-quiz'); // Aller au quiz
+      this.isCheckpointModalVisible = false // Fermer le modal
+      this.$router.push('/checkpoint-quiz') // Aller au quiz
     },
 
-    handleLessonClick(index) {
-      const lesson = this.lessons[index];
-      console.log(`Leçon ${index + 1} cliquée - Statut: ${lesson.status}, Progrès: ${lesson.progress}%`);
-
-      if (lesson.status === 'not-started') {
-        lesson.status = 'in-progress';
-        lesson.progress = 25;
-      } else if (lesson.status === 'in-progress' && lesson.progress < 100) {
-        lesson.progress += 25;
-        if (lesson.progress >= 100) {
-          lesson.status = 'completed';
-          lesson.progress = 100;
-        }
+    openStartModal(lesson) {
+      this.selectedModule = {
+        id: lesson.id,
+        title: lesson.title,
+        description: lesson.description || 'Ready to begin this training lesson?',
+        estimated_duration: lesson.estimated_duration || '15-20 min',
+        lessons: this.lessons
       }
+      this.showStartModal = true
     },
+
+    handleModalClose() {
+      this.showStartModal = false
+      this.selectedModule = null
+    },
+
     async loadProgression() {
       const res = await fetch('http://localhost:8000/api/user', {
         credentials: 'include',
         headers: {
           Accept: 'application/json'
-        }
-      })
-      if (!res.ok) throw new Error('Unauthenticated user (401)')
 
-      const connectedUser = await res.json()
-      const progression = await fetchProgression(connectedUser.id)
-      this.progression = progression //pas sûr que ça serve à qqch
-      return progression
+    handleModuleStarted(data) {
+      console.log('Module started:', data)
+      // Redirection vers la première leçon
+      this.$router.push(`/LearningFlowView.vue`)
     },
+
+
+        }
+
+        console.log(`🔄 Loading progression for user ID: ${connectedUser.id}`)
+        const progression = await fetchProgression(connectedUser.id)
+        console.log('✅ Progression loaded:', progression)
+
+        this.progression = progression
+        return progression
+      } catch (error) {
+        console.error('❌ Error loading progression:', error)
+        return null
+      }
+    },
+
 
     async loadModule() {
       const progression = await this.loadProgression()
@@ -401,8 +509,23 @@ export default {
   }
 }
 
-</script>
+        const module = await fetchModules(moduleToDisplayId)
+        console.log('✅ Module loaded:', module)
 
+        return module
+      } catch (error) {
+        console.error('❌ Error loading modules:', error)
+        console.log('🔄 Falling back to default lessons')
+
+        // Retourner des lessons par défaut en cas d'erreur
+        return {
+          lessons: this.getDefaultLessons()
+        }
+      }
+    }
+  }
+}
+</script>
 <style>
 :root {
   --aviators-vertical: url('/backgrounds/aviators-vertical.png');
@@ -429,7 +552,7 @@ export default {
   position: relative;
   margin-left: 280px;
   @media screen and (max-width: 767px) {
-    margin-left: 0
+    margin-left: 0;
   }
 }
 
@@ -482,19 +605,19 @@ export default {
 
 .lesson-not-started {
   background-color: #808080;
-  border-color: #A9A9A9;
+  border-color: #a9a9a9;
   color: white;
 }
 
 .lesson-in-progress {
-  background-color: #4169E1;
+  background-color: #4169e1;
   border-color: white;
   color: white;
 }
 
 .lesson-completed {
   background-color: goldenrod;
-  border-color: #FFD700;
+  border-color: #ffd700;
   color: white;
 }
 
@@ -529,7 +652,7 @@ export default {
 
 .action-btn {
   /* styles identiques */
-  background: #F7C72C;
+  background: #f7c72c;
   color: #232323;
   font-size: 1rem;
   font-weight: bold;
@@ -538,7 +661,7 @@ export default {
   border-radius: 16px;
   padding: 12px 18px;
   box-shadow: 0 3px 12px rgba(35, 35, 35, 0.16);
-  font-family: inherit;
+
   cursor: pointer;
   text-align: center;
   text-decoration: none; /* Pour enlever le souligné de lien */
@@ -547,7 +670,7 @@ export default {
 }
 
 .action-btn:hover {
-  background: #FFD94A;
+  background: #ffd94a;
   box-shadow: 0 6px 24px rgba(35, 35, 35, 0.21);
 }
 
@@ -563,7 +686,7 @@ export default {
     gap: 18px;
   }
   @media screen and (max-width: 767px) {
-    gap: 10px
+    gap: 10px;
   }
 }
 
@@ -608,8 +731,8 @@ export default {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: #F7C72C;
-  color: #072C54;
+  background: #f7c72c;
+  color: #072c54;
   border: none;
   border-radius: 50%;
   width: 35px;
@@ -622,12 +745,12 @@ export default {
 }
 
 .close-btn:hover {
-  background: #E6B625;
+  background: #e6b625;
   transform: scale(1.1);
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #072C54 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #072c54 0%, #1e3a8a 100%);
   color: white;
   padding: 2.5rem 2rem;
   text-align: center;
@@ -636,7 +759,7 @@ export default {
 .modal-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #F7C72C;
+  color: #f7c72c;
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -652,7 +775,7 @@ export default {
 
 .modal-content {
   padding: 2.5rem 2rem;
-  color: #072C54;
+  color: #072c54;
 }
 
 .modal-text {
@@ -671,7 +794,7 @@ export default {
 
 .modal-rules h4 {
   margin: 0 0 1rem 0;
-  color: #072C54;
+  color: #072c54;
   font-weight: 600;
 }
 
@@ -691,8 +814,8 @@ export default {
 }
 
 .btn-start-test {
-  background: #F7C72C;
-  color: #072C54;
+  background: #f7c72c;
+  color: #072c54;
   border: none;
   border-radius: 15px;
   padding: 1.2rem 3rem;
@@ -707,7 +830,7 @@ export default {
 }
 
 .btn-start-test:hover {
-  background: #E6B625;
+  background: #e6b625;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(247, 199, 44, 0.4);
 }

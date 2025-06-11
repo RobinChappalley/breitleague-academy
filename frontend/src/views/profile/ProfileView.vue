@@ -16,7 +16,9 @@
         <div class="profile-avatar-container">
           <div class="profile-avatar">
             <div class="avatar-placeholder">
-              <span>{{ getUserInitial() }}</span>
+              <img :src="getUserInitial()" alt="User's Avatar" class="avatar-image" />
+
+              <!--<span>{{ getUserInitial() }}</span>-->
               <!-- L'initiale au centre -->
             </div>
           </div>
@@ -58,11 +60,11 @@
         <div class="stats-section">
           <div class="stat-item">
             <div class="stat-value">{{ user.battle_won || 0 }}</div>
-            <div class="stat-label">Victoires</div>
+            <div class="stat-label">Victories</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ user.battle_lost || 0 }}</div>
-            <div class="stat-label">Défaites</div>
+            <div class="stat-label">Defeats</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ winRate }}%</div>
@@ -71,53 +73,27 @@
         </div>
 
         <!-- Top 3 Watches Section -->
-        <div class="watches-section">
-          <div class="watches-header">
-            <h2>TOP 3 REWARDS</h2>
-            <button class="see-all-btn" @click="goToCollection">See all</button>
-          </div>
-          <div class="watches-grid">
-            <div
-              v-for="reward in topRewards"
-              :key="reward.id"
-              class="watch-item"
-              :title="reward.model"
-            >
-              <div class="watch-placeholder">⌚</div>
-              <div class="watch-name">{{ reward.model?.substring(0, 15) }}...</div>
+        <div>
+          <h3>FAVORITE WATCHES</h3>
+        </div>
+        <div class="watches-grid">
+          <div
+            v-for="reward in topRewards"
+            :key="reward.id"
+            class="watch-item"
+            :title="reward.model"
+            @click="goToCollection"
+          >
+            <div class="watch-placeholder avatar-placeholder">
+              <template v-if="reward.photo_name">
+                <img :src="getRewardImage(reward)" :alt="reward.model" class="avatar-image" />
+              </template>
+              <template v-else>
+                <span style="font-size: 2rem; color: white">{{ getRewardImage(reward) }}</span>
+              </template>
             </div>
-          </div>
-        </div>
 
-        <!-- User Info Section -->
-        <div class="user-info-section">
-          <div class="info-item">
-            <span class="info-label">Email:</span>
-            <span class="info-value">{{ user.email || 'Non renseigné' }}</span>
-          </div>
-          <div class="info-item clickable">
-            <span class="info-label">Modifier le mot de passe</span>
-            <span class="info-action">→</span>
-          </div>
-          <div class="info-item clickable">
-            <span class="info-label">Changer d'avatar</span>
-            <span class="info-action">→</span>
-          </div>
-          <div class="info-item clickable">
-            <span class="info-label">Paramètres de notification</span>
-            <span class="info-action">→</span>
-          </div>
-          <div class="info-item clickable">
-            <span class="info-label">Confidentialité</span>
-            <span class="info-action">→</span>
-          </div>
-        </div>
-
-        <!-- FAQ Section -->
-        <div class="faq-section">
-          <div class="faq-header">
-            <span>FAQ</span>
-            <span class="arrow">→</span>
+            <div class="watch-name">{{ reward.model }}</div>
           </div>
         </div>
       </div>
@@ -151,7 +127,9 @@ const winRate = computed(() => {
 })
 
 const topRewards = computed(() => {
-  return userRewards.value.slice(0, 3)
+  return userRewards.value
+    .filter((reward) => reward.pivot?.is_favourite) //filtre les favoris
+    .slice(0, 3) // top 3
 })
 
 // Méthodes
@@ -160,7 +138,7 @@ const loadUserProfile = async () => {
     isLoading.value = true
     error.value = null
 
-    console.log('🔄 Load logged-in user...')
+    console.log("Chargement de l'utilisateur connecté...")
 
     // 1️⃣ Récupérer l'utilisateur connecté
     const res = await fetch('http://localhost:8000/api/user', {
@@ -170,23 +148,24 @@ const loadUserProfile = async () => {
       }
     })
 
-    if (!res.ok) throw new Error('Unauthenticated user (401)')
+    if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
 
     const connectedUser = await res.json()
-    console.log('✅ Utilisateur connecté:', connectedUser)
+    console.log('Utilisateur connecté:', connectedUser)
 
     // 2️⃣ Appeler ton API pour charger les infos complètes du user
     const response = await userService.getUser(connectedUser.id)
-    console.log('📦 Réponse API user:', response)
+    console.log('Réponse API user:', response)
 
     user.value = response.data || response
-    console.log('✅ Full user loaded:', user.value)
+    console.log('User complet chargé:', user.value)
 
     // Charger les rewards
     await loadUserRewards(user.value.id)
   } catch (err) {
     error.value = `Erreur lors du chargement: ${err.message}`
-    console.error('❌ Erreur API:', err)
+    console.error('Erreur API:', err)
+    router.push('/login')
   } finally {
     isLoading.value = false
   }
@@ -194,20 +173,27 @@ const loadUserProfile = async () => {
 
 const loadUserRewards = async (userId) => {
   try {
-    const response = await userService.getUserRewards(userId)
-    console.log('📦 Réponse rewards:', response)
+    const response = await userService.getUser(userId)
+    const user = response.data
 
-    userRewards.value = response.data || []
-    console.log('✅ Rewards loaded:', userRewards.value)
+    userRewards.value = user.rewards || []
+
+    console.log('Utilisateur chargé:', user)
   } catch (err) {
-    console.log('⚠️ No rewards found :', err.message)
+    console.error('Erreur lors du chargement de l’utilisateur:', err.message)
     userRewards.value = []
   }
 }
 
 const getUserInitial = () => {
-  if (user.value.avatar) return user.value.avatar
+  if (user.value.avatar) return `http://localhost:8000/${user.value.avatar}`
   if (user.value.username) return user.value.username[0].toUpperCase()
+  return 'U'
+}
+
+const getRewardImage = (reward) => {
+  if (reward.photo_name) return `http://localhost:8000/${reward.photo_name}`
+  if (reward.model) return reward.model[0].toUpperCase()
   return 'U'
 }
 
@@ -333,7 +319,6 @@ const logout = async () => {
 .avatar-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -341,6 +326,13 @@ const logout = async () => {
   font-weight: bold;
   color: white;
   text-transform: uppercase;
+}
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
 }
 
 .edit-icon {
@@ -554,6 +546,7 @@ const logout = async () => {
   justify-content: center;
   min-height: 80px;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .watch-item:hover {
@@ -568,7 +561,7 @@ const logout = async () => {
 }
 
 .watch-name {
-  font-size: 0.7rem;
+  font-size: 1rem;
   color: rgba(255, 255, 255, 0.8);
 }
 

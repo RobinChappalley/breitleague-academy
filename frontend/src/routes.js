@@ -14,6 +14,7 @@ import CheckpointQuizView from '@/views/learning/CheckpointQuizView.vue'
 import CheckpointResultsView from '@/views/learning/CheckpointResultsView.vue'
 import HistoireView from '@/views/learning/HistoireView.vue'
 
+
 export const routes = [
   { path: '/login', component: LoginView, meta: { hideNavBar: true } },
   { path: '/', component: FormationView, meta: { hideNavBar: false } },
