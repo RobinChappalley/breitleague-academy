@@ -22,7 +22,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 import learningIcon from '/images/icones/learning.svg'
 import battleIcon from '/images/icones/battle.svg'
-import collectionIcon from '/images/icones/collection.svg'
+import collectionIcon from '/images/icones/Collection2.svg'
 import cupIcon from '/images/icones/cup.svg'
 import profileIcon from '/images/icones/profile.svg'
 

@@ -191,7 +191,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { battleService } from '@/services/api'
 
@@ -246,7 +246,7 @@ const loadBattlesFromDB = async () => {
       .map((user, index) => ({
         id: user.id,
         name: user.username,
-        country: getCountryCode(user.pos_id),
+        country: getCountryCode(user),
         timeLeft: '24h left',
         status: index < 2 ? 'invitation' : (index === 2 ? 'play' : 'waiting'),
         user: user
@@ -260,7 +260,7 @@ const loadBattlesFromDB = async () => {
       .map((user, index) => ({
         id: user.id + 100,
         name: user.username,
-        country: getCountryCode(user.pos_id),
+        country: getCountryCode(user),
         timeLeft: `${Math.floor(Math.random() * 20) + 1}h left`,
         status: index === 0 ? 'play' : 'waiting',
         user: user
@@ -273,7 +273,7 @@ const loadBattlesFromDB = async () => {
       .map((user, index) => ({
         id: user.id + 200,
         name: user.username,
-        country: getCountryCode(user.pos_id),
+        country: getCountryCode(user),
         points: index === 0 ? 300 : -100,
         user: user
       }))
@@ -291,12 +291,18 @@ const loadBattlesFromDB = async () => {
 }
 
 // Fonction pour convertir pos_id en code pays
-const getCountryCode = (posId) => {
-  const countryMapping = {
-    1: 'CH', 2: 'FR', 3: 'DE', 4: 'IT', 5: 'ES', 
-    6: 'PT', 7: 'RO', 8: 'US', 9: 'GB', 10: 'BE'
+const getCountryCode = (user) => {
+  // 1. Essayer d'abord depuis user.pos.country_flag
+  if (user.pos && user.pos.country_flag) {
+    return user.pos.country_flag
   }
-  return countryMapping[posId] || 'FR'
+  
+  // 2. Fallback sur le mapping pos_id
+  const countryMapping = {
+    1: '🇨🇭', 2: '🇫🇷', 3: '🇩🇪', 4: '🇮🇹', 5: '🇪🇸', 
+    6: '🇵🇹', 7: '🇷🇴', 8: '🇺🇸', 9: '🇬🇧', 10: '🇧🇪'
+  }
+  return countryMapping[user.pos_id] || '🇫🇷'
 }
 
 // Fonction fallback
@@ -410,22 +416,56 @@ const handleAction = async (challenge) => {
         const questionChoices = allChoices.filter(choice => choice.question_id === question.id)
         
         console.log(`📋 Question ${question.id}: ${questionChoices.length} choix trouvés`)
-        console.log(`✅ Bonne réponse pour question ${question.id}: "${question.correct_answer_text}"`)
         
-        // Adapter la structure pour BattleQuizView
+        // IMPORTANT : correct_answer_text est au format JSON !
+        let correctAnswerText = question.correct_answer_text
+        
+        // Si c'est une string JSON, la parser
+        if (typeof correctAnswerText === 'string') {
+          try {
+            correctAnswerText = JSON.parse(correctAnswerText)
+          } catch (e) {
+            console.warn('Could not parse correct_answer_text as JSON:', correctAnswerText)
+          }
+        }
+        
+        console.log(`✅ Bonne réponse pour question ${question.id}:`, correctAnswerText)
+        
+        // CORRIGER : Adapter la structure pour BattleQuizView
         question.choices = questionChoices.map(choice => {
-          // Comparer le text_answer avec correct_answer_text pour savoir si c'est correct
-          const isCorrect = choice.text_answer === question.correct_answer_text
+          // COMPARER text_answer avec correct_answer_text (en tenant compte du format JSON)
+          let isCorrect = false
+          
+          // Plusieurs façons de comparer selon le format de correct_answer_text
+          if (Array.isArray(correctAnswerText)) {
+            // Si c'est un array, vérifier si text_answer est dedans
+            isCorrect = correctAnswerText.includes(choice.text_answer)
+          } else if (typeof correctAnswerText === 'string') {
+            // Si c'est une string, comparer directement
+            isCorrect = choice.text_answer === correctAnswerText
+          } else if (typeof correctAnswerText === 'boolean') {
+            // Si c'est un boolean, comparer avec "true"/"false"
+            isCorrect = choice.text_answer === String(correctAnswerText)
+          } else {
+            // Essayer de convertir en string et comparer
+            isCorrect = choice.text_answer === String(correctAnswerText)
+          }
           
           console.log(`🔍 Choix "${choice.text_answer}" ${isCorrect ? '✅ CORRECT' : '❌ incorrect'}`)
           
           return {
             id: choice.id,
-            text: choice.text_answer,
-            content: choice.text_answer, 
-            is_correct: isCorrect // UTILISER correct_answer_text pour déterminer si c'est correct !
+            text_answer: choice.text_answer,
+            is_correct: isCorrect // CALCULER is_correct en comparant avec correct_answer_text
           }
         })
+        
+        // Si aucune réponse n'est marquée comme correcte, marquer la première par défaut
+        const correctAnswers = question.choices.filter(c => c.is_correct)
+        if (correctAnswers.length === 0 && question.choices.length > 0) {
+          console.warn(`⚠️ Aucune réponse correcte trouvée pour question ${question.id}, marquage de la première par défaut`)
+          question.choices[0].is_correct = true
+        }
         
         console.log(`✅ Question ${question.id}: ${question.choices.length} choix avec ${question.choices.filter(c => c.is_correct).length} bonne(s) réponse(s)`)
       })
@@ -439,10 +479,10 @@ const handleAction = async (challenge) => {
         if (!question.choices || question.choices.length === 0) {
           console.warn(`⚠️ Pas de choix pour question ${question.id}, ajout de choix par défaut`)
           question.choices = [
-            { id: 1, text: 'Réponse A', is_correct: true },
-            { id: 2, text: 'Réponse B', is_correct: false },
-            { id: 3, text: 'Réponse C', is_correct: false },
-            { id: 4, text: 'Réponse D', is_correct: false }
+            { text_answer: 'Réponse A', is_correct: true },
+            { text_answer: 'Réponse B', is_correct: false },
+            { text_answer: 'Réponse C', is_correct: false },
+            { text_answer: 'Réponse D', is_correct: false }
           ]
         }
       })
@@ -453,27 +493,20 @@ const handleAction = async (challenge) => {
         opponent: {
           id: challenge.user?.id || challenge.id,
           name: challenge.name,
-          avatar: challenge.user?.avatar || challenge.name.charAt(0),
+          avatar: challenge.user?.avatar, // PASSER L'AVATAR COMPLET
           flag: challenge.country
         },
         questions: selectedQuestions
       }))
       
-      console.log('💾 Questions RÉELLES avec bonnes réponses sauvegardées!')
-      console.log('📊 Résumé:', selectedQuestions.map(q => ({
-        id: q.id,
-        question: q.content_default?.substring(0, 50) + '...',
-        choicesCount: q.choices.length,
-        correctAnswers: q.choices.filter(c => c.is_correct).length
-      })))
+      console.log('💾 Battle data saved with opponent avatar:', challenge.user?.avatar)
+      console.log('💾 Battle data saved with opponent flag:', challenge.country)
       
       router.push('/battle-quiz')
       
     } catch (error) {
       console.error('❌ Erreur chargement depuis la base:', error)
       alert(`Erreur API: ${error.message}`)
-      
-      // Fallback si erreur
       router.push('/battle-quiz')
     }
   }
@@ -516,7 +549,7 @@ const invitePlayer = () => {
   const newChallenge = {
     id: Date.now(),
     name: invitedPlayerName.value,
-    country: selectedUser ? getCountryCode(selectedUser.pos_id) : 'US',
+    country: selectedUser ? getCountryCode(selectedUser) : 'US',
     timeLeft: '24h left',
     status: 'waiting',
     user: selectedUser
@@ -548,6 +581,30 @@ onMounted(() => {
 })
 
 console.log('BattleView component loaded')
+
+// Dans le computed currentQuestion, remplace par :
+
+const currentQuestion = computed(() => {
+  if (questions.value.length === 0) return null
+  
+  const question = questions.value[currentQuestionIndex.value]
+  
+  console.log('🔍 Current question data:', question)
+  console.log('🔍 Question choices:', question.choices)
+  
+  // UTILISER LA VRAIE STRUCTURE DE TA BASE (text_answer)
+  return {
+    id: question.id,
+    text: question.content_default || question.content_lf_tf || question.content_lf_blank || 'Question sans contenu',
+    answers: question.choices?.map(choice => {
+      console.log('🔍 Processing choice:', choice)
+      return {
+        text: choice.text_answer || choice.content || choice.text, // CORRIGER : utiliser text_answer
+        correct: choice.is_correct || choice.correct || false
+      }
+    }) || []
+  }
+})
 </script>
 
 <style scoped>
