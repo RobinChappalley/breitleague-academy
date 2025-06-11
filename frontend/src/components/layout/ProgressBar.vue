@@ -1,17 +1,10 @@
 <template>
-  <div class="progress-bar">
-    <h3 class="title">📈 Overall Training Progress</h3>
-
-    <div v-if="progression && modules.length">
-      <p>Overall Progress: {{ overallProgress }}%</p>
-      <div class="progress-bar-fill">
-        <div class="progress-bar-inner" :style="{ width: overallProgress + '%' }"></div>
-      </div>
+  <div class="bs-progress-container">
+    <p class="bs-progress-title">Specialist Progression</p>
+    <div class="bs-progress-bar">
+      <div class="bs-progress-bar-inner" :style="{ width: overallProgress + '%' }"></div>
     </div>
-
-    <div v-else>
-      <p>Loading progression...</p>
-    </div>
+    <p class="bs-progress-percent">{{ overallProgress }}%</p>
   </div>
 </template>
 
@@ -25,7 +18,7 @@ const modules = ref([])
 
 onMounted(async () => {
   try {
-    // 1️⃣ récupérer user
+    // récupérer user
     const fetchCurrentUser = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
       headers: {
@@ -34,12 +27,12 @@ onMounted(async () => {
     })
     const user = await fetchCurrentUser.json()
 
-    // 2️⃣ récupérer progression
+    //récupérer progression
     const resUser = await userService.getUser(user.id)
     const dataUser = resUser.data
     progression.value = dataUser.progression
 
-    // 3️⃣ récupérer modules avec ta fonction
+    //récupérer modules avec ta fonction
     const resModules = await fetchAllModules()
     modules.value = resModules
   } catch (error) {
@@ -101,9 +94,9 @@ watch(overallProgress, async (newValue) => {
           })
         })
 
-        console.log(`✅ User is_BS updated to ${shouldBeBS}`)
+        console.log(`User is_BS updated to ${shouldBeBS}`)
       } else {
-        console.log(`ℹ️ User is_BS already correct (${dataUser.is_BS}) → no update needed`)
+        console.log(`User is_BS already correct (${dataUser.is_BS}) → no update needed`)
       }
     } catch (error) {
       console.error('Error updating is_BS:', error)
@@ -113,31 +106,43 @@ watch(overallProgress, async (newValue) => {
 </script>
 
 <style scoped>
-.progress-bar {
-  border: 2px solid #ccc;
+.bs-progress-container {
+  background: rgba(7, 44, 84, 0.8);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  margin: 1rem auto;
+  text-align: center;
+  color: #fff;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+.bs-progress-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #f7c72c;
+}
+
+.bs-progress-bar {
+  background-color: rgba(255, 255, 255, 0.15);
   border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
-  background: #1f1f1f;
-  color: white;
-}
-
-.title {
-  margin-bottom: 15px;
-  font-size: 1.2rem;
-}
-
-.progress-bar-fill {
-  background-color: #444;
-  border-radius: 5px;
-  height: 20px;
+  height: 10px;
   width: 100%;
   overflow: hidden;
+  margin: 0.5rem 0;
 }
 
-.progress-bar-inner {
+.bs-progress-bar-inner {
   height: 100%;
-  background-color: #4caf50;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #f7c72c, #e6b625);
+  transition: width 0.5s ease;
+}
+
+.bs-progress-percent {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 0.25rem;
 }
 </style>
