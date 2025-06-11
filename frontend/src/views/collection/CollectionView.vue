@@ -79,14 +79,14 @@ const error = ref(null)
 
 const fetchWatches = async () => {
   try {
-    const fetchIDUser = await fetch('http://localhost:8000/api/user', {
+    const fetchCurrentUser = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
       headers: {
         Accept: 'application/json'
       }
     })
 
-    const data = await fetchIDUser.json()
+    const data = await fetchCurrentUser.json()
     console.log(data)
 
     const res = await userService.getUser(data.id)
@@ -95,7 +95,6 @@ const fetchWatches = async () => {
     const dataUser = await res.json()
     console.log(dataUser)
 
-    // traitement watches --> ici bien dans le try
     watches.value = dataUser.data.map((watch) => ({
       ...watch,
       colors: Array.isArray(watch.colors)
@@ -115,9 +114,22 @@ const fetchWatches = async () => {
 
 const fetchFavorites = async () => {
   try {
-    const res = await fetch(`${backendUrl}/api/v1/user-rewards`, { credentials: 'include' })
-    if (!res.ok) throw new Error('User not authenticated (401)')
-    const data = await res.json()
+    const fetchCurrentUser = await fetch('http://localhost:8000/api/user', {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+
+    const data = await fetchCurrentUser.json()
+    console.log(data)
+
+    const res = await userService.getUser(data.id)
+    console.log(res)
+
+    const dataUser = await res.json()
+    console.log(dataUser)
+
     favoriteIds.value = Array.isArray(data.data) ? data.data.map((entry) => entry.reward_id) : []
     watches.value.forEach((watch) => {
       watch.isFavorite = favoriteIds.value.includes(watch.id)
