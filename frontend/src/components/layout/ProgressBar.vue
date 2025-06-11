@@ -117,32 +117,45 @@ watch(overallProgress, async (newValue) => {
 </script>
 
 <style scoped>
+.bs-progress-floating {
+  position: fixed;
+  z-index: 9999; /* pour que ça passe au-dessus de tout */
+  top: 20px; /* par défaut (desktop) */
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+}
+
 .bs-progress-container {
+  position: absolute;
+  z-index: 9999;
+  top: 40px;
+  left: 60%;
+  transform: translateX(-50%);
   background: rgba(7, 44, 84, 0.8);
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  max-width: 500px;
-  margin: 1rem auto;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   text-align: center;
-  color: #fff;
-  font-family: 'Helvetica Neue', sans-serif;
+  color: #f7c72c;
+  min-width: 15vw;
 }
 
 .bs-progress-title {
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   color: #f7c72c;
 }
 
 .bs-progress-bar {
   background-color: rgba(255, 255, 255, 0.15);
   border-radius: 10px;
-  height: 10px;
+  height: 8px;
   width: 100%;
   overflow: hidden;
-  margin: 0.5rem 0;
+  margin: 0.25rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .bs-progress-bar-inner {
@@ -152,22 +165,24 @@ watch(overallProgress, async (newValue) => {
 }
 
 .bs-progress-percent {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #f7c72c;
+  margin-top: 0.15rem;
+  font-weight: 500;
 }
+
 .loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 0.5rem;
   color: rgba(255, 255, 255, 0.8);
 }
 
 .loading-spinner {
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
   animation: spin 1s linear infinite;
 }
 
@@ -177,6 +192,32 @@ watch(overallProgress, async (newValue) => {
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+/* Responsive - mobile (< 768px) */
+@media (max-width: 768px) {
+  .bs-progress-container {
+    left: 30px;
+    transform: none;
+    width: auto;
+    max-width: 180px;
+    padding: 0.4rem 0.6rem;
+    border-radius: 8px;
+    min-width: unset;
+  }
+
+  .bs-progress-title {
+    font-size: 0.75rem;
+  }
+
+  .bs-progress-bar {
+    height: 6px;
+    margin: 0.25rem 0;
+  }
+
+  .bs-progress-percent {
+    font-size: 0.7rem;
   }
 }
 </style>
