@@ -69,7 +69,7 @@
           <!-- ✅ AJOUTÉ : Le composant StartModuleModal -->
           <StartModuleModal
               :isVisible="showStartModal"
-              :moduleData="selectedModule"
+              :moduleData="selectedLesson"
               @close="handleModalClose"
               @module-started="handleModuleStarted"
           />
@@ -122,7 +122,10 @@
               {{ lesson.title }}
             </p>
           </div>
+          <h2 class="module-title">{{moduleTitle}}</h2>
         </div>
+
+
       </transition>
     </div>
   </div>
@@ -135,14 +138,12 @@ import {fetchProgression, fetchModule, fetchModules} from '@/services/api.js'
 import StartModuleModal from './startModuleModal.vue'
 import ProgressBar from '@/components/layout/ProgressBar.vue'
 
-
 export default {
   name: 'FormationView',
   components: {
     StartModuleModal,
     ProgressBar
   },
-
   data() {
     return {
       modules: [],
@@ -186,7 +187,8 @@ export default {
       showLessonPoints: true,
       spinDirection:'right',
       showStartModal: false,
-      selectedModule: null
+      selectedModule: null,
+      selectedLesson:null
     }
   },
 
@@ -227,6 +229,9 @@ export default {
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover'
       };
+    },
+    moduleTitle() {
+      return this.currentModule?.title;
     }
   },
 
@@ -248,6 +253,7 @@ export default {
       this.currentModuleIndex = moduleIndex;
       // Remplacer le module simple par le module complet avec lessons
       this.modules[moduleIndex] = loadedModule;
+
     }
 
     // 4. Mapper les lessons avec status/progress
@@ -379,12 +385,14 @@ export default {
         lessons: this.lessons
       }
       this.showStartModal = true
+      this.selectedLesson = lesson
     },
 
 
     handleModalClose() {
       this.showStartModal = false
       this.selectedModule = null
+      this.selectedLesson = null
     },
 
     handleModuleStarted(data) {
@@ -416,8 +424,7 @@ export default {
       } else {
        moduleToDisplayId = progression.last_checkpoint_id + 1
       }
-      const module = await fetchModule(moduleToDisplayId)
-      return module
+      return await fetchModule(moduleToDisplayId)
     },
 
     async loadAllModules() {
@@ -920,5 +927,13 @@ export default {
 
 .fade-leave-from, .fade-enter-to {
   opacity: 1;
+}
+
+.module-title {
+  position: absolute;
+  right: -100px;
+  bottom: -50px;
+font-size: 2.5rem;
+  color:whitesmoke
 }
 </style>

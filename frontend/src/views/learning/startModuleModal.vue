@@ -27,7 +27,7 @@
           </ul>
         </div>
       </div>
-      
+
       <div class="modal-actions">
         <button class="btn-start-learning btn-primary" @click="startModule">
           START LEARNING
@@ -38,6 +38,9 @@
 </template>
 
 <script>
+import {useRouter} from "vue-router";
+
+const router = useRouter()
 export default {
   name: 'StartModuleModal',
   props: {
@@ -69,6 +72,8 @@ export default {
       
       // Ferme le modal
       this.closeModal();
+      const firstLessonId = this.moduleData.id
+      this.$router.push('/lesson/${firstLessonId}')
     }
   }
 }
