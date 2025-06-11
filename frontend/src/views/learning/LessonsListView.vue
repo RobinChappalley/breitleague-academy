@@ -176,6 +176,7 @@ p {
   border-radius: 12px;
   padding: 1.5rem 2rem;
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
@@ -203,6 +204,7 @@ p {
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  width: 200px
 }
 
 .read-btn:hover {
@@ -341,9 +343,7 @@ p {
   
   .lesson-item {
     padding: 1rem 1.2rem;
-    flex-direction: column;
     gap: 1rem;
-    text-align: center;
   }
   
   .lesson-name {
@@ -353,7 +353,7 @@ p {
   .read-btn {
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
-    width: 100%;
+    width: 100px;
   }
 }
 .back-arrow {
@@ -372,10 +372,5 @@ p {
   background: rgba(247, 199, 44, 0.1);
   box-shadow: 0 1px 4px rgba(33,40,80,0.15);
 }
-@media (max-width: 767px) {
-  .back-arrow {
-    top: 1rem;
-    left: 1rem;
-  }
-}
+
 </style>
