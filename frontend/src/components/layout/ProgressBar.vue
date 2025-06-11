@@ -17,7 +17,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { userService, fetchAllModules } from '@/services/api'
+import { userService, fetchModules } from '@/services/api'
 import { watch } from 'vue'
 
 const progression = ref(null)
@@ -40,7 +40,7 @@ onMounted(async () => {
     progression.value = dataUser.progression
 
     //récupérer modules avec ta fonction
-    const resModules = await fetchAllModules()
+    const resModules = await fetchModules()
     modules.value = resModules
   } catch (error) {
     console.error('Error fetching data:', error)

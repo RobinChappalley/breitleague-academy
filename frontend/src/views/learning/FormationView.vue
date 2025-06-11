@@ -153,7 +153,7 @@
 <script>
 
 
-import { fetchProgression, fetchModules } from '@/services/api.js'
+import { fetchProgression, fetchModule, fetchModules } from '@/services/api.js'
 import StartModuleModal from './startModuleModal.vue'
 import ProgressBar from '@/components/layout/ProgressBar.vue'
 
