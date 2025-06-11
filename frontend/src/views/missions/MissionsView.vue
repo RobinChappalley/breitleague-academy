@@ -18,6 +18,11 @@
         <h1 class="missions-title">MISSIONS</h1>
       </div>
 
+      <!-- Message de succès -->
+      <div v-if="successMessage" class="success-message">
+        {{ successMessage }}
+      </div>
+
       <!-- Missions List -->
       <div class="missions-container">
         <div v-for="mission in visibleMissions" :key="mission.id" class="mission-card">
@@ -74,16 +79,16 @@ const error = ref(null)
 
 // Missions triées : missions complètes (100%) en haut, puis les autres
 const visibleMissions = computed(() => {
-  return missions.value
-    .filter((mission) => !mission.completed)
-    .sort((a, b) => {
-      // Missions à 100% en premier
-      if (a.progress === 100 && b.progress !== 100) return -1
-      if (a.progress !== 100 && b.progress === 100) return 1
-      // Sinon tri par progression décroissante
-      return b.progress - a.progress
-    })
+  return missions.value.sort((a, b) => {
+    // Missions à 100% en premier
+    if (a.progress === 100 && b.progress !== 100) return -1
+    if (a.progress !== 100 && b.progress === 100) return 1
+    // Sinon tri par progression décroissante
+    return b.progress - a.progress
+  })
 })
+
+const successMessage = ref('') // on ajoute un message
 
 const claimReward = async (mission) => {
   if (mission.progress === 100 && !mission.completed) {
@@ -96,7 +101,7 @@ const claimReward = async (mission) => {
           Accept: 'application/json'
         },
         body: JSON.stringify({
-          reward_id: mission.reward_id,
+          reward_id: mission.reward.id,
           user_id: user.value.id,
           is_favourite: false,
           acquired_at: new Date().toISOString()
@@ -109,7 +114,7 @@ const claimReward = async (mission) => {
 
       // DELETE la user-mission
       const resDeleteMission = await fetch(
-        `http://localhost:8000/api/v1/user-missions/${mission.pivot.id}`,
+        `http://localhost:8000/api/v1/user-missions/${mission.user_mission_id}`,
         {
           method: 'DELETE',
           credentials: 'include',
@@ -122,10 +127,18 @@ const claimReward = async (mission) => {
         throw new Error('Erreur lors de la suppression de la mission')
       }
 
-      // Mettre à jour la mission localement
-      mission.completed = true
+      // Supprimer mission de l'UI
+      missions.value = missions.value.filter((m) => m.user_mission_id !== mission.user_mission_id)
+
+      // Afficher message de succès
+      successMessage.value = `The watch "${mission.reward.model}" has been added to your collection !`
+
+      // Effacer le message après 2 secondes
+      setTimeout(() => {
+        successMessage.value = ''
+      }, 2500)
     } catch (error) {
-      console.error('❌ Erreur lors de claimReward:', error)
+      console.error(' Erreur lors de claimReward:', error)
     }
   }
 }
@@ -177,8 +190,8 @@ const getAllMissions = async () => {
               ...mission,
               reward: null,
               progress: mission.pivot.is_completed === 1 ? 100 : 0,
-              completed: mission.pivot.is_completed === 1,
-              user_mission_id: mission.pivot.id // clé du pivot UserMission !
+              completed: false, // NE PAS le mettre égal à is_completed !
+              user_mission_id: mission.pivot.id
             }
           }
 
@@ -188,7 +201,7 @@ const getAllMissions = async () => {
             ...mission,
             reward: rewardData.data,
             progress: mission.pivot.is_completed === 1 ? 100 : 0,
-            completed: mission.pivot.is_completed === 1,
+            completed: false, // pareil
             user_mission_id: mission.pivot.id
           }
         } catch (err) {
@@ -197,7 +210,7 @@ const getAllMissions = async () => {
             ...mission,
             reward: null,
             progress: mission.pivot.is_completed === 1 ? 100 : 0,
-            completed: mission.pivot.is_completed === 1,
+            completed: false,
             user_mission_id: mission.pivot.id
           }
         }
@@ -240,6 +253,18 @@ onMounted(async () => {
 .missions-header {
   text-align: center;
   margin-bottom: 2rem;
+}
+
+.success-message {
+  background: rgba(247, 199, 44, 0.1);
+  border: 1px solid #f7c72c;
+  color: #f7c72c;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
 }
 
 /* MISSIONS CONTAINER */
