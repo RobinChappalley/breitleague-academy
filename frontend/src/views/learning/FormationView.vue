@@ -248,7 +248,7 @@ export default {
       const currentAngle = startAngle - (index * angleStep);
       const angleRad = (currentAngle * Math.PI) / 180;
 
-      const radiusPixels = this.containerWidth;
+      const radiusPixels = this.containerWidth-30;
       const centerX = 0;
       const centerY = this.containerHeight / 2;
 
@@ -504,6 +504,8 @@ export default {
   color: whitesmoke;
   font-weight: bold;
   min-width: 150px;
+  max-width: 10vw;
+  text-align: left;
 }
 
 .action-btn {
