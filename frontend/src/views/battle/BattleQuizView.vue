@@ -265,28 +265,185 @@ const getCountryFlag = (posId) => {
 
 // Computed
 const currentQuestion = computed(() => {
-  if (questions.value.length === 0) return null
+  if (questions.value.length === 0) {
+    console.log('❌ Aucune question disponible')
+    return null
+  }
   
   const question = questions.value[currentQuestionIndex.value]
+  console.log('🎯 Question actuelle BRUTE:', question)
   
-  // UTILISER LA VRAIE STRUCTURE DE TA BASE (text_answer)
-  return {
-    id: question.id,
-    text: question.content_default || question.content_lf_tf || question.content_lf_blank || 'Question sans contenu',
-    answers: question.choices?.map(choice => ({
-      text: choice.text_answer || choice.content || choice.text,
-      correct: choice.is_correct || choice.correct || false
-    })) || []
+  if (!question) {
+    console.log('❌ Question non trouvée à l\'index:', currentQuestionIndex.value)
+    return null
   }
+  
+  // CORRIGER : Ne plus utiliser || false qui écrase
+  const formattedAnswers = question.choices?.map((choice, index) => {
+    const isCorrect = choice.is_correct === true // COMPARAISON STRICTE
+    
+    const answer = {
+      text: choice.text_answer || choice.content || choice.text || `Réponse ${index + 1}`,
+      correct: isCorrect // PAS de || false qui écrase !
+    }
+    
+    console.log(`📝 Formatage réponse ${index}:`)
+    console.log(`   - Texte: "${answer.text}"`)
+    console.log(`   - choice.is_correct (brute): ${choice.is_correct}`)
+    console.log(`   - choice.is_correct === true: ${choice.is_correct === true}`)
+    console.log(`   - Résultat final correct: ${answer.correct}`)
+    
+    return answer
+  }) || []
+  
+  const result = {
+    id: question.id,
+    text: question.content_default || question.content_if_TF || question.content_if_blank || 'Question sans contenu',
+    answers: formattedAnswers
+  }
+  
+  console.log('✅ Question FINALE pour affichage:', result)
+  console.log('🔍 === RÉSUMÉ DES RÉPONSES ===')
+  result.answers.forEach((answer, index) => {
+    console.log(`   ${index}: "${answer.text}" = ${answer.correct ? '✅ CORRECT' : '❌ incorrect'}`)
+  })
+  
+  return result
 })
 
+// CORRIGER formatQuestions() - UTILISER correct_answer_text au lieu de correct_choice_id
+const formatQuestions = async (questionsList) => {
+  try {
+    console.log('🔧 === FORMATAGE QUESTIONS AVEC correct_answer_text ===')
+    console.log('📋 Questions reçues:', questionsList)
+    
+    questions.value = questionsList.map((q, index) => {
+      console.log(`\n📝 === QUESTION ${index + 1} ===`)
+      console.log(`🆔 ID: ${q.id}`)
+      console.log(`📝 Contenu: ${q.content_default}`)
+      console.log(`🎯 correct_answer_text: ${q.correct_answer_text}`)
+      console.log(`🎯 correct_choice_id: ${q.correct_choice_id}`)
+      
+      const choices = q.choices || []
+      console.log(`📋 Choix reçus (${choices.length}):`, choices)
+      
+      if (choices.length === 0) {
+        console.warn(`⚠️ Aucun choix pour question ${q.id}`)
+        return {
+          id: q.id,
+          content_default: q.content_default,
+          choices: []
+        }
+      }
+      
+      // UTILISER correct_answer_text (format JSON string ou array)
+      let correctAnswerTexts = []
+      
+      if (q.correct_answer_text) {
+        try {
+          // Si c'est un string JSON, le parser
+          if (typeof q.correct_answer_text === 'string') {
+            correctAnswerTexts = JSON.parse(q.correct_answer_text)
+          } else if (Array.isArray(q.correct_answer_text)) {
+            correctAnswerTexts = q.correct_answer_text
+          } else {
+            correctAnswerTexts = [q.correct_answer_text]
+          }
+        } catch (e) {
+          console.warn('⚠️ Erreur parsing correct_answer_text, fallback sur string direct')
+          correctAnswerTexts = [q.correct_answer_text]
+        }
+      } else {
+        console.warn('⚠️ Pas de correct_answer_text, essai avec correct_choice_id')
+        // Fallback sur correct_choice_id si pas de correct_answer_text
+        const correctChoice = choices.find(c => parseInt(c.id) === parseInt(q.correct_choice_id))
+        if (correctChoice) {
+          correctAnswerTexts = [correctChoice.text_answer]
+        } else {
+          console.error('❌ Aucune méthode pour identifier la bonne réponse !')
+          correctAnswerTexts = []
+        }
+      }
+      
+      console.log(`✅ Réponses correctes identifiées:`, correctAnswerTexts)
+      
+      const formattedChoices = choices.map((choice, choiceIndex) => {
+        // COMPARAISON avec correct_answer_text
+        const isCorrect = correctAnswerTexts.includes(choice.text_answer)
+        
+        console.log(`\n📝 Choix ${choiceIndex}:`)
+        console.log(`   - ID: ${choice.id}`)
+        console.log(`   - Texte: "${choice.text_answer}"`)
+        console.log(`   - Comparaison avec correct_answer_text: ${isCorrect}`)
+        console.log(`   - Résultat: ${isCorrect ? '✅ CORRECT' : '❌ incorrect'}`)
+        
+        return {
+          id: choice.id,
+          text_answer: choice.text_answer,
+          is_correct: isCorrect // BOOLEAN STRICT basé sur correct_answer_text
+        }
+      })
+      
+      // VÉRIFICATION : une seule réponse correcte
+      const correctChoices = formattedChoices.filter(c => c.is_correct)
+      console.log(`\n🔍 Vérification question ${index + 1}:`)
+      console.log(`   - Choix corrects trouvés: ${correctChoices.length}`)
+      
+      if (correctChoices.length === 0) {
+        console.error(`❌ AUCUNE réponse correcte pour question ${q.id} !`)
+        console.error('❌ correct_answer_text:', correctAnswerTexts)
+        console.error('❌ Choix disponibles:', choices.map(c => c.text_answer))
+        
+        // FALLBACK : marquer le premier choix comme correct pour éviter le crash
+        if (formattedChoices.length > 0) {
+          formattedChoices[0].is_correct = true
+          console.warn('⚠️ FALLBACK: Premier choix marqué comme correct')
+        }
+      } else if (correctChoices.length > 1) {
+        console.error(`❌ PLUSIEURS réponses correctes pour question ${q.id} !`)
+      } else {
+        console.log(`✅ Une seule réponse correcte: "${correctChoices[0].text_answer}"`)
+      }
+      
+      // Mélanger les choix
+      const shuffledChoices = formattedChoices.sort(() => 0.5 - Math.random())
+      
+      return {
+        id: q.id,
+        content_default: q.content_default,
+        choices: shuffledChoices,
+        debug_correct_answer_text: correctAnswerTexts,
+        debug_original_correct_choice_id: q.correct_choice_id
+      }
+    })
+    
+    totalQuestions.value = questions.value.length
+    console.log(`\n✅ === FORMATAGE TERMINÉ ===`)
+    console.log(`📊 Total questions formatées: ${questions.value.length}`)
+    
+    // VÉRIFICATION FINALE
+    questions.value.forEach((q, index) => {
+      const correctChoices = q.choices.filter(c => c.is_correct)
+      console.log(`🔍 Question ${index + 1}: ${correctChoices.length} réponse(s) correcte(s)`)
+      if (correctChoices.length === 1) {
+        console.log(`✅ Bonne réponse: "${correctChoices[0].text_answer}"`)
+      }
+    })
+    
+  } catch (error) {
+    console.error('❌ Erreur formatage:', error)
+    loadFallbackQuestions()
+  }
+}
+
+// Computed
 const progressPercentage = computed(() => {
   if (totalQuestions.value === 0) return 0
   return (currentQuestionIndex.value / totalQuestions.value) * 100
 })
 
 // Charger les données de bataille depuis localStorage
-const loadBattleData = () => {
+const loadBattleData = async () => {
   try {
     const savedBattle = localStorage.getItem('currentBattle')
     if (savedBattle) {
@@ -304,29 +461,21 @@ const loadBattleData = () => {
         console.log('✅ Opponent data loaded:', opponent.value)
         console.log('🖼️ Opponent avatar:', battleData.value.opponent.avatar)
       }
-      
-      // Charger les questions depuis la base de données
-      if (battleData.value.questions && battleData.value.questions.length > 0) {
-        questions.value = battleData.value.questions
-        totalQuestions.value = questions.value.length
-        
-        console.log('✅ Questions loaded from database:', questions.value.length, 'questions')
-      } else {
-        console.warn('⚠️ No questions found in battle data, using fallback')
-        loadFallbackQuestions()
-      }
-    } else {
-      console.warn('⚠️ No battle data found, using fallback')
-      loadFallbackQuestions()
     }
+    
+    // TOUJOURS charger les questions depuis l'API (pas depuis localStorage)
+    await loadQuestionsFromAPI()
+    
   } catch (error) {
     console.error('❌ Error loading battle data:', error)
-    loadFallbackQuestions()
+    await loadQuestionsFromAPI() // Fallback sur l'API
   }
 }
 
-// Questions de fallback si problème avec la base
+// AJOUTER la fonction loadFallbackQuestions qui manque
 const loadFallbackQuestions = () => {
+  console.log('🔄 Chargement des questions de fallback...')
+  
   questions.value = [
     {
       id: 1,
@@ -381,7 +530,128 @@ const loadFallbackQuestions = () => {
   ]
   
   totalQuestions.value = questions.value.length
-  console.log('🔄 Using fallback questions:', questions.value.length)
+  console.log('✅ Questions de fallback chargées:', questions.value.length)
+}
+
+// AJOUTER la fonction loadSpecificQuestions qui manque aussi
+const loadSpecificQuestions = async (questionIds) => {
+  try {
+    console.log('🎯 Chargement des questions spécifiques:', questionIds)
+    
+    if (!Array.isArray(questionIds) || questionIds.length === 0) {
+      throw new Error('IDs de questions invalides')
+    }
+    
+    // Récupérer toutes les questions depuis l'API
+    const questionsData = await battleService.getQuestions()
+    console.log('📋 Toutes les questions depuis API:', questionsData)
+    
+    const allQuestions = questionsData.data || questionsData || []
+    console.log('📊 Questions disponibles dans l\'API:', allQuestions.length)
+    
+    if (allQuestions.length === 0) {
+      throw new Error('Aucune question disponible dans l\'API')
+    }
+    
+    // Filtrer les questions par leurs IDs dans l'ordre donné
+    const specificQuestions = questionIds.map(id => {
+      const found = allQuestions.find(q => q.id === id)
+      console.log(`🔍 Recherche question ID ${id}:`, found ? 'TROUVÉE' : 'NON TROUVÉE')
+      return found
+    }).filter(Boolean) // Enlever les undefined
+    
+    console.log(`🎯 Questions spécifiques trouvées: ${specificQuestions.length}/${questionIds.length}`)
+    
+    if (specificQuestions.length === 0) {
+      throw new Error('Aucune question spécifique trouvée')
+    }
+    
+    // Formater les questions trouvées
+    await formatQuestions(specificQuestions)
+    
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement des questions spécifiques:', error)
+    console.warn('⚠️ Fallback sur questions aléatoires')
+    
+    // Fallback : charger des questions aléatoirement
+    try {
+      const questionsData = await battleService.getQuestions()
+      const allQuestions = questionsData.data || questionsData || []
+      
+      if (allQuestions.length > 0) {
+        const shuffled = allQuestions.sort(() => 0.5 - Math.random())
+        const selectedQuestions = shuffled.slice(0, 5)
+        await formatQuestions(selectedQuestions)
+      } else {
+        throw new Error('Aucune question disponible')
+      }
+    } catch (fallbackError) {
+      console.error('❌ Erreur fallback:', fallbackError)
+      loadFallbackQuestions()
+    }
+  }
+}
+
+// CORRIGER loadQuestionsFromAPI() avec une gestion d'erreur plus robuste
+const loadQuestionsFromAPI = async () => {
+  try {
+    console.log('🔄 Chargement des questions pour cette bataille...')
+    console.log('🎯 battleData:', battleData.value)
+    
+    // Vérifier si on a des questions fixes pour cette bataille (IDs)
+    if (battleData.value?.questions && Array.isArray(battleData.value.questions) && battleData.value.questions.length > 0) {
+      console.log('🎯 Utilisation des questions fixes de la bataille:', battleData.value.questions)
+      await loadSpecificQuestions(battleData.value.questions)
+      return
+    }
+    
+    // Vérifier si l'autre joueur a déjà joué (questions complètes dans son summary)
+    if (battleData.value?.existingQuestions && Array.isArray(battleData.value.existingQuestions) && battleData.value.existingQuestions.length > 0) {
+      console.log('🔄 Utilisation des questions déjà jouées par l\'adversaire')
+      
+      // CORRIGER : Reformater les questions existantes avec la même structure
+      questions.value = battleData.value.existingQuestions.map((q, index) => ({
+        id: q.id || index + 1,
+        content_default: q.text || `Question ${index + 1}`,
+        choices: [
+          { text_answer: q.correctAnswer, is_correct: true },
+          { text_answer: 'Réponse B', is_correct: false },
+          { text_answer: 'Réponse C', is_correct: false },
+          { text_answer: 'Réponse D', is_correct: false }
+        ]
+      }))
+      
+      totalQuestions.value = questions.value.length
+      console.log('✅ Questions formatées depuis l\'adversaire:', questions.value.length)
+      return
+    }
+    
+    // Fallback : charger 5 questions aléatoirement depuis l'API
+    console.log('🎲 Chargement de 5 questions aléatoirement depuis l\'API...')
+    const questionsData = await battleService.getQuestions()
+    console.log('📋 Réponse API questions:', questionsData)
+    
+    const allQuestions = questionsData.data || questionsData || []
+    console.log('📊 Questions disponibles:', allQuestions.length)
+    
+    if (allQuestions.length === 0) {
+      console.warn('⚠️ Aucune question API, utilisation du fallback')
+      loadFallbackQuestions()
+      return
+    }
+    
+    // Sélectionner 5 questions aléatoirement
+    const shuffled = allQuestions.sort(() => 0.5 - Math.random())
+    const selectedQuestions = shuffled.slice(0, 5)
+    
+    console.log('🎯 Questions sélectionnées:', selectedQuestions.length)
+    await formatQuestions(selectedQuestions)
+    
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement des questions depuis API:', error)
+    console.warn('⚠️ Fallback sur questions par défaut')
+    loadFallbackQuestions()
+  }
 }
 
 // Methods (le reste des méthodes reste identique...)
@@ -405,58 +675,107 @@ const stopTimer = () => {
 const selectAnswer = (index) => {
   if (hasAnswered.value) return
   
+  console.log('\n🎯 === DÉBUT SÉLECTION RÉPONSE ===')
+  console.log(`🎯 Index cliqué: ${index}`)
+  
+  // VÉRIFICATIONS DE BASE
+  if (!currentQuestion.value) {
+    console.error('❌ currentQuestion.value est null/undefined')
+    return
+  }
+  
+  if (!currentQuestion.value.answers) {
+    console.error('❌ currentQuestion.value.answers est null/undefined')
+    console.log('❌ currentQuestion.value:', currentQuestion.value)
+    return
+  }
+  
+  if (index >= currentQuestion.value.answers.length) {
+    console.error(`❌ Index ${index} invalide (max: ${currentQuestion.value.answers.length - 1})`)
+    return
+  }
+  
+  const selectedAnswerObj = currentQuestion.value.answers[index]
+  console.log(`\n🔍 === ANALYSE RÉPONSE SÉLECTIONNÉE ===`)
+  console.log(`🔍 Index: ${index}`)
+  console.log(`🔍 Objet complet:`, selectedAnswerObj)
+  console.log(`🔍 Texte: "${selectedAnswerObj.text}"`)
+  console.log(`🔍 Propriété correct:`, selectedAnswerObj.correct)
+  console.log(`🔍 Type de correct:`, typeof selectedAnswerObj.correct)
+  
+  // COMPARAISON STRICTE
+  const isCorrect = selectedAnswerObj.correct === true
+  console.log(`🔍 Résultat final isCorrect: ${isCorrect}`)
+  
+  // DEBUG : Afficher TOUTES les réponses
+  console.log(`\n🔍 === TOUTES LES RÉPONSES ===`)
+  currentQuestion.value.answers.forEach((answer, i) => {
+    const thisCorrect = answer.correct === true
+    console.log(`   ${i}: "${answer.text}"`)
+    console.log(`       correct: ${answer.correct} (${typeof answer.correct})`)
+    console.log(`       correct === true: ${thisCorrect}`)
+    console.log(`       ${i === index ? '← SÉLECTIONNÉE' : ''}`)
+    console.log(`       ${thisCorrect ? '✅ CORRECTE' : '❌ incorrecte'}`)
+  })
+  
+  // TROUVER LA VRAIE BONNE RÉPONSE
+  const correctAnswerIndex = currentQuestion.value.answers.findIndex(a => a.correct === true)
+  console.log(`\n🎯 Index de la vraie bonne réponse: ${correctAnswerIndex}`)
+  
+  if (correctAnswerIndex === -1) {
+    console.error('❌ AUCUNE bonne réponse trouvée dans cette question !')
+  } else {
+    const correctAnswer = currentQuestion.value.answers[correctAnswerIndex]
+    console.log(`✅ Vraie bonne réponse: "${correctAnswer.text}"`)
+  }
+  
   selectedAnswer.value = index
   hasAnswered.value = true
   stopTimer()
 
   const timeTaken = 30 - timeLeft.value
   playerTime.value += timeTaken
-
   const opponentTime = Math.floor(Math.random() * 25) + 3
   
-  let isCorrect = false
-  let selectedAnswerText = 'Pas de réponse'
   let pointsEarned = 0
+  const selectedAnswerText = selectedAnswerObj.text
   
-  if (index !== null && currentQuestion.value?.answers[index]) {
-    isCorrect = currentQuestion.value.answers[index].correct
-    selectedAnswerText = currentQuestion.value.answers[index].text
+  if (isCorrect) {
+    console.log('🎉 === BONNE RÉPONSE CONFIRMÉE ===')
+    playerScore.value++
     
-    if (isCorrect) {
-      playerScore.value++
+    const basePoints = 100
+    let speedBonus = 0
+    
+    if (timeTaken < opponentTime) {
+      const timeDifference = opponentTime - timeTaken
       
-      const basePoints = 100
-      let speedBonus = 0
-      
-      if (timeTaken < opponentTime) {
-        const timeDifference = opponentTime - timeTaken
-        
-        if (timeDifference >= 15) {
-          speedBonus = 75
-        } else if (timeDifference >= 10) {
-          speedBonus = 50
-        } else if (timeDifference >= 5) {
-          speedBonus = 30
-        } else {
-          speedBonus = 15
-        }
-      }
-      
-      pointsEarned = basePoints + speedBonus
-      
-      if (speedBonus > 0) {
-        pointsPopupText.value = `+${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité vs adversaire)`
+      if (timeDifference >= 15) {
+        speedBonus = 75
+      } else if (timeDifference >= 10) {
+        speedBonus = 50
+      } else if (timeDifference >= 5) {
+        speedBonus = 30
       } else {
-        pointsPopupText.value = `+${pointsEarned} PTS\n(Adversaire était plus rapide)`
+        speedBonus = 15
       }
-      
-      showPointsPopup.value = true
-      setTimeout(() => showPointsPopup.value = false, 2500)
-    } else {
-      pointsPopupText.value = `0 PTS\n(Mauvaise réponse)`
-      showPointsPopup.value = true
-      setTimeout(() => showPointsPopup.value = false, 2000)
     }
+    
+    pointsEarned = basePoints + speedBonus
+    
+    if (speedBonus > 0) {
+      pointsPopupText.value = `+${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité vs adversaire)`
+    } else {
+      pointsPopupText.value = `+${pointsEarned} PTS\n(Adversaire était plus rapide)`
+    }
+    
+    showPointsPopup.value = true
+    setTimeout(() => showPointsPopup.value = false, 2500)
+  } else {
+    console.log('💥 === MAUVAISE RÉPONSE CONFIRMÉE ===')
+    pointsPopupText.value = `0 PTS\n(Mauvaise réponse)`
+    showPointsPopup.value = true
+    setTimeout(() => showPointsPopup.value = false, 2000)
   }
   
   playerAnswers.value.push({
@@ -470,6 +789,9 @@ const selectAnswer = (index) => {
     points: pointsEarned,
     speedBonus: isCorrect ? (timeTaken < opponentTime ? true : false) : false
   })
+  
+  console.log('📊 Réponse ajoutée:', playerAnswers.value[playerAnswers.value.length - 1])
+  console.log('🎯 === FIN SÉLECTION RÉPONSE ===\n')
   
   setTimeout(() => nextQuestion(), 2500)
 }
@@ -491,135 +813,139 @@ const finishBattle = async () => {
   
   const playerTotalPoints = playerAnswers.value.reduce((total, answer) => total + answer.points, 0)
   
-  // Générer les réponses de l'adversaire
-  const opponentAnswers = playerAnswers.value.map((playerAnswer, index) => {
-    const question = questions.value[index]
-    const opponentTime = Math.random() * 25 + 5 // Entre 5 et 30 secondes
+  try {
+    const existingBattleId = battleData.value?.id
+    console.log('🆔 Mise à jour de la bataille:', existingBattleId)
     
-    const isCorrect = Math.random() > 0.3 // 70% de chance d'être correct
-    const randomAnswer = Math.floor(Math.random() * 4)
+    if (!existingBattleId) {
+      throw new Error('ID de bataille manquant')
+    }
+
+    await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+      credentials: 'include'
+    })
+
+    // Déterminer si je suis challenger ou challenged
+    const iAmChallenger = battleData.value?.isFirstPlayer === false
     
-    let points = 0
-    if (isCorrect) {
-      opponentScore.value++
-      
-      const basePoints = 100
-      let speedBonus = 0
-      
-      if (opponentTime < playerAnswer.time) {
-        const timeDifference = playerAnswer.time - opponentTime
-        
-        if (timeDifference >= 15) {
-          speedBonus = 75
-        } else if (timeDifference >= 10) {
-          speedBonus = 50
-        } else if (timeDifference >= 5) {
-          speedBonus = 30
-        } else {
-          speedBonus = 15
+    // Préparer les données selon mon rôle
+    let updateData = {}
+    
+    if (iAmChallenger) {
+      // Je suis le challenger, j'ajoute challenger_summary
+      updateData = {
+        has_challenger_won: null,
+        challenger_summary: {
+          score: playerScore.value,
+          totalPoints: playerTotalPoints,
+          totalTime: playerTime.value,
+          answers: playerAnswers.value.map(answer => ({
+            questionId: answer.questionId,
+            selectedAnswer: answer.selectedAnswer,
+            correct: answer.correct,
+            time: answer.time,
+            points: answer.points
+          })),
+          questionsData: questions.value.map(q => ({
+            id: q.id,
+            text: q.text,
+            correctAnswer: q.answers?.find(a => a.correct)?.text || 'Réponse correcte'
+          }))
         }
       }
-      
-      points = basePoints + speedBonus
+    } else {
+      // Je suis le challenged, j'ajoute challenged_summary
+      updateData = {
+        has_challenger_won: null,
+        challenged_summary: {
+          score: playerScore.value,
+          totalPoints: playerTotalPoints,
+          totalTime: playerTime.value,
+          answers: playerAnswers.value.map(answer => ({
+            questionId: answer.questionId,
+            selectedAnswer: answer.selectedAnswer,
+            correct: answer.correct,
+            time: answer.time,
+            points: answer.points
+          })),
+          questionsData: questions.value.map(q => ({
+            id: q.id,
+            text: q.text,
+            correctAnswer: q.answers?.find(a => a.correct)?.text || 'Réponse correcte'
+          }))
+        }
+      }
     }
     
-    return {
-      questionId: question.id,
-      questionText: question.content_default,
-      selectedAnswer: question.choices?.[randomAnswer]?.text_answer || question.choices?.[randomAnswer]?.text || 'Réponse mockée',
-      correct: isCorrect,
-      text: question.choices?.[randomAnswer]?.text_answer || question.choices?.[randomAnswer]?.text || 'Réponse mockée',
-      time: opponentTime,
-      timeLeft: Math.max(0, 30 - opponentTime),
-      points: points,
-      speedBonus: isCorrect ? (opponentTime < playerAnswer.time ? true : false) : false
-    }
-  })
-  
-  const opponentTotalPoints = opponentAnswers.reduce((total, answer) => total + answer.points, 0)
-  
-  try {
-    // Créer un ID unique pour la bataille
-    const battleId = Date.now()
+    console.log('💾 Données de mise à jour:', updateData)
+
+    const csrfToken = decodeURIComponent(
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1] ?? ''
+    )
     
-    // Calculer les points de victoire/défaite
-    const isPlayerWinner = playerTotalPoints > opponentTotalPoints
-    const pointsChange = isPlayerWinner ? +300 : (playerTotalPoints === opponentTotalPoints ? +100 : -70)
+    const response = await fetch(`http://localhost:8000/api/v1/battles/${existingBattleId}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-XSRF-TOKEN': csrfToken
+      },
+      body: JSON.stringify(updateData)
+    })
     
-    // Préparer les données pour BattleDetailsView
-    const battleResults = {
-      battleId: battleId,
-      opponent: opponent.value,
-      playerScore: playerScore.value,
-      opponentScore: opponentScore.value,
-      playerTime: playerTime.value,
-      opponentTime: opponentAnswers.reduce((total, answer) => total + answer.time, 0),
-      playerTotalPoints: playerTotalPoints,
-      opponentTotalPoints: opponentTotalPoints,
-      questionsData: questions.value.map(q => ({
-        id: q.id,
-        text: q.content_default || q.content_lf_tf || q.content_lf_blank || 'Question sans contenu',
-        correctAnswer: q.choices?.find(c => c.is_correct)?.text_answer || q.choices?.find(c => c.is_correct)?.text || 'Réponse correcte'
-      })),
-      playerAnswers: playerAnswers.value.map(answer => ({
-        correct: answer.correct,
-        text: answer.selectedAnswer || answer.text,
-        time: answer.time
-      })),
-      opponentAnswers: opponentAnswers.map(answer => ({
-        correct: answer.correct,
-        text: answer.selectedAnswer || answer.text,
-        time: answer.time
-      }))
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`API Error: ${response.status} - ${errorText}`)
     }
     
-    // NOUVEAU : Préparer les données pour la section "Finished Battles"
-    const finishedBattleData = {
-      id: battleId,
-      name: opponent.value.name,
-      country: opponent.value.flag,
-      points: pointsChange,
-      user: opponent.value,
-      timestamp: Date.now(),
-      playerWon: isPlayerWinner
+    const updatedBattle = await response.json()
+    const battle = updatedBattle.data || updatedBattle
+    
+    console.log('✅ Tour terminé:', battle)
+    
+    // NOUVEAU : Vérifier si la bataille est maintenant terminée
+    const bothPlayersFinished = battle.challenger_summary && battle.challenged_summary
+    
+    if (bothPlayersFinished) {
+      console.log('🏁 Bataille terminée ! Redirection vers BattleDetails')
+      await router.push(`/battle-details/${existingBattleId}`)
+    } else {
+      console.log('⏳ En attente de l\'autre joueur, retour à Battle')
+      await router.push('/battle')
     }
-    
-    console.log('💾 Sauvegarde des résultats de bataille:', battleResults)
-    console.log('🏆 Sauvegarde de la bataille terminée:', finishedBattleData)
-    
-    // Sauvegarder dans localStorage pour BattleDetailsView
-    localStorage.setItem('lastBattleResults', JSON.stringify(battleResults))
-    
-    // NOUVEAU : Sauvegarder dans localStorage pour BattleView (finished battles)
-    const existingFinishedBattles = JSON.parse(localStorage.getItem('finishedBattles') || '[]')
-    existingFinishedBattles.unshift(finishedBattleData) // Ajouter au début
-    
-    // Garder seulement les 10 dernières batailles
-    if (existingFinishedBattles.length > 10) {
-      existingFinishedBattles.splice(10)
-    }
-    
-    localStorage.setItem('finishedBattles', JSON.stringify(existingFinishedBattles))
-    
-    // Rediriger vers battle-details avec l'ID
-    console.log('🔄 Redirection vers battle-details avec ID:', battleId)
-    await router.push(`/battle-details/${battleId}`)
     
   } catch (error) {
-    console.error('❌ Erreur lors de la finalisation de la bataille:', error)
-    // En cas d'erreur, rediriger quand même vers battle-details
-    await router.push('/battle-details/1')
+    console.error('❌ Erreur lors de la sauvegarde:', error)
+    alert(`Erreur: ${error.message}`)
+    router.push('/battle')
   }
 }
 
+// CORRIGER getAnswerClass() avec debug
 const getAnswerClass = (index) => {
   if (!hasAnswered.value) return ''
   
-  if (selectedAnswer.value === index) {
-    return currentQuestion.value?.answers[index]?.correct ? 'correct' : 'incorrect'
+  const selectedAnswerObj = currentQuestion.value?.answers[index]
+  const isSelectedAnswer = selectedAnswer.value === index
+  const isCorrectAnswer = selectedAnswerObj?.correct === true
+  
+  console.log(`🎨 Style pour réponse ${index}:`, {
+    isSelected: isSelectedAnswer,
+    isCorrect: isCorrectAnswer,
+    answerObj: selectedAnswerObj,
+    correctProperty: selectedAnswerObj?.correct,
+    correctType: typeof selectedAnswerObj?.correct
+  })
+  
+  if (isSelectedAnswer) {
+    return isCorrectAnswer ? 'correct' : 'incorrect'
   }
   
-  if (currentQuestion.value?.answers[index]?.correct) {
+  if (isCorrectAnswer) {
     return 'correct-answer'
   }
   
@@ -641,21 +967,23 @@ const getAvatarStyle = (player) => {
   }
 }
 
-// Lifecycle - ORDRE DE CHARGEMENT IMPORTANT
+// Lifecycle - ORDRE DE CHARGEMENT MODIFIÉ
 onMounted(async () => {
   console.log('🚀 BattleQuizView mounted')
   
   // 1. Charger les données du joueur actuel EN PREMIER
   await loadCurrentUserData()
   
-  // 2. Ensuite charger les données de bataille
-  loadBattleData()
+  // 2. Ensuite charger les données de bataille (qui va charger les questions depuis l'API)
+  await loadBattleData()
   
   // 3. Démarrer le timer après un délai
   setTimeout(() => {
     if (questions.value.length > 0) {
       console.log('⏰ Starting timer...')
       startTimer()
+    } else {
+      console.error('❌ Aucune question disponible pour démarrer le timer')
     }
   }, 1000)
 })

@@ -419,62 +419,150 @@ const loadCurrentUserData = async () => {
   }
 }
 
-// Charger les données depuis localStorage si disponibles
+// Charger les données depuis l'API UNIQUEMENT
 onMounted(async () => {
   console.log('🔄 BattleDetailsView mounted with battleId:', battleId)
   
   // 1. D'abord charger les données utilisateur
   await loadCurrentUserData()
   
-  // 2. Ensuite charger les données de bataille
-  const savedResults = localStorage.getItem('lastBattleResults')
-  if (savedResults) {
-    try {
-      const results = JSON.parse(savedResults)
-      console.log('📋 Données récupérées depuis localStorage:', results)
-      
-      // Vérifier si les données correspondent à cette bataille
-      const currentBattleId = battleId ? parseInt(battleId) : null
-      
-      if (!battleId || results.battleId === currentBattleId) {
-        console.log('✅ Mise à jour avec les données de la bataille')
-        
-        // Mettre à jour l'adversaire
-        if (results.opponent) {
-          opponent.value = {
-            ...opponent.value,
-            ...results.opponent
-          }
-          console.log('✅ Opponent loaded:', opponent.value)
-          console.log('🖼️ Opponent avatar:', opponent.value.avatar)
-        }
-        
-        // Mettre à jour les réponses du joueur
-        if (results.playerAnswers?.length) {
-          playerAnswers.value = results.playerAnswers
-        }
-        
-        // Mettre à jour les réponses de l'adversaire
-        if (results.opponentAnswers?.length) {
-          opponentAnswers.value = results.opponentAnswers
-        }
-        
-        // Mettre à jour les données des questions
-        if (results.questionsData?.length) {
-          questionsData.value = results.questionsData
-        }
-        
-        console.log('✅ Toutes les données ont été mises à jour')
-      } else {
-        console.log('⚠️ ID de bataille ne correspond pas:', currentBattleId, 'vs', results.battleId)
-      }
-    } catch (error) {
-      console.error('❌ Erreur lors du parsing des données localStorage:', error)
-    }
+  // 2. NOUVEAU : Charger les données de bataille depuis l'API UNIQUEMENT
+  if (battleId) {
+    await loadBattleFromAPI(battleId)
   } else {
-    console.log('⚠️ Aucune donnée trouvée dans localStorage')
+    console.error('❌ Aucun ID de bataille fourni')
+    router.push('/battle')
   }
 })
+
+// NOUVELLE FONCTION : Charger une bataille depuis l'API
+const loadBattleFromAPI = async (battleId) => {
+  try {
+    console.log('🔄 Chargement de la bataille depuis l\'API:', battleId)
+    
+    const response = await fetch(`http://localhost:8000/api/v1/battles/${battleId}`, {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+    
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`)
+    }
+    
+    const battleDetail = await response.json()
+    const battle = battleDetail.data || battleDetail
+    
+    console.log('📋 Bataille récupérée depuis l\'API:', battle)
+    console.log('📋 Challenger summary:', battle.challenger_summary)
+    console.log('📋 Challenged summary:', battle.challenged_summary)
+    
+    // Vérifier qu'on a les données nécessaires
+    if (!battle.challenger_summary || !battle.challenged_summary) {
+      throw new Error('Données de bataille incomplètes')
+    }
+    
+    // DÉTERMINER QUI EST LE JOUEUR ACTUEL
+    const isCurrentUserChallenger = battle.challenger_id === currentPlayer.value.id
+    
+    if (isCurrentUserChallenger) {
+      // L'utilisateur actuel est le challenger
+      console.log('✅ L\'utilisateur actuel est le challenger')
+      
+      // Mettre à jour l'adversaire (challenged)
+      opponent.value = {
+        id: battle.challenged?.id || battle.challenged_id,
+        name: battle.challenged?.username || battle.challenged?.name || 'Adversaire',
+        avatar: battle.challenged?.avatar || null,
+        flag: battle.challenged?.pos?.country_flag || getCountryCodeSafe(battle.challenged) || '🇨🇭'
+      }
+      
+      // Mettre à jour les réponses du joueur (challenger)
+      playerAnswers.value = (battle.challenger_summary?.answers || []).map(answer => ({
+        correct: answer.correct || false,
+        text: answer.selectedAnswer || answer.text || 'Pas de réponse',
+        time: answer.time || 0
+      }))
+      
+      // Mettre à jour les réponses de l'adversaire (challenged)
+      opponentAnswers.value = (battle.challenged_summary?.answers || []).map(answer => ({
+        correct: answer.correct || false,
+        text: answer.selectedAnswer || answer.text || 'Pas de réponse',
+        time: answer.time || 0
+      }))
+      
+    } else {
+      // L'utilisateur actuel est le challenged
+      console.log('✅ L\'utilisateur actuel est le challenged')
+      
+      // Mettre à jour l'adversaire (challenger)
+      opponent.value = {
+        id: battle.challenger?.id || battle.challenger_id,
+        name: battle.challenger?.username || battle.challenger?.name || 'Adversaire',
+        avatar: battle.challenger?.avatar || null,
+        flag: battle.challenger?.pos?.country_flag || getCountryCodeSafe(battle.challenger) || '🇨🇭'
+      }
+      
+      // Mettre à jour les réponses du joueur (challenged)
+      playerAnswers.value = (battle.challenged_summary?.answers || []).map(answer => ({
+        correct: answer.correct || false,
+        text: answer.selectedAnswer || answer.text || 'Pas de réponse',
+        time: answer.time || 0
+      }))
+      
+      // Mettre à jour les réponses de l'adversaire (challenger)
+      opponentAnswers.value = (battle.challenger_summary?.answers || []).map(answer => ({
+        correct: answer.correct || false,
+        text: answer.selectedAnswer || answer.text || 'Pas de réponse',
+        time: answer.time || 0
+      }))
+    }
+    
+    // Mettre à jour les questions (depuis challenger_summary car elles sont identiques)
+    if (battle.challenger_summary?.questionsData?.length) {
+      questionsData.value = battle.challenger_summary.questionsData
+    }
+    
+    console.log('✅ Toutes les données ont été chargées depuis l\'API')
+    console.log('- Adversaire:', opponent.value.name)
+    console.log('- Questions:', questionsData.value.length)
+    console.log('- Réponses joueur:', playerAnswers.value.length)
+    console.log('- Réponses adversaire:', opponentAnswers.value.length)
+    
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement de la bataille:', error)
+    alert(`Erreur lors du chargement de la bataille: ${error.message}`)
+    router.push('/battle')
+  }
+}
+
+// FONCTION UTILITAIRE : Version sécurisée de getCountryCode
+const getCountryCodeSafe = (user) => {
+  if (!user) return '🇨🇭'
+  
+  // 1. Essayer depuis pos.country_flag
+  if (user.pos && user.pos.country_flag) {
+    return user.pos.country_flag
+  }
+  
+  // 2. Fallback sur pos_id
+  if (user.pos_id) {
+    const countryMapping = {
+      1: '🇨🇭', 2: '🇫🇷', 3: '🇩🇪', 4: '🇮🇹', 5: '🇪🇸', 
+      6: '🇵🇹', 7: '🇷🇴', 8: '🇺🇸', 9: '🇬🇧', 10: '🇧🇪'
+    }
+    return countryMapping[user.pos_id] || '🇨🇭'
+  }
+  
+  return '🇨🇭'
+}
+
+const closeBattleDetails = () => {
+  router.push('/battle')
+}
+
+const returnToBattles = () => {
+  router.push('/battle')
+}
 
 // Computed Properties
 const totalQuestions = computed(() => questionsData.value.length)
@@ -554,17 +642,6 @@ const getAvatarStyle = (player) => {
   }
 }
 
-const closeBattleDetails = () => {
-  // Nettoyer localStorage
-  localStorage.removeItem('lastBattleResults')
-  router.push('/battle')
-}
-
-const returnToBattles = () => {
-  // Nettoyer localStorage
-  localStorage.removeItem('lastBattleResults')
-  router.push('/battle')
-}
 </script>
 
 <style scoped>
