@@ -142,7 +142,7 @@ export default {
             },
         Novelties: {
           watch: '/backgrounds/explorators-watch.png',
-          backgroundMobile: 'backgrounds/explorators-horizontal.png',
+          backgroundMobile: 'backgrounds/explorators-vertical.png',
           backgroundDesktop: 'backgrounds/explorators-horizontal.png',
         },
         Discovery: {
