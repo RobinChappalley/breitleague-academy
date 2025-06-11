@@ -206,12 +206,26 @@ onMounted(() => {
   console.log('ProfileView monté, chargement des données...')
   loadUserProfile()
 })
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop().split(';').shift()
+}
+
+const csrfToken = getCookie('XSRF-TOKEN')
 const logout = async () => {
   try {
-    await fetch('/logout', {
+    await fetch('http://localhost:8000/logout', {
       method: 'POST',
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        'X-CSRF-TOKEN': csrfToken,
+        Accept: 'application/json'
+      }
     })
+    localStorage.clear()
+    sessionStorage.clear()
 
     // Redirige vers la page de login
     router.push('/login')
