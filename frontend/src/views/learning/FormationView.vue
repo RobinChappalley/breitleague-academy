@@ -74,12 +74,13 @@
           />
 
           <!-- Boutons de checkpoint avec progression individuelle -->
-          <RouterLink
+          <div
               v-for="(lesson,index) in lessons"
               :key="index"
-              :to="`/lesson/${lesson.id}`"
               class="lesson-container"
               :style="getButtonPosition(index)"
+              @click="openStartModal(lesson)"
+
 
           >
             <!-- Cercle de progression pour chaque leçon -->
@@ -119,7 +120,7 @@
             <p class="lesson-label">
               {{ lesson.title }}
             </p>
-          </RouterLink>
+          </div>
         </div>
       </transition>
     </div>
