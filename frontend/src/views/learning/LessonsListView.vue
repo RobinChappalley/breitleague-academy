@@ -176,6 +176,7 @@ p {
   border-radius: 12px;
   padding: 1.5rem 2rem;
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
@@ -341,7 +342,6 @@ p {
   
   .lesson-item {
     padding: 1rem 1.2rem;
-    flex-direction: column;
     gap: 1rem;
     text-align: center;
   }
@@ -353,7 +353,7 @@ p {
   .read-btn {
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
-    width: 100%;
+    width: 100px;
   }
 }
 .back-arrow {
