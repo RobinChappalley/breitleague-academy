@@ -1,63 +1,79 @@
 <template>
   <div class="quiz-page">
-    <!-- Progress Bar -->
-    <div class="progress-container">
-      <div class="progress-bar">
-        <div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
-      </div>
+    <!-- Loading State -->
+    <div v-if="loading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Chargement des questions...</p>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="error" class="error-container">
+      <p>{{ error }}</p>
+      <button @click="loadQuestions" class="retry-btn">Réessayer</button>
     </div>
 
     <!-- Quiz Content -->
-    <div class="quiz-content">
-      <div class="quiz-container">
-        <!-- Question -->
-        <div class="question-section">
-          <p class="question-text">{{ questions[currentQuestionIndex].question }}</p>
-        </div>
-
-        <!-- Answer Options -->
-        <div class="answers-section">
-          <div 
-            v-for="(answer, index) in questions[currentQuestionIndex].answers" 
-            :key="index"
-            class="answer-option"
-            :class="{ 
-              'selected': selectedAnswer === index,
-              'correct': showResult && answer.correct,
-              'incorrect': showResult && selectedAnswer === index && !answer.correct
-            }"
-            @click="selectAnswer(index)"
-          >
-            {{ answer.text }}
-          </div>
-        </div>
-
-        <!-- Navigation -->
-        <div class="button-section">
-          <button 
-            class="cancel-btn" 
-            @click="exitQuiz"
-            title="Exit Quiz"
-          >
-            ✕
-          </button>
-          
-          <button 
-            class="next-btn"
-            :class="{ 'disabled': selectedAnswer === null && !showResult }"
-            @click="nextQuestion"
-            :disabled="selectedAnswer === null && !showResult"
-          >
-            {{ currentQuestion === totalQuestions ? 'FINISH' : 'NEXT' }}
-          </button>
+    <div v-else-if="questions.length > 0">
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
         </div>
       </div>
-    </div>
+      <!-- Timer Centered -->
+    <h1 class="timer-large">{{ formatTime(timeRemaining) }}</h1>
 
-    <!-- Timer Display -->
-    <div class="timer-display">
-      <span class="timer-icon">⏱️</span>
-      <span class="timer-text">{{ formatTime(timeRemaining) }}</span>
+      <!-- Quiz Content -->
+      <div class="quiz-content">
+        <div class="quiz-container">
+          <!-- Question -->
+          <div class="question-section">
+            <p class="question-text">{{ questions[currentQuestionIndex].question }}</p>
+          </div>
+
+          <!-- Answer Options -->
+          <div class="answers-section">
+            <div 
+              v-for="(answer, index) in questions[currentQuestionIndex].answers" 
+              :key="index"
+              class="answer-option"
+              :class="{
+                'selected': selectedAnswer === index && !showResult,
+                'correct': showResult && answer.correct,
+                'incorrect': showResult && selectedAnswer === index && !answer.correct,
+                'not-selected': showResult && selectedAnswer !== index && !answer.correct
+              }"
+              @click="selectAnswer(index)"
+            >
+              <span class="answer-text">{{ answer.text }}</span>
+              <span v-if="showResult && answer.correct" class="check-icon">✓</span>
+              <span v-if="showResult && selectedAnswer === index && !answer.correct" class="cross-icon">✗</span>
+            </div>
+          </div>
+
+          <!-- Navigation -->
+          <div class="button-section">
+            <button 
+              class="cancel-btn" 
+              @click="exitQuiz"
+              title="Exit Quiz"
+            >
+              ✕
+            </button>
+            
+            <button 
+              class="next-btn"
+              :class="{ 'disabled': selectedAnswer === null && !showResult }"
+              @click="nextQuestion"
+              :disabled="selectedAnswer === null && !showResult"
+            >
+              {{ currentQuestion === totalQuestions ? 'FINISH' : 'NEXT' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      
     </div>
   </div>
 </template>
@@ -65,6 +81,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { battleService } from '@/services/api'
 
 const router = useRouter()
 
@@ -72,104 +89,18 @@ const router = useRouter()
 const currentQuestionIndex = ref(0)
 const selectedAnswer = ref(null)
 const userAnswers = ref([])
-const timeRemaining = ref(1200) // 20 minutes in seconds
-const totalTime = ref(1200)
+const timeRemaining = ref(600) // 20 minutes in seconds
+const totalTime = ref(600)
 const showResult = ref(false)
 const quizTimer = ref(null)
 
-// Quiz Data
-const questions = ref([
-  {
-    question: "When was Breitling founded and by whom?",
-    answers: [
-      { text: "1884 by Léon Breitling", correct: true },
-      { text: "1905 by Gaston Breitling", correct: false },
-      { text: "1892 by Georges Breitling", correct: false },
-      { text: "1878 by Henri Breitling", correct: false }
-    ]
-  },
-  {
-    question: "What was Breitling's primary focus when the company was first established?",
-    answers: [
-      { text: "Luxury dress watches", correct: false },
-      { text: "Chronographs and precision timing instruments", correct: true },
-      { text: "Marine chronometers", correct: false },
-      { text: "Pocket watches for the general public", correct: false }
-    ]
-  },
-  {
-    question: "Which Breitling watch was the first wrist-worn chronograph?",
-    answers: [
-      { text: "Navitimer", correct: false },
-      { text: "Premier", correct: false },
-      { text: "Montbrillant", correct: true },
-      { text: "Chronomat", correct: false }
-    ]
-  },
-  {
-    question: "What makes the Breitling Navitimer distinctive?",
-    answers: [
-      { text: "Its diving capabilities", correct: false },
-      { text: "The integrated slide rule bezel", correct: true },
-      { text: "The GMT function", correct: false },
-      { text: "The perpetual calendar", correct: false }
-    ]
-  },
-  {
-    question: "Which professional group was primarily targeted by early Breitling chronographs?",
-    answers: [
-      { text: "Racing drivers", correct: false },
-      { text: "Aviation professionals", correct: true },
-      { text: "Military officers", correct: false },
-      { text: "Scientists and researchers", correct: false }
-    ]
-  },
-  {
-    question: "What does the Breitling Emergency watch feature?",
-    answers: [
-      { text: "GPS navigation", correct: false },
-      { text: "Emergency locator transmitter", correct: true },
-      { text: "Satellite communication", correct: false },
-      { text: "Weather forecast", correct: false }
-    ]
-  },
-  {
-    question: "In which year was the Navitimer first launched?",
-    answers: [
-      { text: "1950", correct: false },
-      { text: "1952", correct: true },
-      { text: "1954", correct: false },
-      { text: "1956", correct: false }
-    ]
-  },
-  {
-    question: "What is the signature feature of Breitling's Superocean collection?",
-    answers: [
-      { text: "Chronograph function", correct: false },
-      { text: "Diving capabilities", correct: true },
-      { text: "GMT complication", correct: false },
-      { text: "Skeleton dial", correct: false }
-    ]
-  },
-  {
-    question: "Which caliber is most commonly associated with modern Breitling Navitimer watches?",
-    answers: [
-      { text: "B01", correct: true },
-      { text: "B09", correct: false },
-      { text: "B20", correct: false },
-      { text: "B13", correct: false }
-    ]
-  },
-  {
-    question: "What is the minimum passing score for this checkpoint?",
-    answers: [
-      { text: "60%", correct: false },
-      { text: "65%", correct: false },
-      { text: "70%", correct: true },
-      { text: "75%", correct: false }
-    ]
-  }
-])
+// API State
+const loading = ref(true)
+const error = ref(null)
+const questions = ref([])
+
+// Configuration
+const CHECKPOINT_ID = 1
 
 // Computed Properties
 const currentQuestion = computed(() => currentQuestionIndex.value + 1)
@@ -188,42 +119,116 @@ const finalScore = computed(() => {
 
 const testPassed = computed(() => finalScore.value >= 70)
 
-// Methods
+// API Methods
+const loadQuestions = async () => {
+  try {
+    loading.value = true
+    error.value = null
+
+    const questionsRaw = await battleService.getQuestions()
+    const choicesRaw = await battleService.getChoices()
+
+    const questionsData = questionsRaw.data || questionsRaw
+    const choicesData = choicesRaw.data || choicesRaw
+
+    const checkpointQuestions = questionsData.filter(q => q.checkpoint_id === CHECKPOINT_ID)
+    const qcmQuestions = transformQuestionsToQCM(checkpointQuestions, choicesData)
+
+    if (qcmQuestions.length === 0) {
+      throw new Error('Aucune question QCM trouvée pour ce checkpoint')
+    }
+
+    questions.value = qcmQuestions
+    loading.value = false
+
+  } catch (err) {
+    console.error('Erreur lors du chargement des questions:', err)
+    error.value = err.message || 'Erreur lors du chargement des questions'
+    loading.value = false
+  }
+}
+
+const transformQuestionsToQCM = (questionsData, choicesData) => {
+  const qcmQuestions = questionsData
+    .map(question => {
+      const questionChoices = choicesData.filter(choice => choice.question_id === question.id)
+      if (questionChoices.length < 2) return null
+
+      // Amélioration pour gérer différentes structures de données possibles
+      const correctChoiceId = question.correct_answer_text?.correct_choice_id || 
+                             question.correct_choice_id ||
+                             question.correct_answer_id
+
+      const answers = questionChoices.map(choice => ({
+        id: choice.id,
+        text: choice.text_answer,
+        correct: choice.id === correctChoiceId
+      }))
+
+      // Vérifier qu'au moins une réponse est marquée comme correcte
+      const hasCorrectAnswer = answers.some(a => a.correct)
+      if (!hasCorrectAnswer && answers.length > 0) {
+        console.warn(`Aucune réponse correcte trouvée pour la question ${question.id}`)
+        // Marquer la première réponse comme correcte par défaut (à ajuster selon votre logique)
+        answers[0].correct = true
+      }
+
+      return {
+        id: question.id,
+        question: question.content_default,
+        answers: shuffleArray(answers)
+      }
+    })
+    .filter(question => question !== null)
+
+  return shuffleArray(qcmQuestions)
+}
+
+// Quiz Methods
 const selectAnswer = (answerIndex) => {
   if (!showResult.value) {
     selectedAnswer.value = answerIndex
-    showResult.value = true
-    
-    // Auto-advance after showing result
-    setTimeout(() => {
-      nextQuestion()
-    }, 1500)
   }
 }
 
 const nextQuestion = () => {
-  if (selectedAnswer.value !== null || showResult.value) {
-    // Save answer
+  if (selectedAnswer.value !== null && !showResult.value) {
+    // 1. Enregistre la réponse
     userAnswers.value[currentQuestionIndex.value] = selectedAnswer.value
-    
-    if (currentQuestion.value === totalQuestions.value) {
-      // Finish test - redirect directly to results page
-      completeTest()
-    } else {
-      // Next question
-      currentQuestionIndex.value++
-      selectedAnswer.value = null
-      showResult.value = false
-    }
+
+    // 2. Affiche les résultats (bonne réponse en vert)
+    showResult.value = true
+
+    // 3. Attend 2 secondes puis passe à la suite
+    setTimeout(() => {
+      if (currentQuestion.value === totalQuestions.value) {
+        completeTest()
+      } else {
+        currentQuestionIndex.value++
+        selectedAnswer.value = null
+        showResult.value = false
+      }
+    }, 2000)
   }
 }
 
 const completeTest = () => {
   clearInterval(quizTimer.value)
   
-  // Redirect directly to CheckpointResults page
+  console.log('Résultats du quiz:', {
+    score: finalScore.value,
+    passed: testPassed.value,
+    correctAnswers: correctAnswers.value,
+    totalQuestions: totalQuestions.value,
+    timeUsed: totalTime.value - timeRemaining.value,
+    userAnswers: userAnswers.value
+  })
+  
+  // Navigation vers la page de résultats avec les paramètres
+  // Si tu utilises 'name', assure-toi que la route est bien définie dans ton router
+  // Sinon, utilise 'path' comme ci-dessous
   router.push({
-    name: 'CheckpointResults',
+    path: '/checkpoint-results',  // ou utilise name: 'CheckpointResults' si défini
     query: {
       score: finalScore.value,
       passed: testPassed.value,
@@ -235,7 +240,7 @@ const completeTest = () => {
 }
 
 const exitQuiz = () => {
-  if (confirm('Are you sure you want to exit the quiz? Your progress will be lost.')) {
+  if (confirm('Êtes-vous sûr de vouloir quitter le quiz ? Votre progression sera perdue.')) {
     clearInterval(quizTimer.value)
     router.push('/checkpoint')
   }
@@ -256,9 +261,22 @@ const startTimer = () => {
   }, 1000)
 }
 
+function shuffleArray(array) {
+  const newArray = [...array]
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[newArray[i], newArray[j]] = [newArray[j], newArray[i]]
+  }
+  return newArray
+}
+
 // Lifecycle
 onMounted(() => {
-  startTimer()
+  loadQuestions().then(() => {
+    if (questions.value.length > 0) {
+      startTimer()
+    }
+  })
 })
 
 onUnmounted(() => {
@@ -279,6 +297,58 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   position: relative;
+}
+
+/* LOADING STATE */
+.loading-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #F7C72C;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ERROR STATE */
+.error-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.retry-btn {
+  background: #F7C72C;
+  color: #072C54;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+  background: #E6B625;
+  transform: translateY(-2px);
 }
 
 /* PROGRESS BAR */
@@ -304,24 +374,15 @@ onUnmounted(() => {
 }
 
 /* TIMER */
-.timer-display {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 20px;
-  padding: 0.5rem 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 100;
+.timer-large {
+
+  text-align: center;
+  color: #F7C72C;
+  margin: 2rem;
 }
 
-.timer-icon {
-  font-size: 1rem;
-}
+
+
 
 .timer-text {
   font-size: 0.9rem;
@@ -380,9 +441,10 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
-.answer-option:hover {
+.answer-option:hover:not(.correct):not(.incorrect) {
   background: rgba(255, 255, 255, 0.95);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
@@ -394,16 +456,67 @@ onUnmounted(() => {
   color: white;
 }
 
+/* Styles pour l'affichage des résultats */
 .answer-option.correct {
-  border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.2);
-  color: white;
+  border-color: #22c55e !important;
+  background: rgba(34, 197, 94, 0.9) !important;
+  color: white !important;
+  animation: correctPulse 0.5s ease;
+  cursor: default;
 }
 
 .answer-option.incorrect {
-  border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.9) !important;
+  color: white !important;
+  animation: incorrectShake 0.5s ease;
+  cursor: default;
+}
+
+.answer-option.not-selected {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Icônes de résultat */
+.check-icon, .cross-icon {
+  position: absolute;
+  right: 1rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.check-icon {
   color: white;
+}
+
+.cross-icon {
+  color: white;
+}
+
+/* Animations */
+@keyframes correctPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes incorrectShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 /* BUTTON SECTION */
@@ -566,6 +679,11 @@ onUnmounted(() => {
     min-height: 50px;
   }
   
+  .check-icon, .cross-icon {
+    font-size: 1.2rem;
+    right: 0.8rem;
+  }
+  
   .next-btn {
     padding: 0.8rem 2rem;
     font-size: 0.9rem;
@@ -577,11 +695,7 @@ onUnmounted(() => {
     font-size: 1rem;
   }
   
-  .timer-display {
-    top: 0.5rem;
-    right: 0.5rem;
-    padding: 0.4rem 0.8rem;
-  }
+
   
   .timer-text {
     font-size: 0.8rem;

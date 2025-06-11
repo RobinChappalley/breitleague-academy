@@ -127,8 +127,8 @@ export default {
       checkpointData: {
         title: 'Breitling Heritage & Foundations',
         description: 'Test your knowledge of Breitling\'s history, founding principles, and core values that shaped the brand into what it is today.',
-        totalQuestions: 15,
-        timeLimit: '20 minutes',
+        totalQuestions: 22,
+        timeLimit: '10 minutes',
         passScore: 70
       },
       progression: {},

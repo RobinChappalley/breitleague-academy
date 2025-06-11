@@ -10,7 +10,8 @@
       <!-- Score Circle -->
       <div class="score-section">
         <div class="score-circle">
-          <svg class="score-ring" width="200" height="200">
+          <svg class="score-ring" viewBox="0 0 200 200">
+            <!-- Background circle -->
             <circle
               cx="100"
               cy="100"
@@ -18,9 +19,10 @@
               fill="none"
               stroke="rgba(255, 255, 255, 0.2)"
               stroke-width="8"
+              class="background-circle"
             />
+            <!-- Progress circle -->
             <circle
-              ref="progressRing"
               cx="100"
               cy="100"
               r="80"
@@ -28,9 +30,8 @@
               :stroke="scoreColor"
               stroke-width="8"
               stroke-linecap="round"
-              :stroke-dasharray="circumference"
+              :stroke-dasharray="`${circumference} ${circumference}`"
               :stroke-dashoffset="strokeOffset"
-              transform="rotate(-90 100 100)"
               class="progress-circle"
             />
           </svg>
@@ -96,25 +97,26 @@ import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
-// Data from route params
-const score = ref(parseInt(route.params.score) || 0)
-const passed = ref(route.params.passed === 'true')
-const correctAnswers = ref(parseInt(route.params.correctAnswers) || 0)
-const totalQuestions = ref(parseInt(route.params.totalQuestions) || 10)
-const timeUsed = ref(parseInt(route.params.timeUsed) || 0)
+// Data from route query
+const score = ref(parseInt(route.query.score) || 0)
+const passed = ref(route.query.passed === 'true' || route.query.passed === true)
+const correctAnswers = ref(parseInt(route.query.correctAnswers) || 0)
+const totalQuestions = ref(parseInt(route.query.totalQuestions) || 10)
+const timeUsed = ref(parseInt(route.query.timeUsed) || 0)
 
 // Animation
 const animatedScore = ref(0)
-const circumference = 2 * Math.PI * 80
+const radius = 80
+const circumference = 2 * Math.PI * radius
 
 // Computed
 const scoreColor = computed(() => {
-  return passed.value ? '#4CAF50' : '#F44336'
+  return passed.value ? '#22c55e' : '#ef4444'
 })
 
 const strokeOffset = computed(() => {
   const progress = animatedScore.value / 100
-  return circumference - (progress * circumference)
+  return circumference * (1 - progress)
 })
 
 const resultStatus = computed(() => {
@@ -123,9 +125,21 @@ const resultStatus = computed(() => {
 
 const resultMessage = computed(() => {
   if (passed.value) {
-    return 'Congratulations! You have successfully completed this checkpoint. You can now proceed to the next module.'
+    if (score.value >= 90) {
+      return 'Excellent! You have mastered this checkpoint with an outstanding score. You\'re ready for the next challenge!'
+    } else if (score.value >= 80) {
+      return 'Great job! You have successfully completed this checkpoint with a strong performance. Keep up the good work!'
+    } else {
+      return 'Congratulations! You have successfully completed this checkpoint. You can now proceed to the next module.'
+    }
   } else {
-    return 'You need at least 70% to pass this checkpoint. Review the material and try again when you\'re ready.'
+    if (score.value >= 60) {
+      return 'You\'re close! Just a little more practice and you\'ll pass this checkpoint. Review the material and try again.'
+    } else if (score.value >= 40) {
+      return 'Keep practicing! Focus on the areas where you struggled and try again when you feel more confident.'
+    } else {
+      return 'You need at least 70% to pass this checkpoint. Take your time to review the material thoroughly before attempting again.'
+    }
   }
 })
 
@@ -168,6 +182,15 @@ const formatTime = (seconds) => {
 
 // Lifecycle
 onMounted(() => {
+  // Log pour debug
+  console.log('Results data:', {
+    score: score.value,
+    passed: passed.value,
+    correctAnswers: correctAnswers.value,
+    totalQuestions: totalQuestions.value,
+    timeUsed: timeUsed.value
+  })
+  
   setTimeout(() => {
     animateScore()
   }, 500)
@@ -224,11 +247,18 @@ onMounted(() => {
 
 .score-circle {
   position: relative;
-  display: inline-block;
+  width: 200px;
+  height: 200px;
 }
 
 .score-ring {
+  width: 100%;
+  height: 100%;
   transform: rotate(-90deg);
+}
+
+.background-circle {
+  stroke: rgba(255, 255, 255, 0.2);
 }
 
 .progress-circle {
@@ -327,23 +357,25 @@ onMounted(() => {
 }
 
 .retry-btn {
-  background: #F44336;
+  background: #ef4444;
   color: white;
 }
 
 .retry-btn:hover {
-  background: #D32F2F;
+  background: #dc2626;
   transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .continue-btn {
-  background: #4CAF50;
+  background: #22c55e;
   color: white;
 }
 
 .continue-btn:hover {
-  background: #45A049;
+  background: #16a34a;
   transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .back-btn {
@@ -355,6 +387,7 @@ onMounted(() => {
 .back-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 /* RESPONSIVE - TABLET */
@@ -369,6 +402,11 @@ onMounted(() => {
   
   .results-subtitle {
     font-size: 1.8rem;
+  }
+  
+  .score-circle {
+    width: 250px;
+    height: 250px;
   }
   
   .percentage {
@@ -394,10 +432,6 @@ onMounted(() => {
 
 /* RESPONSIVE - DESKTOP */
 @media (min-width: 1200px) {
-  .checkpoint-results {
-    margin-left: 280px;
-    width: calc(100% - 280px);
-  }
   
   .results-container {
     max-width: 700px;
@@ -412,15 +446,9 @@ onMounted(() => {
     font-size: 2rem;
   }
   
-  .score-circle svg {
-    width: 250px;
-    height: 250px;
-  }
-  
-  .score-circle circle {
-    r: 100px;
-    cx: 125px;
-    cy: 125px;
+  .score-circle {
+    width: 300px;
+    height: 300px;
   }
   
   .percentage {
@@ -494,15 +522,9 @@ onMounted(() => {
     margin-bottom: 2rem;
   }
   
-  .score-circle svg {
+  .score-circle {
     width: 160px;
     height: 160px;
-  }
-  
-  .score-circle circle {
-    r: 60px;
-    cx: 80px;
-    cy: 80px;
   }
   
   .percentage {
@@ -559,15 +581,9 @@ onMounted(() => {
     font-size: 1rem;
   }
   
-  .score-circle svg {
+  .score-circle {
     width: 140px;
     height: 140px;
-  }
-  
-  .score-circle circle {
-    r: 50px;
-    cx: 70px;
-    cy: 70px;
   }
   
   .percentage {
@@ -600,6 +616,52 @@ onMounted(() => {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Animation des stats */
+.stat-item {
+  animation: fadeIn 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.stat-item:nth-child(1) {
+  animation-delay: 0.8s;
+}
+
+.stat-item:nth-child(2) {
+  animation-delay: 1s;
+}
+
+.stat-item:nth-child(3) {
+  animation-delay: 1.2s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Pulse animation pour le score quand passed */
+.score-label {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
   }
 }
 </style>
