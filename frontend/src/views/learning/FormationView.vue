@@ -111,7 +111,7 @@ export default {
     return {
       modules: [],
       currentModuleIndex: 0,
-      isTransitioning: false,
+      isWatchTransitioning: false,
       lessons: [],
       containerWidth: 0,
       containerHeight: 0,
@@ -147,11 +147,6 @@ export default {
       if (!this.modules.length) return null;
       return this.modules[this.currentModuleIndex];
     },
-    nextModuleData() {
-      if (!this.modules.length) return null;
-      const nextIndex = (this.currentModuleIndex + 1) % this.modules.length;
-      return this.modules[nextIndex];
-    },
     numberOfButtons() {
       return this.currentModule.lessons?.length
     },
@@ -159,9 +154,36 @@ export default {
     // Circumférence du cercle (rayon = 20, cohérent avec le SVG)
     circumference() {
       return 2 * Math.PI * 20;
+    },
+    currentWatchImage() {
+      const moduleId = this.currentModule?.id;
+      return this.moduleImages[moduleId]?.watch || this.defaultImages.watch;
+    },
+
+    nextWatchImage() {
+      const moduleId = this.nextModule?.id;
+      return this.moduleImages[moduleId]?.watch || this.defaultImages.watch;
+    },
+
+    currentBackgroundImage() {
+      const moduleId = this.currentModule?.id;
+      return this.moduleImages[moduleId]?.background || this.defaultImages.background;
+    },
+
+    nextBackgroundImage() {
+      const moduleId = this.nextModule?.id;
+      return this.moduleImages[moduleId]?.background || this.defaultImages.background;
+    },
+
+    // Style dynamique pour le background
+    backgroundStyle() {
+      return {
+        backgroundImage: this.currentBackgroundImage
+      };
     }
-  }
-  ,
+
+
+  },
 
   async mounted() {
     await this.$nextTick(() => {
