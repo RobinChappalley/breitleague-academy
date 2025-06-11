@@ -130,7 +130,7 @@ const data = await module.json()
 return data.data
 }
 export const fetchModules = async () => {
-  const modules = await fetch(`${API_BASE_URL}/modules/$`, {})
+  const modules = await fetch(`${API_BASE_URL}/modules`, {})
   const data = await modules.json()
   return data.data
 }
