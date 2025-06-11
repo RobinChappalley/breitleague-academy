@@ -7,9 +7,9 @@
         "pos_id": 1,
         "signup_year": 2020,
         "avatar": "img/profile_photo/rafael.jpg",
-        "elo_score": 79034,
-        "battle_won": 95,
-        "battle_lost": 50,
+        "elo_score": 13220,
+        "battle_won": 31,
+        "battle_lost": 13,
         "number_available_slots": 3,
         "is_BS": true
     },
@@ -21,9 +21,9 @@
         "pos_id": 2,
         "signup_year": 2016,
         "avatar": "img/profile_photo/keller.jpg",
-        "elo_score": 79883,
-        "battle_won": 128,
-        "battle_lost": 73,
+        "elo_score": 40984,
+        "battle_won": 70,
+        "battle_lost": 59,
         "number_available_slots": 2,
         "is_BS": true
     },
@@ -35,9 +35,9 @@
         "pos_id": 3,
         "signup_year": 2019,
         "avatar": "img/profile_photo/dacosta.jpg",
-        "elo_score": 84320,
-        "battle_won": 110,
-        "battle_lost": 45,
+        "elo_score": 36598,
+        "battle_won": 64,
+        "battle_lost": 30,
         "number_available_slots": 4,
         "is_BS": true
     },
@@ -49,11 +49,11 @@
         "pos_id": 4,
         "signup_year": 2018,
         "avatar": "img/profile_photo/ovsanna.jpg",
-        "elo_score": 87530,
-        "battle_won": 125,
-        "battle_lost": 60,
+        "elo_score": 22934,
+        "battle_won": 49,
+        "battle_lost": 19,
         "number_available_slots": 1,
-        "is_BS": false
+        "is_BS": true
     },
     {
         "id": 5,
@@ -63,11 +63,11 @@
         "pos_id": 5,
         "signup_year": 2021,
         "avatar": "img/profile_photo/degirmenci.jpg",
-        "elo_score": 94532,
-        "battle_won": 150,
-        "battle_lost": 40,
+        "elo_score": 40966,
+        "battle_won": 76,
+        "battle_lost": 52,
         "number_available_slots": 5,
-        "is_BS": false
+        "is_BS": true
     },
     {
         "id": 6,
@@ -77,11 +77,11 @@
         "pos_id": 6,
         "signup_year": 2017,
         "avatar": "img/profile_photo/anex.jpg",
-        "elo_score": 82342,
-        "battle_won": 105,
-        "battle_lost": 58,
+        "elo_score": 37820,
+        "battle_won": 71,
+        "battle_lost": 33,
         "number_available_slots": 3,
-        "is_BS": false
+        "is_BS": true
     },
     {
         "id": 7,
@@ -91,11 +91,11 @@
         "pos_id": 7,
         "signup_year": 2022,
         "avatar": "img/profile_photo/takeda.jpg",
-        "elo_score": 77600,
-        "battle_won": 80,
-        "battle_lost": 40,
+        "elo_score": 24672,
+        "battle_won": 46,
+        "battle_lost": 22,
         "number_available_slots": 4,
-        "is_BS": false
+        "is_BS": true
     },
     {
         "id": 8,
@@ -105,11 +105,11 @@
         "pos_id": 8,
         "signup_year": 2015,
         "avatar": "img/profile_photo/morel.jpg",
-        "elo_score": 78850,
-        "battle_won": 99,
-        "battle_lost": 62,
+        "elo_score": 33918,
+        "battle_won": 58,
+        "battle_lost": 32,
         "number_available_slots": 2,
-        "is_BS": false
+        "is_BS": true
     },
     {
         "id": 9,
@@ -119,11 +119,11 @@
         "pos_id": 9,
         "signup_year": 2021,
         "avatar": "img/profile_photo/bensaid.jpg",
-        "elo_score": 80160,
-        "battle_won": 112,
-        "battle_lost": 54,
+        "elo_score": 47929,
+        "battle_won": 25,
+        "battle_lost": 19,
         "number_available_slots": 3,
-        "is_BS": false
+        "is_BS": true
     },
     {
         "id": 10,
@@ -133,11 +133,11 @@
         "pos_id": 10,
         "signup_year": 2020,
         "avatar": "img/profile_photo/rojas.jpg",
-        "elo_score": 76307,
-        "battle_won": 76,
-        "battle_lost": 45,
+        "elo_score": 13833,
+        "battle_won": 25,
+        "battle_lost": 19,
         "number_available_slots": 2,
-        "is_BS": false
+        "is_BS": true
     },
     {
         "id": 11,
@@ -147,9 +147,9 @@
         "pos_id": 1,
         "signup_year": 2025,
         "avatar": "img/profile_photo/cedrine.jpg",
-        "elo_score": 50000,
-        "battle_won": 40,
-        "battle_lost": 5,
+        "elo_score": 49285,
+        "battle_won": 93,
+        "battle_lost": 27,
         "number_available_slots": 2,
         "is_BS": true
     },
