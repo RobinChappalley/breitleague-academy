@@ -30,6 +30,12 @@ const showNavbar = computed(() => {
   </div>
 </template>
 
-<style scoped>
+<style >
+ #app-layout {
+   height: 100%;
+   width: 100%;
+   overflow: hidden;
+ }
+
 
 </style>

@@ -1,21 +1,92 @@
 <template>
-  <div class="formation-image-container">
+  <div class="formation-image-container" :style="backgroundStyle">
     <div class="top-action-buttons">
-      <RouterLink class="action-btn btn-primary" to="/ressources">Read Ressources</RouterLink>
-      <RouterLink class="action-btn btn-primary" to="/missions">Missions</RouterLink>
-    </div>
     <div class="progress-bar">
       <ProgressBar />
     </div>
+      <!-- Bouton temporaire pour tester -->
+      <button class="action-btn" @click="changeModule('next')">Next Module (Test)</button>
+      <button class="action-btn" @click="changeModule('previous')">Previous Module (Test)</button>
+
+      <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
+      <RouterLink class="action-btn" to="/missions">Missions</RouterLink>
+    </div>
 
     <div ref="watchContainer" class="formation-watch-container">
-      <img
-        alt="watch aviators"
-        src="/backgrounds/aviators-watch.png"
-        class="lesson-watch"
-        @load="updateContainerDimensions"
-      />
 
+      <!-- Image de la montre avec transition -->
+      <transition name="watch-slide"  mode="out-in" @after-enter="onWatchTransitionEnd">
+        <img
+            v-if="currentWatchImage"
+            :key="currentWatchImage"
+            :alt="`${currentModule?.title || 'Breitling'} watch`"
+            :src="currentWatchImage"
+            class="lesson-watch"
+            @load="updateContainerDimensions"
+        >
+      </transition>
+      <!-- Bouton spécial checkpoint -->
+      <transition name="fade">
+        <div v-if="showLessonPoints">
+          <button
+              class="checkpoint-button special-button"
+              @click="showCheckpointModal"
+          ></button>
+
+          <!-- Boutons de checkpoint avec progression individuelle -->
+          <RouterLink
+              v-for="(lesson,index) in lessons"
+              :key="index"
+              :to="`/lesson/${lesson.id}`"
+              class="lesson-container"
+              :style="getButtonPosition(index)"
+
+          >
+            <!-- Cercle de progression pour chaque leçon -->
+            <svg class="lesson-progress-circle" width="50" height="50">
+              <!-- Cercle de fond -->
+              <circle
+                  cx="25"
+                  cy="25"
+                  r="20"
+                  fill="none"
+              />
+              <!-- Cercle de progression (seulement si en cours) -->
+              <!--I don't why it works with 28. but that's it! !-->
+              <circle
+                  v-if="lesson.status === 'in-progress'"
+                  cx="25"
+                  cy="28"
+                  r="20"
+                  fill="none"
+                  stroke="white"
+                  stroke-width="3"
+                  :stroke-dasharray="circumference"
+                  :stroke-dashoffset="getLessonProgressOffset(lesson.progress)"
+                  stroke-linecap="round"
+                  class="progress-stroke"
+                  transform="rotate(-90 25 25)"
+              />
+            </svg>
+
+            <!-- Bouton de la leçon -->
+            <button
+                class="checkpoint-button dynamic-button"
+                :class="getLessonClass(lesson.status)"
+            >
+              {{ index + 1 }}
+            </button>
+            <p class="lesson-label">
+              {{ lesson.title }}
+            </p>
+          </RouterLink>
+        </div>
+      </transition>
+=======
+        </div>
+
+    <div ref="watchContainer" class="formation-watch-container">
+     
       <!-- Bouton spécial checkpoint -->
       <button class="checkpoint-button special-button" @click="showCheckpointModal"></button>
 
@@ -27,35 +98,9 @@
         :style="getButtonPosition(index)"
         @click="openStartModal(lesson)"
       >
-        <!-- Cercle de progression pour chaque leçon -->
-        <svg class="lesson-progress-circle" width="50" height="50">
-          <!-- Cercle de fond -->
-          <circle cx="25" cy="25" r="20" fill="none" />
-          <!-- Cercle de progression (seulement si en cours) -->
-          <circle
-            v-if="lesson.status === 'in-progress'"
-            cx="25"
-            cy="28"
-            r="20"
-            fill="none"
-            stroke="white"
-            stroke-width="3"
-            :stroke-dasharray="circumference"
-            :stroke-dashoffset="getLessonProgressOffset(lesson.progress)"
-            stroke-linecap="round"
-            class="progress-stroke"
-            transform="rotate(-90 25 25)"
-          />
-        </svg>
+      
 
-        <!-- Bouton de la leçon -->
-        <button class="checkpoint-button dynamic-button" :class="getLessonClass(lesson.status)">
-          {{ index + 1 }}
-        </button>
-        <p class="lesson-label">
-          {{ lesson.title }}
-        </p>
-      </div>
+        
     </div>
 
     <!-- Modal Checkpoint - Affiché par-dessus -->
@@ -70,10 +115,12 @@
 
         <div class="modal-content">
           <p class="modal-text">
+
             Welcome to your checkpoint assessment. This test will evaluate your understanding of the
             material covered in this module. You'll need to answer
             {{ checkpointData.totalQuestions }} questions with a minimum score of
             {{ checkpointData.passScore }}% to pass.
+
           </p>
 
           <div class="modal-rules">
@@ -104,9 +151,12 @@
 </template>
 
 <script>
+
+
 import { fetchProgression, fetchModules } from '@/services/api.js'
 import StartModuleModal from './startModuleModal.vue'
 import ProgressBar from '@/components/layout/ProgressBar.vue'
+
 
 export default {
   name: 'FormationView',
@@ -117,6 +167,9 @@ export default {
 
   data() {
     return {
+      modules: [],
+      currentModuleIndex: 0,
+      isWatchTransitioning: false,
       lessons: [],
       containerWidth: 0,
       containerHeight: 0,
@@ -129,57 +182,106 @@ export default {
         passScore: 70
       },
       progression: {},
+      moduleImages: {
+        Onboarding:
+            {
+              watch: '/backgrounds/aviators-watch.png',
+              backgroundMobile: 'backgrounds/aviators-vertical.png',
+              backgroundDesktop: 'backgrounds/aviators-horizontal.png'
+            },
+        Novelties: {
+          watch: '/backgrounds/explorators-watch.png',
+          backgroundMobile: 'backgrounds/explorators-vertical.png',
+          backgroundDesktop: 'backgrounds/explorators-horizontal.png',
+        },
+        Discovery: {
+          watch: '/backgrounds/surfers-watch.png',
+          backgroundMobile: 'backgrounds/surfers-vertical.png',
+          backgroundDesktop: 'backgrounds/surfers-horizontal.png'
+        },
+      },
+      defaultImages: {
+        watch: '/backgrounds/aviators-watch.png',
+        backgroundMobile: 'backgrounds/aviators-vertical.png',
+        backgroundDesktop: 'backgrounds/aviators-horizontal.png'
+      },
+      showLessonPoints: true,
+
       showStartModal: false,
       selectedModule: null
     }
   },
 
   computed: {
+    currentModule() {
+      if (!this.modules.length) return null;
+      return this.modules[this.currentModuleIndex];
+    },
     numberOfButtons() {
-      return this.lessons.length
+      return this.currentModule.lessons?.length
     },
 
     // Circumférence du cercle (rayon = 20, cohérent avec le SVG)
     circumference() {
-      return 2 * Math.PI * 20
+
+      return 2 * Math.PI * 20;
+    },
+    currentWatchImage() {
+      const moduleId = this.currentModule?.title;
+      return this.moduleImages[moduleId]?.watch || this.defaultImages.watch;
+    },
+
+    currentBackgroundImage() {
+      const moduleTitle = this.currentModule?.title;
+      const moduleData = this.moduleImages[moduleTitle];
+
+      if (!moduleData) return this.defaultImages.background;
+
+      // Choix responsive
+      return window.innerWidth >= 768
+          ? moduleData.backgroundDesktop
+          : moduleData.backgroundMobile;
+    },
+    backgroundStyle() {
+      return {
+        backgroundImage: `url(${this.currentBackgroundImage})`,
+        backgroundPosition: 'right bottom',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover'
+      };
     }
   },
 
   // ✅ CORRIGÉ : Try-catch dans mounted() pour éviter les erreurs non gérées
   async mounted() {
-    try {
-      console.log('🚀 Component mounting...')
+    await this.$nextTick(() => {
+      this.updateContainerDimensions();
+      window.addEventListener('resize', this.updateContainerDimensions);
+    });
 
-      // Utilisation de nextTick pour s'assurer que le DOM est rendu
-      await this.$nextTick(() => {
-        this.updateContainerDimensions()
-        // Garde le resize listener au cas où la fenêtre change
-        window.addEventListener('resize', this.updateContainerDimensions)
-      })
+    // 1. Charger tous les modules (simple)
+    await this.loadAllModules();
 
-      console.log('📏 Container dimensions updated')
+    // 2. Charger le module spécifique avec ses lessons
+    const loadedModule = await this.loadModule();
 
-      // Charge les modules et remplit le tableau lessons dynamiquement !
-      const loadedModule = await this.loadModules()
-      console.log('📚 Module loaded:', loadedModule)
-
-      // Si tu veux garder le format avec status/progress : adapte ici.
-      this.lessons = loadedModule.lessons.map((lesson, idx) => ({
-        ...lesson,
-        status: 'not-started', // ou récupère depuis ton API ou progression
-        progress: 0,
-        title: lesson.title || `Lesson ${idx + 1}`
-      }))
-
-      console.log('✅ Lessons initialized:', this.lessons.length, 'lessons')
-    } catch (error) {
-      console.error('❌ Error during component mounting:', error)
-
-      // En cas d'erreur, utilise des lessons par défaut
-      console.log('🔄 Loading default lessons as fallback')
-      this.lessons = this.getDefaultLessons()
+    // 3. Trouver l'index du module actuel dans la liste
+    const moduleIndex = this.modules.findIndex(m => m.id === loadedModule.id);
+    if (moduleIndex !== -1) {
+      this.currentModuleIndex = moduleIndex;
+      // Remplacer le module simple par le module complet avec lessons
+      this.modules[moduleIndex] = loadedModule;
     }
-  },
+
+    // 4. Mapper les lessons avec status/progress
+    this.lessons = loadedModule.lessons.map((lesson, idx) => ({
+      ...lesson,
+      status: 'not-started',
+      progress: 0,
+      title: lesson.title || `Lesson ${idx + 1}`
+    }));
+  }
+  ,
 
   methods: {
     updateContainerDimensions() {
@@ -248,9 +350,11 @@ export default {
       const currentAngle = startAngle - index * angleStep
       const angleRad = (currentAngle * Math.PI) / 180
 
-      const radiusPixels = this.containerWidth
-      const centerX = 0
-      const centerY = this.containerHeight / 2
+      //-30 pour que le texte reste dans l'écran sur mobile
+      const radiusPixels = this.containerWidth - 30;
+      const centerX = 0;
+      const centerY = this.containerHeight / 2;
+
 
       const x = centerX + radiusPixels * Math.cos(angleRad)
       const y = centerY + radiusPixels * Math.sin(angleRad)
@@ -307,39 +411,19 @@ export default {
       this.selectedModule = null
     },
 
+    async loadProgression() {
+      const res = await fetch('http://localhost:8000/api/user', {
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json'
+
     handleModuleStarted(data) {
       console.log('Module started:', data)
       // Redirection vers la première leçon
       this.$router.push(`/LearningFlowView.vue`)
     },
 
-    // ✅ CORRIGÉ : Gestion d'erreur complète + URLs corrigées
-    async loadProgression() {
-      try {
-        console.log('🔄 Loading user progression...')
 
-        // ✅ CORRIGÉ : URL avec préfixe v1
-        const res = await fetch('http://localhost:8000/api/v1/users', {
-          credentials: 'include',
-          headers: {
-            Accept: 'application/json'
-          }
-        })
-
-        if (!res.ok) {
-          console.warn(`❌ Users API failed with status: ${res.status}`)
-          return null
-        }
-
-        const userData = await res.json()
-        console.log('✅ User data loaded:', userData)
-
-        // Gère les deux formats possibles de réponse
-        const connectedUser = Array.isArray(userData) ? userData[0] : userData
-
-        if (!connectedUser || !connectedUser.id) {
-          console.warn('❌ No valid user found:', userData)
-          return null
         }
 
         console.log(`🔄 Loading progression for user ID: ${connectedUser.id}`)
@@ -354,22 +438,76 @@ export default {
       }
     },
 
-    async loadModules() {
-      try {
-        console.log('🔄 Loading modules...')
 
-        const progression = await this.loadProgression()
+    async loadModule() {
+      const progression = await this.loadProgression()
+      const moduleToDisplayId = progression.last_checkpoint_id + 1
+      const module = await fetchModule(moduleToDisplayId)
+      return module
+    },
 
-        // Si pas de progression, utilise les lessons par défaut
-        if (!progression || typeof progression.last_checkpoint_id === 'undefined') {
-          console.warn('⚠️ No valid progression found, using default lessons')
-          return {
-            lessons: this.getDefaultLessons()
-          }
+    async loadAllModules() {
+      this.modules = await fetchModules()
+    },
+
+    async changeModule(direction = 'next') {
+      if (this.isWatchTransitioning) return;
+      console.log(this.showLessonPoints);
+
+      this.showLessonPoints = false;
+      console.log(this.showLessonPoints);
+
+      console.log('Changing module:', direction);
+
+      // 1. Calculer le prochain index
+      let nextIndex;
+      if (direction === 'next') {
+        nextIndex = (this.currentModuleIndex + 1) % this.modules.length;
+      } else {
+        nextIndex = this.currentModuleIndex === 0 ? this.modules.length - 1 : this.currentModuleIndex - 1;
+      }
+
+      console.log('Current index:', this.currentModuleIndex, 'Next index:', nextIndex);
+
+      // 2. Démarrer la transition
+      this.isWatchTransitioning = true;
+
+      // 3. Charger le module complet s'il n'a pas ses lessons
+      let newModule = this.modules[nextIndex];
+      if (!newModule.lessons || newModule.lessons.length === 0) {
+        try {
+          newModule = await fetchModule(newModule.id);
+          this.modules[nextIndex] = newModule; // Remplacer dans la liste
+        } catch (error) {
+          console.error('Erreur lors du chargement du module:', error);
+          this.isWatchTransitioning = false;
+          return;
         }
+      }
 
-        const moduleToDisplayId = progression.last_checkpoint_id + 1
-        console.log(`🔄 Loading module ID: ${moduleToDisplayId}`)
+      // 4. Attendre l'animation, puis changer
+      setTimeout(() => {
+        this.currentModuleIndex = nextIndex;
+
+        // Mettre à jour les lessons du nouveau module
+        this.lessons = newModule.lessons.map((lesson, idx) => ({
+          ...lesson,
+          status: 'not-started',
+          progress: 0,
+          title: lesson.title || `Lesson ${idx + 1}`
+        }));
+
+        this.isWatchTransitioning = false;
+        console.log('Module changed to:', newModule.title);
+      }, 400);
+    },
+
+    onWatchTransitionEnd() {
+      // Affiche les points dès que la transition sortie de la montre est finie
+      this.showLessonPoints = true;
+    },
+  }
+}
 
         const module = await fetchModules(moduleToDisplayId)
         console.log('✅ Module loaded:', module)
@@ -392,6 +530,10 @@ export default {
 :root {
   --aviators-vertical: url('/backgrounds/aviators-vertical.png');
   --aviators-horizontal: url('/backgrounds/aviators-horizontal.png');
+  --explorators-vertical: url('/backgrounds/explorators-vertical.png');
+  --explorators-horizontal: url('/backgrounds/explorators-horizontal.png');
+  --surfers-horizontal: url('/backgrounds/surfers-horizontal.png');
+  --surfers-vertical: url('/backgrounds/surfers-vertical.png');
 }
 
 .formation-image-container {
@@ -403,12 +545,7 @@ export default {
   background-size: cover;
   display: flex;
   align-items: center;
-  @media screen and (max-width: 768px) {
-    background-image: var(--aviators-vertical);
-  }
-  @media screen and (min-width: 768px) {
-    background-image: var(--aviators-horizontal);
-  }
+  transition: background-image 1s ease-in-out;
 }
 
 .formation-watch-container {
@@ -422,6 +559,13 @@ export default {
 .lesson-watch {
   max-width: 65vw;
   max-height: 85vh;
+  transform-origin: 0 50%; /* Point de rotation : gauche-centre */
+  transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+}
+
+.lesson-watch.watch-transitioning {
+  transform: rotate(180deg);
+  opacity: 0.7;
 }
 
 .checkpoint-button {
@@ -443,7 +587,7 @@ export default {
 }
 
 .lesson-container {
-  position: relative; /* Changé de absolute à relative */
+  position: relative;
 }
 
 .lesson-progress-circle {
@@ -501,6 +645,9 @@ export default {
   transform: translateY(-50%);
   color: whitesmoke;
   font-weight: bold;
+  min-width: 150px;
+  max-width: 10vw;
+  text-align: left;
 }
 
 .action-btn {
@@ -535,7 +682,7 @@ export default {
   justify-content: center;
   flex-direction: column;
   align-items: flex-end;
-  @media screen and (width>= 768px) {
+  @media screen and (width >= 768px) {
     gap: 18px;
   }
   @media screen and (max-width: 767px) {
@@ -726,4 +873,45 @@ export default {
     font-size: 1rem;
   }
 }
+
+/* Animation pour la montre qui sort : rotation autour du centre + disparition */
+.watch-slide-leave-active {
+  animation: watch-spin-out 0.3s forwards cubic-bezier(.13, -0.33, .7, 1.2);
+  z-index: 2;
+}
+
+@keyframes watch-spin-out {
+  100% {
+    opacity: 0.8;
+    transform: rotate(180deg)
+  }
+}
+
+/* Animation pour la montre qui entre : descend du haut vers son centre */
+.watch-slide-enter-active {
+  animation: watch-slide-down-in 0.3s forwards cubic-bezier(.13, -0.33, .7, 1.2);
+  z-index: 3;
+}
+
+@keyframes watch-slide-down-in {
+
+  0% {
+    opacity: 0.8;
+    transform: rotate(-150deg);
+  }
+
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+.fade-leave-from, .fade-enter-to {
+  opacity: 1;
+}
+
 </style>
