@@ -13,6 +13,7 @@ import CheckpointView from '@/views/learning/CheckpointView.vue'
 import CheckpointQuizView from '@/views/learning/CheckpointQuizView.vue'
 import CheckpointResultsView from '@/views/learning/CheckpointResultsView.vue'
 import HistoireView from '@/views/learning/HistoireView.vue'
+import LearningFlowView from "@/views/learning/LearningFlowView.vue";
 
 
 export const routes = [
@@ -45,5 +46,5 @@ export const routes = [
       }
     }
   },
-  {path:'/lesson/:id?', component: BattleQuizView, meta: { hideNavBar: false } },
+  {path:'/lesson/:id?', component: LearningFlowView, meta: { hideNavBar: true } },
 ]

@@ -69,7 +69,7 @@
           <!-- ✅ AJOUTÉ : Le composant StartModuleModal -->
           <StartModuleModal
               :isVisible="showStartModal"
-              :moduleData="selectedModule"
+              :moduleData="selectedLesson"
               @close="handleModalClose"
               @module-started="handleModuleStarted"
           />
@@ -137,7 +137,6 @@
 import {fetchProgression, fetchModule, fetchModules} from '@/services/api.js'
 import StartModuleModal from './startModuleModal.vue'
 import ProgressBar from '@/components/layout/ProgressBar.vue'
-import {ref} from "vue";
 
 export default {
   name: 'FormationView',
@@ -189,6 +188,7 @@ export default {
       spinDirection:'right',
       showStartModal: false,
       selectedModule: null,
+      selectedLesson:null
     }
   },
 
@@ -385,12 +385,14 @@ export default {
         lessons: this.lessons
       }
       this.showStartModal = true
+      this.selectedLesson = lesson
     },
 
 
     handleModalClose() {
       this.showStartModal = false
       this.selectedModule = null
+      this.selectedLesson = null
     },
 
     handleModuleStarted(data) {
@@ -422,9 +424,7 @@ export default {
       } else {
        moduleToDisplayId = progression.last_checkpoint_id + 1
       }
-      const module = await fetchModule(moduleToDisplayId)
-      this.moduleTitle =  module.title
-      return module
+      return await fetchModule(moduleToDisplayId)
     },
 
     async loadAllModules() {
