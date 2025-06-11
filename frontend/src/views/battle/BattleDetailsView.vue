@@ -267,23 +267,56 @@ const questionsData = ref([
 
 // Charger les données depuis localStorage si disponibles
 onMounted(() => {
+  console.log('🔄 BattleDetailsView mounted with battleId:', battleId)
+  
   const savedResults = localStorage.getItem('lastBattleResults')
   if (savedResults) {
-    const results = JSON.parse(savedResults)
-    
-    // Mettre à jour avec les vraies données si elles existent
-    if (results.battleId === parseInt(battleId)) {
-      opponent.value = results.opponent
-      if (results.playerAnswers?.length) {
-        playerAnswers.value = results.playerAnswers
+    try {
+      const results = JSON.parse(savedResults)
+      console.log('📋 Données récupérées depuis localStorage:', results)
+      
+      // Vérifier si les données correspondent à cette bataille
+      const currentBattleId = battleId ? parseInt(battleId) : null
+      
+      if (!battleId || results.battleId === currentBattleId) {
+        console.log('✅ Mise à jour avec les données de la bataille')
+        
+        // Mettre à jour l'adversaire
+        if (results.opponent) {
+          opponent.value = {
+            ...opponent.value,
+            ...results.opponent
+          }
+        }
+        
+        // Mettre à jour les réponses du joueur
+        if (results.playerAnswers?.length) {
+          playerAnswers.value = results.playerAnswers
+        }
+        
+        // Mettre à jour les réponses de l'adversaire
+        if (results.opponentAnswers?.length) {
+          opponentAnswers.value = results.opponentAnswers
+        }
+        
+        // Mettre à jour les données des questions
+        if (results.questionsData?.length) {
+          questionsData.value = results.questionsData
+        }
+        
+        console.log('✅ Toutes les données ont été mises à jour')
+        console.log('- Adversaire:', opponent.value)
+        console.log('- Réponses joueur:', playerAnswers.value.length)
+        console.log('- Réponses adversaire:', opponentAnswers.value.length)
+        console.log('- Questions:', questionsData.value.length)
+      } else {
+        console.log('⚠️ ID de bataille ne correspond pas:', currentBattleId, 'vs', results.battleId)
       }
-      if (results.opponentAnswers?.length) {
-        opponentAnswers.value = results.opponentAnswers
-      }
-      if (results.questionsData?.length) {
-        questionsData.value = results.questionsData
-      }
+    } catch (error) {
+      console.error('❌ Erreur lors du parsing des données localStorage:', error)
     }
+  } else {
+    console.log('⚠️ Aucune donnée trouvée dans localStorage')
   }
 })
 

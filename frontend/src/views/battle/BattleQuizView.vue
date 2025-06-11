@@ -491,11 +491,12 @@ const finishBattle = async () => {
   
   const playerTotalPoints = playerAnswers.value.reduce((total, answer) => total + answer.points, 0)
   
+  // Générer les réponses de l'adversaire
   const opponentAnswers = playerAnswers.value.map((playerAnswer, index) => {
     const question = questions.value[index]
-    const opponentTime = playerAnswer.opponentTime
+    const opponentTime = Math.random() * 25 + 5 // Entre 5 et 30 secondes
     
-    const isCorrect = Math.random() > 0.3
+    const isCorrect = Math.random() > 0.3 // 70% de chance d'être correct
     const randomAnswer = Math.floor(Math.random() * 4)
     
     let points = 0
@@ -522,13 +523,12 @@ const finishBattle = async () => {
       points = basePoints + speedBonus
     }
     
-    opponentTime.value += opponentTime
-    
     return {
       questionId: question.id,
       questionText: question.content_default,
       selectedAnswer: question.choices?.[randomAnswer]?.text_answer || question.choices?.[randomAnswer]?.text || 'Réponse mockée',
       correct: isCorrect,
+      text: question.choices?.[randomAnswer]?.text_answer || question.choices?.[randomAnswer]?.text || 'Réponse mockée',
       time: opponentTime,
       timeLeft: Math.max(0, 30 - opponentTime),
       points: points,
@@ -539,52 +539,49 @@ const finishBattle = async () => {
   const opponentTotalPoints = opponentAnswers.reduce((total, answer) => total + answer.points, 0)
   
   try {
-    const matchData = {
-      player1_id: currentPlayer.value.id,
-      player2_id: opponent.value.id,
-      player1_score: playerScore.value,
-      player2_score: opponentScore.value,
-      player1_time: playerTime.value,
-      player2_time: opponentTime.value,
-      player1_points: playerTotalPoints,
-      player2_points: opponentTotalPoints,
-      winner_id: playerTotalPoints > opponentTotalPoints ? currentPlayer.value.id : opponent.value.id,
-      questions_data: JSON.stringify(questions.value.map(q => ({
-        id: q.id,
-        text: q.content_default,
-        correctAnswer: q.choices?.find(c => c.is_correct)?.text_answer || q.choices?.find(c => c.is_correct)?.text
-      }))),
-      player1_answers: JSON.stringify(playerAnswers.value),
-      player2_answers: JSON.stringify(opponentAnswers)
-    }
+    // Créer un ID unique pour la bataille
+    const battleId = Date.now()
     
-    console.log('💾 Sauvegarde du match dans la base...')
-    // const savedMatch = await battleService.saveMatch(matchData)
-    // console.log('✅ Match sauvegardé avec ID:', savedMatch.id)
-    
+    // Préparer les données pour BattleDetailsView
     const battleResults = {
-      battleId: Date.now(),
+      battleId: battleId,
       opponent: opponent.value,
       playerScore: playerScore.value,
       opponentScore: opponentScore.value,
       playerTime: playerTime.value,
-      opponentTime: opponentTime.value,
+      opponentTime: opponentAnswers.reduce((total, answer) => total + answer.time, 0),
       playerTotalPoints: playerTotalPoints,
       opponentTotalPoints: opponentTotalPoints,
       questionsData: questions.value.map(q => ({
         id: q.id,
-        text: q.content_default || q.content_lf_tf || q.content_lf_blank,
+        text: q.content_default || q.content_lf_tf || q.content_lf_blank || 'Question sans contenu',
         correctAnswer: q.choices?.find(c => c.is_correct)?.text_answer || q.choices?.find(c => c.is_correct)?.text || 'Réponse correcte'
       })),
-      playerAnswers: playerAnswers.value,
-      opponentAnswers: opponentAnswers
+      playerAnswers: playerAnswers.value.map(answer => ({
+        correct: answer.correct,
+        text: answer.selectedAnswer || answer.text,
+        time: answer.time
+      })),
+      opponentAnswers: opponentAnswers.map(answer => ({
+        correct: answer.correct,
+        text: answer.selectedAnswer || answer.text,
+        time: answer.time
+      }))
     }
     
+    console.log('💾 Sauvegarde des résultats de bataille:', battleResults)
+    
+    // Sauvegarder dans localStorage
     localStorage.setItem('lastBattleResults', JSON.stringify(battleResults))
-    router.push(`/battle-details/${battleResults.battleId}`)
+    
+    // Rediriger vers battle-details avec l'ID
+    console.log('🔄 Redirection vers battle-details avec ID:', battleId)
+    await router.push(`/battle-details/${battleId}`)
     
   } catch (error) {
-    console.error('❌ Erreur sauvegarde match:', error)
+    console.error('❌ Erreur lors de la finalisation de la bataille:', error)
+    // En cas d'erreur, rediriger quand même vers battle-details
+    await router.push('/battle-details/1')
   }
 }
 
