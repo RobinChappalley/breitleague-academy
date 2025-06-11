@@ -203,34 +203,35 @@ const goToCollection = () => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('ProfileView monté, chargement des données...')
+  console.log('🚀 ProfileView mounted, loading ...')
   loadUserProfile()
 })
-
-function getCookie(name) {
-  const value = `; ${document.cookie}`
-  const parts = value.split(`; ${name}=`)
-  if (parts.length === 2) return parts.pop().split(';').shift()
-}
-
-const csrfToken = getCookie('XSRF-TOKEN')
 const logout = async () => {
   try {
+    // Lire le token CSRF depuis le cookie
+    const csrfTokenFromCookie = decodeURIComponent(
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1] ?? ''
+    )
+
     await fetch('http://localhost:8000/logout', {
       method: 'POST',
       credentials: 'include',
       headers: {
-        'X-CSRF-TOKEN': csrfToken,
-        Accept: 'application/json'
+        'Content-Type': 'application/json',
+        'X-XSRF-TOKEN': csrfTokenFromCookie
       }
     })
-    localStorage.clear()
-    sessionStorage.clear()
+
+    // Nettoyer le localStorage
+    localStorage.removeItem('isLoggedIn')
 
     // Redirige vers la page de login
     router.push('/login')
   } catch (err) {
-    console.error('Erreur lors du logout:', err)
+    console.error('❌ Error when logged out :', err)
   }
 }
 </script>
