@@ -656,11 +656,20 @@ const loadQuestionsFromAPI = async () => {
 
 // Methods (le reste des méthodes reste identique...)
 const startTimer = () => {
+  console.log('⏰ Démarrage du timer...')
+  
+  // Nettoyer l'ancien timer si il existe
+  if (timerInterval) {
+    clearInterval(timerInterval)
+    timerInterval = null
+  }
+  
   timerInterval = setInterval(() => {
     if (timeLeft.value > 0) {
       timeLeft.value--
     } else {
-      selectAnswer(null)
+      console.log('⏰ Temps écoulé ! Sélection automatique de null')
+      selectAnswer(null) // Temps écoulé
     }
   }, 1000)
 }
@@ -672,8 +681,12 @@ const stopTimer = () => {
   }
 }
 
+// CORRIGER selectAnswer() - Déclarer speedBonus au début
 const selectAnswer = (index) => {
-  if (hasAnswered.value) return
+  if (hasAnswered.value) {
+    console.log('⚠️ Réponse déjà donnée, ignoré')
+    return
+  }
   
   console.log('\n🎯 === DÉBUT SÉLECTION RÉPONSE ===')
   console.log(`🎯 Index cliqué: ${index}`)
@@ -686,124 +699,178 @@ const selectAnswer = (index) => {
   
   if (!currentQuestion.value.answers) {
     console.error('❌ currentQuestion.value.answers est null/undefined')
-    console.log('❌ currentQuestion.value:', currentQuestion.value)
     return
   }
   
-  if (index >= currentQuestion.value.answers.length) {
+  if (index !== null && index >= currentQuestion.value.answers.length) {
     console.error(`❌ Index ${index} invalide (max: ${currentQuestion.value.answers.length - 1})`)
     return
   }
   
-  const selectedAnswerObj = currentQuestion.value.answers[index]
-  console.log(`\n🔍 === ANALYSE RÉPONSE SÉLECTIONNÉE ===`)
-  console.log(`🔍 Index: ${index}`)
-  console.log(`🔍 Objet complet:`, selectedAnswerObj)
-  console.log(`🔍 Texte: "${selectedAnswerObj.text}"`)
-  console.log(`🔍 Propriété correct:`, selectedAnswerObj.correct)
-  console.log(`🔍 Type de correct:`, typeof selectedAnswerObj.correct)
-  
-  // COMPARAISON STRICTE
-  const isCorrect = selectedAnswerObj.correct === true
-  console.log(`🔍 Résultat final isCorrect: ${isCorrect}`)
-  
-  // DEBUG : Afficher TOUTES les réponses
-  console.log(`\n🔍 === TOUTES LES RÉPONSES ===`)
-  currentQuestion.value.answers.forEach((answer, i) => {
-    const thisCorrect = answer.correct === true
-    console.log(`   ${i}: "${answer.text}"`)
-    console.log(`       correct: ${answer.correct} (${typeof answer.correct})`)
-    console.log(`       correct === true: ${thisCorrect}`)
-    console.log(`       ${i === index ? '← SÉLECTIONNÉE' : ''}`)
-    console.log(`       ${thisCorrect ? '✅ CORRECTE' : '❌ incorrecte'}`)
-  })
-  
-  // TROUVER LA VRAIE BONNE RÉPONSE
-  const correctAnswerIndex = currentQuestion.value.answers.findIndex(a => a.correct === true)
-  console.log(`\n🎯 Index de la vraie bonne réponse: ${correctAnswerIndex}`)
-  
-  if (correctAnswerIndex === -1) {
-    console.error('❌ AUCUNE bonne réponse trouvée dans cette question !')
-  } else {
-    const correctAnswer = currentQuestion.value.answers[correctAnswerIndex]
-    console.log(`✅ Vraie bonne réponse: "${correctAnswer.text}"`)
-  }
-  
+  // Arrêter le timer et marquer comme répondu
   selectedAnswer.value = index
   hasAnswered.value = true
   stopTimer()
+  
+  console.log(`✅ hasAnswered défini à: ${hasAnswered.value}`)
+  console.log(`✅ selectedAnswer défini à: ${selectedAnswer.value}`)
 
   const timeTaken = 30 - timeLeft.value
   playerTime.value += timeTaken
-  const opponentTime = Math.floor(Math.random() * 25) + 3
   
+  // DÉCLARER TOUTES LES VARIABLES AU DÉBUT
   let pointsEarned = 0
-  const selectedAnswerText = selectedAnswerObj.text
+  let selectedAnswerText = 'Temps écoulé'
+  let isCorrect = false
+  let speedBonus = 0 // ✅ DÉCLARER ICI POUR ÉVITER L'ERREUR
+  
+  // Gérer le cas où l'utilisateur a répondu (index !== null)
+  if (index !== null) {
+    const selectedAnswerObj = currentQuestion.value.answers[index]
+    isCorrect = selectedAnswerObj.correct === true
+    selectedAnswerText = selectedAnswerObj.text
+    
+    console.log(`🔍 Réponse sélectionnée: "${selectedAnswerText}"`)
+    console.log(`🔍 Est correcte: ${isCorrect}`)
+  } else {
+    console.log('⏰ Temps écoulé - aucune réponse sélectionnée')
+  }
   
   if (isCorrect) {
-    console.log('🎉 === BONNE RÉPONSE CONFIRMÉE ===')
+    console.log('🎉 === BONNE RÉPONSE ===')
     playerScore.value++
     
     const basePoints = 100
-    let speedBonus = 0
     
-    if (timeTaken < opponentTime) {
-      const timeDifference = opponentTime - timeTaken
-      
-      if (timeDifference >= 15) {
-        speedBonus = 75
-      } else if (timeDifference >= 10) {
-        speedBonus = 50
-      } else if (timeDifference >= 5) {
-        speedBonus = 30
-      } else {
-        speedBonus = 15
-      }
+    // CALCUL DU BONUS DE RAPIDITÉ
+    if (timeTaken <= 5) {
+      speedBonus = 100 // ⚡ Super rapide
+    } else if (timeTaken <= 10) {
+      speedBonus = 75  // 🔥 Très rapide
+    } else if (timeTaken <= 15) {
+      speedBonus = 50  // ⚡ Rapide
+    } else if (timeTaken <= 20) {
+      speedBonus = 25  // 👍 Correct
+    } else {
+      speedBonus = 0   // 😐 Lent
     }
     
     pointsEarned = basePoints + speedBonus
     
-    if (speedBonus > 0) {
-      pointsPopupText.value = `+${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité vs adversaire)`
+    // MESSAGES DE BONUS
+    if (speedBonus >= 75) {
+      pointsPopupText.value = `🔥 +${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité)`
+    } else if (speedBonus >= 25) {
+      pointsPopupText.value = `⚡ +${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité)`
+    } else if (speedBonus > 0) {
+      pointsPopupText.value = `👍 +${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité)`
     } else {
-      pointsPopupText.value = `+${pointsEarned} PTS\n(Adversaire était plus rapide)`
+      pointsPopupText.value = `✅ +${pointsEarned} PTS\n(Bonne réponse !)`
     }
     
     showPointsPopup.value = true
     setTimeout(() => showPointsPopup.value = false, 2500)
   } else {
-    console.log('💥 === MAUVAISE RÉPONSE CONFIRMÉE ===')
-    pointsPopupText.value = `0 PTS\n(Mauvaise réponse)`
+    console.log('💥 === MAUVAISE RÉPONSE OU TEMPS ÉCOULÉ ===')
+    
+    // speedBonus reste à 0 pour les mauvaises réponses
+    pointsEarned = 0
+    
+    if (index === null) {
+      pointsPopupText.value = `⏰ 0 PTS\n(Temps écoulé !)`
+    } else if (timeTaken <= 5) {
+      pointsPopupText.value = `💨 0 PTS\n(Trop rapide, mauvaise réponse !)`
+    } else if (timeTaken >= 25) {
+      pointsPopupText.value = `🐌 0 PTS\n(Temps presque écoulé...)`
+    } else {
+      pointsPopupText.value = `❌ 0 PTS\n(Mauvaise réponse)`
+    }
+    
     showPointsPopup.value = true
     setTimeout(() => showPointsPopup.value = false, 2000)
   }
   
+  // Sauvegarder la réponse (maintenant speedBonus est toujours défini)
   playerAnswers.value.push({
     questionId: currentQuestion.value?.id,
     questionText: currentQuestion.value?.text,
     selectedAnswer: selectedAnswerText,
     correct: isCorrect,
     time: timeTaken,
-    opponentTime: opponentTime,
     timeLeft: timeLeft.value,
     points: pointsEarned,
-    speedBonus: isCorrect ? (timeTaken < opponentTime ? true : false) : false
+    speedCategory: getSpeedCategory(timeTaken),
+    speedBonus: speedBonus // ✅ MAINTENANT TOUJOURS DÉFINI
   })
   
-  console.log('📊 Réponse ajoutée:', playerAnswers.value[playerAnswers.value.length - 1])
-  console.log('🎯 === FIN SÉLECTION RÉPONSE ===\n')
+  console.log('📊 Réponse sauvegardée:', playerAnswers.value[playerAnswers.value.length - 1])
   
-  setTimeout(() => nextQuestion(), 2500)
+  // Passage à la question suivante
+  console.log('⏳ Programmation du passage à la question suivante dans 2.5s...')
+  
+  setTimeout(() => {
+    console.log('🔄 Exécution du passage à la question suivante')
+    try {
+      nextQuestion()
+    } catch (error) {
+      console.error('❌ Erreur dans nextQuestion():', error)
+      // Fallback en cas d'erreur
+      if (currentQuestionIndex.value < totalQuestions.value - 1) {
+        currentQuestionIndex.value++
+        timeLeft.value = 30
+        hasAnswered.value = false
+        selectedAnswer.value = null
+        startTimer()
+      } else {
+        finishBattle()
+      }
+    }
+  }, 2500)
+  
+  console.log('🎯 === FIN SÉLECTION RÉPONSE ===\n')
+}
+
+// NOUVELLE FONCTION : Catégoriser la rapidité
+const getSpeedCategory = (timeTaken) => {
+  if (timeTaken <= 5) return 'lightning' // ⚡ Éclair
+  if (timeTaken <= 10) return 'fast' // 🔥 Rapide
+  if (timeTaken <= 15) return 'good' // ⚡ Bien
+  if (timeTaken <= 20) return 'average' // 👍 Moyen
+  if (timeTaken <= 25) return 'slow' // 😐 Lent
+  return 'very_slow' // 🐌 Très lent
 }
 
 const nextQuestion = () => {
+  console.log('\n🔄 === PASSAGE À LA QUESTION SUIVANTE ===')
+  console.log(`📊 Index actuel: ${currentQuestionIndex.value}`)
+  console.log(`📊 Total questions: ${totalQuestions.value}`)
+  console.log(`📊 Questions restantes: ${totalQuestions.value - currentQuestionIndex.value - 1}`)
+  
   if (currentQuestionIndex.value < totalQuestions.value - 1) {
+    console.log('➡️ Passage à la question suivante...')
+    
+    // Réinitialiser l'état
     currentQuestionIndex.value++
     timeLeft.value = 30
     hasAnswered.value = false
     selectedAnswer.value = null
-    startTimer()
+    
+    console.log(`✅ Nouvelle question index: ${currentQuestionIndex.value}`)
+    console.log(`✅ Timer réinitialisé: ${timeLeft.value}s`)
+    console.log(`✅ hasAnswered réinitialisé: ${hasAnswered.value}`)
+    
+    // Vérifier que la prochaine question existe
+    const nextQ = questions.value[currentQuestionIndex.value]
+    if (nextQ) {
+      console.log(`✅ Prochaine question trouvée: "${nextQ.content_default}"`)
+      startTimer()
+    } else {
+      console.error(`❌ Question ${currentQuestionIndex.value} introuvable !`)
+      console.error('❌ Questions disponibles:', questions.value.length)
+      finishBattle()
+    }
   } else {
+    console.log('🏁 Dernière question terminée, fin de bataille')
     finishBattle()
   }
 }
@@ -812,6 +879,20 @@ const finishBattle = async () => {
   stopTimer()
   
   const playerTotalPoints = playerAnswers.value.reduce((total, answer) => total + answer.points, 0)
+  const playerAverageTime = playerAnswers.value.length > 0 
+    ? playerTime.value / playerAnswers.value.length 
+    : 0
+  
+  // STATISTIQUES PERSONNELLES (pas de comparaison adversaire)
+  const perfectAnswers = playerAnswers.value.filter(a => a.correct && a.time <= 10).length
+  const goodAnswers = playerAnswers.value.filter(a => a.correct && a.time <= 20).length
+  
+  console.log('📊 === STATISTIQUES FINALES ===')
+  console.log(`✅ Score: ${playerScore.value}/${totalQuestions.value}`)
+  console.log(`⚡ Réponses parfaites (≤10s): ${perfectAnswers}`)
+  console.log(`👍 Bonnes réponses (≤20s): ${goodAnswers}`)
+  console.log(`📈 Points totaux: ${playerTotalPoints}`)
+  console.log(`⏱️ Temps moyen: ${playerAverageTime.toFixed(1)}s`)
   
   try {
     const existingBattleId = battleData.value?.id
@@ -839,17 +920,21 @@ const finishBattle = async () => {
           score: playerScore.value,
           totalPoints: playerTotalPoints,
           totalTime: playerTime.value,
+          averageTime: playerAverageTime,
+          perfectAnswers: perfectAnswers, // NOUVEAU
+          goodAnswers: goodAnswers, // NOUVEAU
           answers: playerAnswers.value.map(answer => ({
             questionId: answer.questionId,
             selectedAnswer: answer.selectedAnswer,
             correct: answer.correct,
             time: answer.time,
-            points: answer.points
+            points: answer.points,
+            speedCategory: answer.speedCategory // NOUVEAU
           })),
           questionsData: questions.value.map(q => ({
             id: q.id,
-            text: q.text,
-            correctAnswer: q.answers?.find(a => a.correct)?.text || 'Réponse correcte'
+            text: q.content_default,
+            correctAnswer: q.choices?.find(c => c.is_correct)?.text_answer || 'Réponse correcte'
           }))
         }
       }
@@ -861,17 +946,21 @@ const finishBattle = async () => {
           score: playerScore.value,
           totalPoints: playerTotalPoints,
           totalTime: playerTime.value,
+          averageTime: playerAverageTime,
+          perfectAnswers: perfectAnswers, // NOUVEAU
+          goodAnswers: goodAnswers, // NOUVEAU
           answers: playerAnswers.value.map(answer => ({
             questionId: answer.questionId,
             selectedAnswer: answer.selectedAnswer,
             correct: answer.correct,
             time: answer.time,
-            points: answer.points
+            points: answer.points,
+            speedCategory: answer.speedCategory // NOUVEAU
           })),
           questionsData: questions.value.map(q => ({
             id: q.id,
-            text: q.text,
-            correctAnswer: q.answers?.find(a => a.correct)?.text || 'Réponse correcte'
+            text: q.content_default,
+            correctAnswer: q.choices?.find(c => c.is_correct)?.text_answer || 'Réponse correcte'
           }))
         }
       }
@@ -907,7 +996,7 @@ const finishBattle = async () => {
     
     console.log('✅ Tour terminé:', battle)
     
-    // NOUVEAU : Vérifier si la bataille est maintenant terminée
+    // VÉRIFIER si la bataille est maintenant terminée
     const bothPlayersFinished = battle.challenger_summary && battle.challenged_summary
     
     if (bothPlayersFinished) {
