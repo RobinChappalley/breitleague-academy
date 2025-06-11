@@ -11,8 +11,8 @@
 
       <!-- Bouton spécial checkpoint -->
       <button
-        class="checkpoint-button special-button"
-        @click="showCheckpointModal"
+          class="checkpoint-button special-button"
+          @click="showCheckpointModal"
       ></button>
 
       <!-- Boutons de checkpoint avec progression individuelle -->
@@ -104,11 +104,12 @@
 
 <script>
 import {fetchProgression, fetchModules, fetchModule} from "@/services/api.js";
+
 export default {
   name: 'FormationView',
   data() {
     return {
-      modules : [],
+      modules: [],
       currentModuleIndex: 0,
       isTransitioning: false,
       lessons: [],
@@ -122,7 +123,22 @@ export default {
         timeLimit: '20 minutes',
         passScore: 70
       },
-      progression:{},
+      progression: {},
+      moduleImages: {
+        Onboarding:
+            {
+              watch: '/background/aviators-watch.png',
+              background: 'var(--aviators-horizontal)'
+            },
+        Novelties: {
+          watch: '/background/explorators-watch.png',
+          background: 'var(--aviators-horizontal)'
+        },
+        Discovery: {
+          watch: '/background/surfers-watch.png',
+          background: 'var(--aviators-horizontal)'
+        },
+      },
     }
   },
 
@@ -136,15 +152,15 @@ export default {
       const nextIndex = (this.currentModuleIndex + 1) % this.modules.length;
       return this.modules[nextIndex];
     },
-      numberOfButtons() {
-        return this.currentModule.lessons?.length
-      },
+    numberOfButtons() {
+      return this.currentModule.lessons?.length
+    },
 
-      // Circumférence du cercle (rayon = 20, cohérent avec le SVG)
-      circumference() {
-        return 2 * Math.PI * 20;
-      }
+    // Circumférence du cercle (rayon = 20, cohérent avec le SVG)
+    circumference() {
+      return 2 * Math.PI * 20;
     }
+  }
   ,
 
   async mounted() {
@@ -175,7 +191,7 @@ export default {
       title: lesson.title || `Lesson ${idx + 1}`
     }));
   }
-,
+  ,
 
   methods: {
     updateContainerDimensions() {
@@ -255,7 +271,7 @@ export default {
         }
       }
     },
-    async loadProgression () {
+    async loadProgression() {
       const res = await fetch('http://localhost:8000/api/user', {
         credentials: 'include',
         headers: {
@@ -270,14 +286,15 @@ export default {
       return progression
     },
 
-    async loadModule () {
+    async loadModule() {
       const progression = await this.loadProgression()
-      const moduleToDisplayId = progression.last_checkpoint_id+1
+      const moduleToDisplayId = progression.last_checkpoint_id + 1
       const module = await fetchModule(moduleToDisplayId)
       return module
     },
-    async loadAllModules () {
-      this.modules = await fetchModules()}
+    async loadAllModules() {
+      this.modules = await fetchModules()
+    }
   }
 }
 
@@ -287,6 +304,10 @@ export default {
 :root {
   --aviators-vertical: url('/backgrounds/aviators-vertical.png');
   --aviators-horizontal: url('/backgrounds/aviators-horizontal.png');
+  --explorators-vertical: url('/backgrounds/explorators-vertical.png');
+  --explorators-horizontal: url('/backgrounds/explorators-horizontal.png');
+  --surfers-horizontal: url('/backgrounds/surfers-horizontal.png');
+  --surfers-vertical: url('/backgrounds/surfers-vertical.png');
 }
 
 .formation-image-container {
@@ -431,7 +452,7 @@ export default {
   justify-content: center;
   flex-direction: column;
   align-items: flex-end;
-  @media screen and (width>= 768px) {
+  @media screen and (width >= 768px) {
     gap: 18px;
   }
   @media screen and (max-width: 767px) {
@@ -590,15 +611,15 @@ export default {
     width: 95%;
     margin: 1rem;
   }
-  
+
   .modal-content {
     padding: 2rem 1.5rem;
   }
-  
+
   .modal-header {
     padding: 2rem 1.5rem;
   }
-  
+
   .modal-title {
     font-size: 2rem;
   }
@@ -608,15 +629,15 @@ export default {
   .modal-title {
     font-size: 1.8rem;
   }
-  
+
   .modal-subtitle {
     font-size: 1rem;
   }
-  
+
   .modal-text {
     font-size: 0.9rem;
   }
-  
+
   .btn-start-test {
     padding: 1rem 2rem;
     font-size: 1rem;
