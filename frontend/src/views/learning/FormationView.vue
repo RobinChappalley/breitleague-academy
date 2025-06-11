@@ -122,7 +122,10 @@
               {{ lesson.title }}
             </p>
           </div>
+          <h2 class="module-title">{{moduleTitle}}</h2>
         </div>
+
+
       </transition>
     </div>
   </div>
@@ -134,7 +137,7 @@
 import {fetchProgression, fetchModule, fetchModules} from '@/services/api.js'
 import StartModuleModal from './startModuleModal.vue'
 import ProgressBar from '@/components/layout/ProgressBar.vue'
-
+import {ref} from "vue";
 
 export default {
   name: 'FormationView',
@@ -142,7 +145,6 @@ export default {
     StartModuleModal,
     ProgressBar
   },
-
   data() {
     return {
       modules: [],
@@ -186,7 +188,7 @@ export default {
       showLessonPoints: true,
       spinDirection:'right',
       showStartModal: false,
-      selectedModule: null
+      selectedModule: null,
     }
   },
 
@@ -227,6 +229,9 @@ export default {
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover'
       };
+    },
+    moduleTitle() {
+      return this.currentModule?.title;
     }
   },
 
@@ -248,6 +253,7 @@ export default {
       this.currentModuleIndex = moduleIndex;
       // Remplacer le module simple par le module complet avec lessons
       this.modules[moduleIndex] = loadedModule;
+
     }
 
     // 4. Mapper les lessons avec status/progress
@@ -417,6 +423,7 @@ export default {
        moduleToDisplayId = progression.last_checkpoint_id + 1
       }
       const module = await fetchModule(moduleToDisplayId)
+      this.moduleTitle =  module.title
       return module
     },
 
