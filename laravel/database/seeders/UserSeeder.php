@@ -6,6 +6,8 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Progression;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Question;
+use App\Models\Lesson;
 
 class UserSeeder extends Seeder
 {
@@ -13,6 +15,12 @@ class UserSeeder extends Seeder
     {
         $path = database_path('seeders/data/users.json');
         $users = json_decode(file_get_contents($path), true);
+
+        $allQuestionIds = Question::pluck('id')->toArray();
+
+        $lesson1Questions = Question::whereHas('theory.lesson', function ($query) {
+            $query->where('module_id', 1)->where('id', 1);
+        })->pluck('id')->toArray();
 
         foreach ($users as $userData) {
             // Crée l'utilisateur
@@ -31,11 +39,38 @@ class UserSeeder extends Seeder
                 'is_BS' => $userData['is_BS'],
             ]);
 
-            // Crée la progression liée
+            //préparer la progression en fonction de is_BS
+            $lastCheckpointId = 0;
+            $lastLessonId = 0;
+            $answeredQuestions = [];
+
+            if ($userData['is_BS']) {
+                // cas général pour les is_BS == true
+                $lastCheckpointId = 3;
+                $lastLessonId = 11;
+                $answeredQuestions = $allQuestionIds;
+            }
+
+            if ($userData['id'] == 12) {
+                // cas spécial user 12 → toutes les questions de lesson 1
+                $lastCheckpointId = 0;
+                $lastLessonId = 1;
+                $answeredQuestions = $lesson1Questions;
+            }
+
+            if ($userData['id'] == 13) {
+                // cas spécial user 13 → moitié des questions de lesson 1
+                $lastCheckpointId = 0;
+                $lastLessonId = 1;
+                $halfCount = (int) ceil(count($lesson1Questions) / 2);
+                $answeredQuestions = array_slice($lesson1Questions, 0, $halfCount);
+            }
+
+            //Crée la progression liée
             $user->progression()->create([
-                'last_lesson_id' => 0,
-                'last_checkpoint_id' => 0,
-                'idofquestionscorrectlyanswered' => [],
+                'last_lesson_id' => $lastLessonId,
+                'last_checkpoint_id' => $lastCheckpointId,
+                'idofquestionscorrectlyanswered' => $answeredQuestions,
             ]);
             // Attache le reward avec l'id 1
             $user->rewards()->attach(1, [

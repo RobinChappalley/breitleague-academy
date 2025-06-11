@@ -1,10 +1,17 @@
 <template>
   <div class="bs-progress-container">
     <p class="bs-progress-title">Specialist Progression</p>
-    <div class="bs-progress-bar">
-      <div class="bs-progress-bar-inner" :style="{ width: overallProgress + '%' }"></div>
-    </div>
-    <p class="bs-progress-percent">{{ overallProgress }}%</p>
+    <template v-if="isDataReady">
+      <div class="bs-progress-bar">
+        <div class="bs-progress-bar-inner" :style="{ width: overallProgress + '%' }"></div>
+      </div>
+      <p class="bs-progress-percent">{{ overallProgress }}%</p>
+    </template>
+    <template v-else>
+      <div class="loading">
+        <div class="loading-spinner">⏳</div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -61,6 +68,10 @@ const overallProgress = computed(() => {
     100
   ).toFixed(0)
 })
+
+const isDataReady = computed(() => {
+  return progression.value !== null && modules.value.length > 0
+})
 watch(overallProgress, async (newValue) => {
   if (progression.value) {
     try {
@@ -82,7 +93,7 @@ watch(overallProgress, async (newValue) => {
 
       if (dataUser.is_BS !== shouldBeBS) {
         // faire le PUT pour mettre à jour is_BS
-        await fetch(`http://localhost:8000/api/v1/users/${user.id}`, {
+        await fetch(await userService.getUser(user.id), {
           method: 'PUT',
           credentials: 'include',
           headers: {
@@ -144,5 +155,28 @@ watch(overallProgress, async (newValue) => {
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.8);
   margin-top: 0.25rem;
+}
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.loading-spinner {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
