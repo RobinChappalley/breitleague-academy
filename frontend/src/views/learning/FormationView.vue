@@ -1,6 +1,6 @@
 <template>
   <div class="formation-image-container" :style="backgroundStyle">
-    <div class="progress-bar">
+    <div class="progress-bar" v-if=!showStartModal>
       <ProgressBar/>
     </div>
     <div class="top-action-buttons">
@@ -380,6 +380,7 @@ export default {
       }
       this.showStartModal = true
     },
+
 
     handleModalClose() {
       this.showStartModal = false
