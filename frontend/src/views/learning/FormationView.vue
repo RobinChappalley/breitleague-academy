@@ -12,7 +12,7 @@
     <div ref="watchContainer" class="formation-watch-container">
 
       <!-- Image de la montre avec transition -->
-      <transition name="watch-slide" mode="out-in">
+      <transition name="watch-slide"  mode="out-in" @after-enter="onWatchTransitionEnd">
         <img
             v-if="currentWatchImage"
             :key="currentWatchImage"
@@ -23,58 +23,62 @@
         >
       </transition>
       <!-- Bouton spécial checkpoint -->
-      <button
-          class="checkpoint-button special-button"
-          @click="showCheckpointModal"
-      ></button>
+      <transition name="fade">
+        <div v-if="showLessonPoints">
+          <button
+              class="checkpoint-button special-button"
+              @click="showCheckpointModal"
+          ></button>
 
-      <!-- Boutons de checkpoint avec progression individuelle -->
-      <RouterLink
-          v-for="(lesson,index) in lessons"
-          :key="index"
-          :to="`/lesson/${lesson.id}`"
-          class="lesson-container"
-          :style="getButtonPosition(index)"
+          <!-- Boutons de checkpoint avec progression individuelle -->
+          <RouterLink
+              v-for="(lesson,index) in lessons"
+              :key="index"
+              :to="`/lesson/${lesson.id}`"
+              class="lesson-container"
+              :style="getButtonPosition(index)"
 
-      >
-        <!-- Cercle de progression pour chaque leçon -->
-        <svg class="lesson-progress-circle" width="50" height="50">
-          <!-- Cercle de fond -->
-          <circle
-              cx="25"
-              cy="25"
-              r="20"
-              fill="none"
-          />
-          <!-- Cercle de progression (seulement si en cours) -->
-          <!--I don't why it works with 28. but that's it! !-->
-          <circle
-              v-if="lesson.status === 'in-progress'"
-              cx="25"
-              cy="28"
-              r="20"
-              fill="none"
-              stroke="white"
-              stroke-width="3"
-              :stroke-dasharray="circumference"
-              :stroke-dashoffset="getLessonProgressOffset(lesson.progress)"
-              stroke-linecap="round"
-              class="progress-stroke"
-              transform="rotate(-90 25 25)"
-          />
-        </svg>
+          >
+            <!-- Cercle de progression pour chaque leçon -->
+            <svg class="lesson-progress-circle" width="50" height="50">
+              <!-- Cercle de fond -->
+              <circle
+                  cx="25"
+                  cy="25"
+                  r="20"
+                  fill="none"
+              />
+              <!-- Cercle de progression (seulement si en cours) -->
+              <!--I don't why it works with 28. but that's it! !-->
+              <circle
+                  v-if="lesson.status === 'in-progress'"
+                  cx="25"
+                  cy="28"
+                  r="20"
+                  fill="none"
+                  stroke="white"
+                  stroke-width="3"
+                  :stroke-dasharray="circumference"
+                  :stroke-dashoffset="getLessonProgressOffset(lesson.progress)"
+                  stroke-linecap="round"
+                  class="progress-stroke"
+                  transform="rotate(-90 25 25)"
+              />
+            </svg>
 
-        <!-- Bouton de la leçon -->
-        <button
-            class="checkpoint-button dynamic-button"
-            :class="getLessonClass(lesson.status)"
-        >
-          {{ index + 1 }}
-        </button>
-        <p class="lesson-label">
-          {{ lesson.title }}
-        </p>
-      </RouterLink>
+            <!-- Bouton de la leçon -->
+            <button
+                class="checkpoint-button dynamic-button"
+                :class="getLessonClass(lesson.status)"
+            >
+              {{ index + 1 }}
+            </button>
+            <p class="lesson-label">
+              {{ lesson.title }}
+            </p>
+          </RouterLink>
+        </div>
+      </transition>
     </div>
 
     <!-- Modal Checkpoint - Affiché par-dessus -->
@@ -152,14 +156,15 @@ export default {
         Discovery: {
           watch: '/backgrounds/surfers-watch.png',
           backgroundMobile: 'backgrounds/surfers-vertical.png',
-          backgroundDesktop:'backgrounds/surfers-horizontal.png'
+          backgroundDesktop: 'backgrounds/surfers-horizontal.png'
         },
       },
       defaultImages: {
         watch: '/backgrounds/aviators-watch.png',
         backgroundMobile: 'backgrounds/aviators-vertical.png',
-        backgroundDesktop:'backgrounds/aviators-horizontal.png'
+        backgroundDesktop: 'backgrounds/aviators-horizontal.png'
       },
+      showLessonPoints: true,
     }
   },
 
@@ -253,7 +258,7 @@ export default {
       const angleRad = (currentAngle * Math.PI) / 180;
 
       //-30 pour que le texte reste dans l'écran sur mobile
-      const radiusPixels = this.containerWidth-30;
+      const radiusPixels = this.containerWidth - 30;
       const centerX = 0;
       const centerY = this.containerHeight / 2;
 
@@ -339,6 +344,10 @@ export default {
 
     async changeModule(direction = 'next') {
       if (this.isWatchTransitioning) return;
+      console.log(this.showLessonPoints);
+
+      this.showLessonPoints = false;
+      console.log(this.showLessonPoints);
 
       console.log('Changing module:', direction);
 
@@ -382,7 +391,12 @@ export default {
 
         this.isWatchTransitioning = false;
         console.log('Module changed to:', newModule.title);
-      }, 1000);
+      }, 400);
+    },
+
+    onWatchTransitionEnd() {
+      // Affiche les points dès que la transition sortie de la montre est finie
+      this.showLessonPoints = true;
     },
   }
 }
@@ -429,7 +443,7 @@ export default {
 .lesson-watch.watch-transitioning {
   transform: rotate(180deg);
   opacity: 0.7;
- }
+}
 
 .checkpoint-button {
   height: 3.5em;
@@ -736,31 +750,45 @@ export default {
     font-size: 1rem;
   }
 }
+
 /* Animation pour la montre qui sort : rotation autour du centre + disparition */
 .watch-slide-leave-active {
-  animation: watch-spin-out 0.7s forwards cubic-bezier(.83,-0.33,.2,1.2);
+  animation: watch-spin-out 0.3s forwards cubic-bezier(.13, -0.33, .7, 1.2);
   z-index: 2;
 }
+
 @keyframes watch-spin-out {
-100% {
-  opacity: 0;
-  transform: rotate(180deg)
-  /* disparait et se rétrécit */
-}
+  100% {
+    opacity: 0.8;
+    transform: rotate(180deg)
+  }
 }
 
 /* Animation pour la montre qui entre : descend du haut vers son centre */
 .watch-slide-enter-active {
-  animation: watch-slide-down-in 0.7s forwards cubic-bezier(.83,-0.33,.2,1.2);
+  animation: watch-slide-down-in 0.3s forwards cubic-bezier(.13, -0.33, .7, 1.2);
   z-index: 3;
 }
+
 @keyframes watch-slide-down-in {
 
   0% {
-    opacity: 1;
-    transform: rotate(-180deg);
+    opacity: 0.8;
+    transform: rotate(-150deg);
   }
 
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+.fade-leave-from, .fade-enter-to {
+  opacity: 1;
 }
 
 </style>
