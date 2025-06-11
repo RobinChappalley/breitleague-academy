@@ -77,8 +77,13 @@ const isLoading = ref(true)
 const error = ref(null)
 // 1️⃣ Récupérer l'utilisateur connecté
 
+const errorWatches = ref(null)
+const errorFavorites = ref(null)
+
 const fetchWatches = async () => {
   try {
+    errorWatches.value = null
+
     const fetchCurrentUser = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
       headers: {
@@ -87,10 +92,8 @@ const fetchWatches = async () => {
     })
 
     const data = await fetchCurrentUser.json()
-    console.log(data)
 
     const res = await userService.getUser(data.id)
-    console.log(res)
     const dataUser = res.data
 
     watches.value = dataUser.rewards.map((reward) => ({
@@ -105,13 +108,15 @@ const fetchWatches = async () => {
       selectedWatch.value = watches.value[0]
     }
   } catch (err) {
-    error.value = 'Error loading watches'
+    errorWatches.value = 'Error loading watches'
     console.error(err)
   }
 }
 
 const fetchFavorites = async () => {
   try {
+    errorFavorites.value = null
+
     const fetchCurrentUser = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
       headers: {
@@ -120,20 +125,23 @@ const fetchFavorites = async () => {
     })
 
     const data = await fetchCurrentUser.json()
-    console.log(data)
 
     const res = await userService.getUser(data.id)
-    console.log(res)
+    const dataUser = res.data
 
-    const dataUser = await res.json()
-    console.log(dataUser)
+    favoriteIds.value = Array.isArray(dataUser.rewards)
+      ? dataUser.rewards
+          .filter((reward) => reward.pivot?.is_favourite === 1)
+          .map((reward) => reward.id)
+      : []
 
-    favoriteIds.value = Array.isArray(data.data) ? data.data.map((entry) => entry.reward_id) : []
     watches.value.forEach((watch) => {
       watch.isFavorite = favoriteIds.value.includes(watch.id)
     })
   } catch (err) {
-    error.value = "You haven't earned any rewards yet, so no watches are available."
+    // Ici attention : ne pas dire "You haven't earned rewards" par défaut !
+    // On distingue "aucun favori" (normal) et "erreur réseau / auth" (anormal)
+    errorFavorites.value = 'Error loading favorites'
     favoriteIds.value = []
     console.warn('⚠️ Missing or empty auth:', err.message)
   }
