@@ -128,7 +128,7 @@ const winRate = computed(() => {
 
 const topRewards = computed(() => {
   return userRewards.value
-    .filter((reward) => reward.pivot?.is_favourite) // 👈 filtre les favoris
+    .filter((reward) => reward.pivot?.is_favourite) //filtre les favoris
     .slice(0, 3) // top 3
 })
 
@@ -138,7 +138,7 @@ const loadUserProfile = async () => {
     isLoading.value = true
     error.value = null
 
-    console.log("🔄 Chargement de l'utilisateur connecté...")
+    console.log("Chargement de l'utilisateur connecté...")
 
     // 1️⃣ Récupérer l'utilisateur connecté
     const res = await fetch('http://localhost:8000/api/user', {
@@ -151,20 +151,20 @@ const loadUserProfile = async () => {
     if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
 
     const connectedUser = await res.json()
-    console.log('✅ Utilisateur connecté:', connectedUser)
+    console.log('Utilisateur connecté:', connectedUser)
 
     // 2️⃣ Appeler ton API pour charger les infos complètes du user
     const response = await userService.getUser(connectedUser.id)
-    console.log('📦 Réponse API user:', response)
+    console.log('Réponse API user:', response)
 
     user.value = response.data || response
-    console.log('✅ User complet chargé:', user.value)
+    console.log('User complet chargé:', user.value)
 
     // Charger les rewards
     await loadUserRewards(user.value.id)
   } catch (err) {
     error.value = `Erreur lors du chargement: ${err.message}`
-    console.error('❌ Erreur API:', err)
+    console.error('Erreur API:', err)
     router.push('/login')
   } finally {
     isLoading.value = false
@@ -178,9 +178,9 @@ const loadUserRewards = async (userId) => {
 
     userRewards.value = user.rewards || []
 
-    console.log('👤 Utilisateur chargé:', user)
+    console.log('Utilisateur chargé:', user)
   } catch (err) {
-    console.error('❌ Erreur lors du chargement de l’utilisateur:', err.message)
+    console.error('Erreur lors du chargement de l’utilisateur:', err.message)
     userRewards.value = []
   }
 }
@@ -203,7 +203,7 @@ const goToCollection = () => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('🚀 ProfileView monté, chargement des données...')
+  console.log('ProfileView monté, chargement des données...')
   loadUserProfile()
 })
 const logout = async () => {
@@ -216,7 +216,7 @@ const logout = async () => {
     // Redirige vers la page de login
     router.push('/login')
   } catch (err) {
-    console.error('❌ Erreur lors du logout:', err)
+    console.error('Erreur lors du logout:', err)
   }
 }
 </script>

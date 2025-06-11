@@ -75,7 +75,6 @@ const selectedWatch = ref({})
 const favoriteIds = ref([])
 const isLoading = ref(true)
 const error = ref(null)
-// 1️⃣ Récupérer l'utilisateur connecté
 
 const errorWatches = ref(null)
 const errorFavorites = ref(null)
@@ -144,7 +143,7 @@ const fetchFavorites = async () => {
     // On distingue "aucun favori" (normal) et "erreur réseau / auth" (anormal)
     errorFavorites.value = 'Error loading favorites'
     favoriteIds.value = []
-    console.warn('⚠️ Missing or empty auth:', err.message)
+    console.warn('Missing or empty auth:', err.message)
   }
 }
 
@@ -158,14 +157,14 @@ const toggleFavorite = async (watch) => {
   }
 
   try {
-    // 1️⃣ On définit bodyData ici
+    // On définit bodyData ici
     const bodyData = {
       is_favourite: !isCurrentlyFavorite ? 1 : 0
       // Si besoin, ajoute user_id ici :
       // user_id: currentUserId.value
     }
 
-    // 2️⃣ On utilise bodyData dans le fetch
+    //On utilise bodyData dans le fetch
     const response = await fetch(`${backendUrl}/api/v1/user-rewards/${watch.userRewardId}`, {
       method: 'PUT',
       credentials: 'include',
@@ -173,7 +172,7 @@ const toggleFavorite = async (watch) => {
       body: JSON.stringify(bodyData)
     })
 
-    // 3️⃣ On affiche le résultat
+    // On affiche le résultat
     const result = await response.json()
     console.log('PUT result', result)
 

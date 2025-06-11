@@ -267,14 +267,14 @@ const loadUsersRanking = async () => {
     if (!res.ok) throw new Error('Erreur lors du chargement des utilisateurs')
 
     const data = await res.json()
-    console.log('✅ Utilisateurs chargés:', data)
+    console.log('Utilisateurs chargés:', data)
 
     // Mapper les users pour les adapter à ton format Ranking
     rankingPlayers.value = data.data
       .filter((user) => user.is_BS === true)
       .map((user, index) => ({
         id: user.id,
-        rank: index + 1, // 👈 on trie + on met le rang
+        rank: index + 1, //on trie + on met le rang
         name: user.username.toUpperCase(),
         country: user.pos?.country || 'Unknown',
         score: user.elo_score || 0,
@@ -303,7 +303,7 @@ const loadUsersRanking = async () => {
         rank: index + 1
       }))
   } catch (err) {
-    console.error('❌ Erreur API users ranking:', err.message)
+    console.error('Erreur API users ranking:', err.message)
   }
 }
 
@@ -381,9 +381,9 @@ const loadCurrentUser = async () => {
     }
     //console.log(fullUser.data.id)
 
-    console.log('✅ Utilisateur courant chargé :', currentUser.value)
+    console.log('Utilisateur courant chargé :', currentUser.value)
   } catch (err) {
-    console.error('❌ Erreur lors du chargement du currentUser:', err.message)
+    console.error('Erreur lors du chargement du currentUser:', err.message)
   }
 }
 
