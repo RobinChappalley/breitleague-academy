@@ -66,6 +66,7 @@
 </template>
 
 <script setup>
+import { userService } from '@/services/api'
 import { ref, onMounted } from 'vue'
 
 const backendUrl = 'http://localhost:8000'
@@ -74,13 +75,28 @@ const selectedWatch = ref({})
 const favoriteIds = ref([])
 const isLoading = ref(true)
 const error = ref(null)
+// 1️⃣ Récupérer l'utilisateur connecté
 
 const fetchWatches = async () => {
   try {
-    const res = await fetch(`${backendUrl}/api/v1/rewards`, { credentials: 'include' })
-    const data = await res.json()
+    const fetchIDUser = await fetch('http://localhost:8000/api/user', {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
 
-    watches.value = data.data.map((watch) => ({
+    const data = await fetchIDUser.json()
+    console.log(data)
+
+    const res = await userService.getUser(data.id)
+    console.log(res)
+
+    const dataUser = await res.json()
+    console.log(dataUser)
+
+    // traitement watches --> ici bien dans le try
+    watches.value = dataUser.data.map((watch) => ({
       ...watch,
       colors: Array.isArray(watch.colors)
         ? watch.colors
