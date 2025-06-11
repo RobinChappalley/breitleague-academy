@@ -136,21 +136,25 @@ export default {
       moduleImages: {
         Onboarding:
             {
-              watch: '/background/aviators-watch.png',
-              background: 'var(--aviators-horizontal)'
+              watch: '/backgrounds/aviators-watch.png',
+              backgroundMobile: 'backgrounds/aviators-vertical.png',
+              backgroundDesktop: 'backgrounds/aviators-horizontal.png'
             },
         Novelties: {
-          watch: '/background/explorators-watch.png',
-          background: 'var(--aviators-horizontal)'
+          watch: '/backgrounds/explorators-watch.png',
+          backgroundMobile: 'backgrounds/explorators-horizontal.png',
+          backgroundDesktop: 'backgrounds/explorators-horizontal.png',
         },
         Discovery: {
-          watch: '/background/surfers-watch.png',
-          background: 'var(--aviators-horizontal)'
+          watch: '/backgrounds/surfers-watch.png',
+          backgroundMobile: 'backgrounds/surfers-vertical.png',
+          backgroundDesktop:'backgrounds/surfers-horizontal.png'
         },
       },
       defaultImages: {
         watch: '/backgrounds/aviators-watch.png',
-        background: 'var(--aviators-horizontal)'
+        backgroundMobile: 'backgrounds/aviators-vertical.png',
+        backgroundDesktop:'backgrounds/aviators-horizontal.png'
       },
     }
   },
@@ -169,21 +173,29 @@ export default {
       return 2 * Math.PI * 20;
     },
     currentWatchImage() {
-      const moduleId = this.currentModule?.id;
+      const moduleId = this.currentModule?.title;
       return this.moduleImages[moduleId]?.watch || this.defaultImages.watch;
     },
 
     currentBackgroundImage() {
-      const moduleId = this.currentModule?.id;
-      return this.moduleImages[moduleId]?.background || this.defaultImages.background;
+      const moduleTitle = this.currentModule?.title;
+      const moduleData = this.moduleImages[moduleTitle];
+
+      if (!moduleData) return this.defaultImages.background;
+
+      // Choix responsive
+      return window.innerWidth >= 768
+          ? moduleData.backgroundDesktop
+          : moduleData.backgroundMobile;
     },
     backgroundStyle() {
       return {
-        backgroundImage: this.currentBackgroundImage
+        backgroundImage: `url(${this.currentBackgroundImage})`,
+        backgroundPosition: 'right bottom',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover'
       };
     }
-
-
   },
 
   async mounted() {
@@ -319,6 +331,7 @@ export default {
     async loadAllModules() {
       this.modules = await fetchModules()
     },
+
     async changeModule(direction = 'next') {
       if (this.isWatchTransitioning) return;
 
@@ -337,12 +350,24 @@ export default {
       // 2. Démarrer la transition
       this.isWatchTransitioning = true;
 
-      // 3. Attendre l'animation, puis changer
+      // 3. Charger le module complet s'il n'a pas ses lessons
+      let newModule = this.modules[nextIndex];
+      if (!newModule.lessons || newModule.lessons.length === 0) {
+        try {
+          newModule = await fetchModule(newModule.id);
+          this.modules[nextIndex] = newModule; // Remplacer dans la liste
+        } catch (error) {
+          console.error('Erreur lors du chargement du module:', error);
+          this.isWatchTransitioning = false;
+          return;
+        }
+      }
+
+      // 4. Attendre l'animation, puis changer
       setTimeout(() => {
         this.currentModuleIndex = nextIndex;
 
         // Mettre à jour les lessons du nouveau module
-        const newModule = this.modules[nextIndex];
         this.lessons = newModule.lessons.map((lesson, idx) => ({
           ...lesson,
           status: 'not-started',
@@ -378,12 +403,7 @@ export default {
   background-size: cover;
   display: flex;
   align-items: center;
-  @media screen and (max-width: 768px) {
-    background-image: var(--aviators-vertical);
-  }
-  @media screen and (min-width: 768px) {
-    background-image: var(--aviators-horizontal);
-  }
+  transition: background-image 1s ease-in-out;
 }
 
 .formation-watch-container {
@@ -397,7 +417,14 @@ export default {
 .lesson-watch {
   max-width: 65vw;
   max-height: 85vh;
+  transform-origin: 0 50%; /* Point de rotation : gauche-centre */
+  transition: transform 1s ease-in-out, opacity 1s ease-in-out;
 }
+
+.lesson-watch.watch-transitioning {
+  transform: rotate(180deg);
+  opacity: 0.7;
+ }
 
 .checkpoint-button {
   height: 3.5em;

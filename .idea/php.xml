@@ -133,6 +133,8 @@
       <path value="$PROJECT_DIR$/laravel/vendor/laravel/serializable-closure" />
       <path value="$PROJECT_DIR$/laravel/vendor/laravel/framework" />
       <path value="$PROJECT_DIR$/laravel/vendor/mockery/mockery" />
+      <path value="$PROJECT_DIR$/laravel/vendor/laravel/sanctum" />
+      <path value="$PROJECT_DIR$/laravel/vendor/wotz/laravel-swagger-ui" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2">
