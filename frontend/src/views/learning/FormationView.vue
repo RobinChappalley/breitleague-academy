@@ -240,7 +240,6 @@ export default {
 
     // 2. Charger le module spécifique avec ses lessons
     const loadedModule = await this.loadModule();
-    console.log(loadedModule);
     // 3. Trouver l'index du module actuel dans la liste
     const moduleIndex = this.modules.findIndex(m => m.id === loadedModule.id);
     if (moduleIndex !== -1) {
@@ -414,7 +413,6 @@ export default {
       } else {
        moduleToDisplayId = progression.last_checkpoint_id + 1
       }
-      console.log(progression.last_checkpoint_id)
       const module = await fetchModule(moduleToDisplayId)
       return module
     },
