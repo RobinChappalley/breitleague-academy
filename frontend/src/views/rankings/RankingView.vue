@@ -368,7 +368,16 @@ const loadCurrentUser = async () => {
       since: `Reseller since ${userDataFull.signup_year || 'Unknown'}`,
       battleWin: userDataFull.battle_won || 0,
       battleLost: userDataFull.battle_lost || 0,
-      topWatches: [] // à remplir plus tard si dispo
+      topWatches: userDataFull.rewards
+        ? userDataFull.rewards
+            .filter((reward) => reward.pivot?.is_favourite)
+            .slice(0, 3)
+            .map((reward) => ({
+              id: reward.id,
+              name: reward.model,
+              photo: reward.photo_name
+            }))
+        : []
     }
     //console.log(fullUser.data.id)
 
