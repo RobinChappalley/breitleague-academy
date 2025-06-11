@@ -1,9 +1,10 @@
 <template>
   <div class="formation-image-container" :style="backgroundStyle">
-    <div class="top-action-buttons">
-    <div class="progress-bar">
-      <ProgressBar />
+    <div class="progress-bar" v-if=!showStartModal>
+      <ProgressBar/>
     </div>
+    <div class="top-action-buttons">
+
       <!-- Bouton temporaire pour tester -->
       <button class="action-btn" @click="changeModule('next')">Next Module (Test)</button>
       <button class="action-btn" @click="changeModule('previous')">Previous Module (Test)</button>
@@ -15,12 +16,13 @@
     <div ref="watchContainer" class="formation-watch-container">
 
       <!-- Image de la montre avec transition -->
-      <transition name="watch-slide"  mode="out-in" @after-enter="onWatchTransitionEnd">
+      <transition name="watch-slide" mode="out-in" @after-enter="onWatchTransitionEnd">
         <img
             v-if="currentWatchImage"
             :key="currentWatchImage"
             :alt="`${currentModule?.title || 'Breitling'} watch`"
             :src="currentWatchImage"
+            :class="['lesson-watch', spinDirection === 'right' ? 'spin-right' : 'spin-left']"
             class="lesson-watch"
             @load="updateContainerDimensions"
         >
@@ -28,18 +30,58 @@
       <!-- Bouton spécial checkpoint -->
       <transition name="fade">
         <div v-if="showLessonPoints">
-          <button
-              class="checkpoint-button special-button"
-              @click="showCheckpointModal"
-          ></button>
+          <div v-if="isCheckpointModalVisible" class="modal-overlay" @click="closeCheckpointModal">
+            <div class="checkpoint-modal" @click.stop>
+              <button class="close-btn" @click="closeCheckpointModal">✕</button>
+
+              <div class="modal-header">
+                <h2 class="modal-title">CHECKPOINT</h2>
+                <h3 class="modal-subtitle">ONBOARDING</h3>
+              </div>
+
+              <div class="modal-content">
+                <p class="modal-text">
+
+                  Welcome to your checkpoint assessment. This test will evaluate your understanding of the
+                  material covered in this module. You'll need to answer
+                  {{ checkpointData.totalQuestions }} questions with a minimum score of
+                  {{ checkpointData.passScore }}% to pass.
+
+                </p>
+
+                <div class="modal-rules">
+                  <h4>Test Rules:</h4>
+                  <ul>
+                    <li>Time limit: {{ checkpointData.timeLimit }}</li>
+                    <li>{{ checkpointData.totalQuestions }} multiple choice questions</li>
+                    <li>Minimum {{ checkpointData.passScore }}% required to pass</li>
+                    <li>You can retake the test if needed</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="modal-actions">
+                <button class="btn-start-test" @click="startCheckpointTest">START TEST</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ✅ AJOUTÉ : Le composant StartModuleModal -->
+          <StartModuleModal
+              :isVisible="showStartModal"
+              :moduleData="selectedModule"
+              @close="handleModalClose"
+              @module-started="handleModuleStarted"
+          />
 
           <!-- Boutons de checkpoint avec progression individuelle -->
-          <RouterLink
+          <div
               v-for="(lesson,index) in lessons"
               :key="index"
-              :to="`/lesson/${lesson.id}`"
               class="lesson-container"
               :style="getButtonPosition(index)"
+              @click="openStartModal(lesson)"
+
 
           >
             <!-- Cercle de progression pour chaque leçon -->
@@ -79,81 +121,17 @@
             <p class="lesson-label">
               {{ lesson.title }}
             </p>
-          </RouterLink>
-        </div>
-      </transition>
-=======
-        </div>
-
-    <div ref="watchContainer" class="formation-watch-container">
-     
-      <!-- Bouton spécial checkpoint -->
-      <button class="checkpoint-button special-button" @click="showCheckpointModal"></button>
-
-      <!-- ✅ CORRIGÉ : Div au lieu de RouterLink + appel openStartModal -->
-      <div
-        v-for="(lesson, index) in lessons"
-        :key="index"
-        class="lesson-container"
-        :style="getButtonPosition(index)"
-        @click="openStartModal(lesson)"
-      >
-      
-
-        
-    </div>
-
-    <!-- Modal Checkpoint - Affiché par-dessus -->
-    <div v-if="isCheckpointModalVisible" class="modal-overlay" @click="closeCheckpointModal">
-      <div class="checkpoint-modal" @click.stop>
-        <button class="close-btn" @click="closeCheckpointModal">✕</button>
-
-        <div class="modal-header">
-          <h2 class="modal-title">CHECKPOINT</h2>
-          <h3 class="modal-subtitle">ONBOARDING</h3>
-        </div>
-
-        <div class="modal-content">
-          <p class="modal-text">
-
-            Welcome to your checkpoint assessment. This test will evaluate your understanding of the
-            material covered in this module. You'll need to answer
-            {{ checkpointData.totalQuestions }} questions with a minimum score of
-            {{ checkpointData.passScore }}% to pass.
-
-          </p>
-
-          <div class="modal-rules">
-            <h4>Test Rules:</h4>
-            <ul>
-              <li>Time limit: {{ checkpointData.timeLimit }}</li>
-              <li>{{ checkpointData.totalQuestions }} multiple choice questions</li>
-              <li>Minimum {{ checkpointData.passScore }}% required to pass</li>
-              <li>You can retake the test if needed</li>
-            </ul>
           </div>
         </div>
-
-        <div class="modal-actions">
-          <button class="btn-start-test" @click="startCheckpointTest">START TEST</button>
-        </div>
-      </div>
+      </transition>
     </div>
-
-    <!-- ✅ AJOUTÉ : Le composant StartModuleModal -->
-    <StartModuleModal
-      :isVisible="showStartModal"
-      :moduleData="selectedModule"
-      @close="handleModalClose"
-      @module-started="handleModuleStarted"
-    />
   </div>
 </template>
 
 <script>
 
 
-import { fetchProgression, fetchModules } from '@/services/api.js'
+import {fetchProgression, fetchModule, fetchModules} from '@/services/api.js'
 import StartModuleModal from './startModuleModal.vue'
 import ProgressBar from '@/components/layout/ProgressBar.vue'
 
@@ -206,7 +184,7 @@ export default {
         backgroundDesktop: 'backgrounds/aviators-horizontal.png'
       },
       showLessonPoints: true,
-
+      spinDirection:'right',
       showStartModal: false,
       selectedModule: null
     }
@@ -264,7 +242,6 @@ export default {
 
     // 2. Charger le module spécifique avec ses lessons
     const loadedModule = await this.loadModule();
-
     // 3. Trouver l'index du module actuel dans la liste
     const moduleIndex = this.modules.findIndex(m => m.id === loadedModule.id);
     if (moduleIndex !== -1) {
@@ -289,11 +266,9 @@ export default {
       if (container) {
         this.containerWidth = container.offsetWidth
         this.containerHeight = container.offsetHeight
-        console.log(`📏 Container: ${this.containerWidth}x${this.containerHeight}`)
       }
     },
 
-    // ✅ NOUVEAU : Méthode pour générer des lessons par défaut
     getDefaultLessons() {
       return [
         {
@@ -341,7 +316,7 @@ export default {
 
     getButtonPosition(index) {
       if (this.containerWidth === 0) {
-        return { display: 'none' }
+        return {display: 'none'}
       }
 
       const arcDegrees = 150
@@ -406,16 +381,11 @@ export default {
       this.showStartModal = true
     },
 
+
     handleModalClose() {
       this.showStartModal = false
       this.selectedModule = null
     },
-
-    async loadProgression() {
-      const res = await fetch('http://localhost:8000/api/user', {
-        credentials: 'include',
-        headers: {
-          Accept: 'application/json'
 
     handleModuleStarted(data) {
       console.log('Module started:', data)
@@ -423,25 +393,29 @@ export default {
       this.$router.push(`/LearningFlowView.vue`)
     },
 
-
+    async loadProgression() {
+      const res = await fetch('http://localhost:8000/api/user', {
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json'
         }
+      })
+      const connectedUser = await res.json()
+      const progression = await fetchProgression(connectedUser.id)
+      this.progression = progression
+      return progression
 
-        console.log(`🔄 Loading progression for user ID: ${connectedUser.id}`)
-        const progression = await fetchProgression(connectedUser.id)
-        console.log('✅ Progression loaded:', progression)
-
-        this.progression = progression
-        return progression
-      } catch (error) {
-        console.error('❌ Error loading progression:', error)
-        return null
-      }
     },
-
 
     async loadModule() {
       const progression = await this.loadProgression()
-      const moduleToDisplayId = progression.last_checkpoint_id + 1
+      let moduleToDisplayId =0
+      if (progression.last_checkpoint_id == 3) {
+         moduleToDisplayId = 1
+
+      } else {
+       moduleToDisplayId = progression.last_checkpoint_id + 1
+      }
       const module = await fetchModule(moduleToDisplayId)
       return module
     },
@@ -453,7 +427,7 @@ export default {
     async changeModule(direction = 'next') {
       if (this.isWatchTransitioning) return;
       console.log(this.showLessonPoints);
-
+      this.spinDirection = direction === 'next' ? 'right' : 'left';
       this.showLessonPoints = false;
       console.log(this.showLessonPoints);
 
@@ -509,22 +483,6 @@ export default {
   }
 }
 
-        const module = await fetchModules(moduleToDisplayId)
-        console.log('✅ Module loaded:', module)
-
-        return module
-      } catch (error) {
-        console.error('❌ Error loading modules:', error)
-        console.log('🔄 Falling back to default lessons')
-
-        // Retourner des lessons par défaut en cas d'erreur
-        return {
-          lessons: this.getDefaultLessons()
-        }
-      }
-    }
-  }
-}
 </script>
 <style>
 :root {
@@ -902,6 +860,56 @@ export default {
 
 }
 
+.watch-slide-leave-active.spin-right {
+  animation: watch-spin-out-right 0.7s forwards;
+}
+.watch-slide-leave-active.spin-left {
+  animation: watch-spin-out-left 0.7s forwards;
+}
+
+/* Pour arrivée/entrée */
+.watch-slide-enter-active.spin-right {
+  animation: watch-spin-in-right 0.7s forwards;
+}
+.watch-slide-enter-active.spin-left {
+  animation: watch-spin-in-left 0.7s forwards;
+}
+
+/* Keyframes pour tourner à droite */
+@keyframes watch-spin-out-right {
+  to {
+    opacity: 0;
+    transform: rotate(2turn) scale(0.7); /* tourne complet à droite */
+  }
+}
+@keyframes watch-spin-in-right {
+  from {
+    opacity: 0;
+    transform: translateY(-40px) rotate(-1turn) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+/* ...et idem pour la gauche : */
+@keyframes watch-spin-out-left {
+  to {
+    opacity: 0;
+    transform: rotate(-2turn) scale(0.7); /* tourne complet à gauche */
+  }
+}
+@keyframes watch-spin-in-left {
+  from {
+    opacity: 0;
+    transform: translateY(-40px) rotate(1turn) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+}
+
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.2s;
 }
@@ -913,5 +921,4 @@ export default {
 .fade-leave-from, .fade-enter-to {
   opacity: 1;
 }
-
 </style>
