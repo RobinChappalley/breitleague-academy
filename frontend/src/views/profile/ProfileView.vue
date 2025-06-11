@@ -73,6 +73,9 @@
         </div>
 
         <!-- Top 3 Watches Section -->
+        <div>
+          <h3>FAVORITES WATCHES</h3>
+        </div>
         <div class="watches-grid">
           <div
             v-for="reward in topRewards"

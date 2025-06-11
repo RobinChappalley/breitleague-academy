@@ -133,7 +133,7 @@
 
         <div class="popup-watches">
           <div class="watches-header">
-            <h3>TOP 3 WATCHES</h3>
+            <h3>FAVORITES WATCHES</h3>
           </div>
           <div class="watches-grid">
             <div
@@ -850,6 +850,11 @@ console.log('RankingView component loaded')
 .popup-watches {
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   padding-top: 2rem;
+}
+.popup-watches .watch-placeholder img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .watches-header {
