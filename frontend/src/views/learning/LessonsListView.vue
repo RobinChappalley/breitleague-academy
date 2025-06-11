@@ -204,6 +204,7 @@ p {
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  width: 200px
 }
 
 .read-btn:hover {
@@ -343,7 +344,6 @@ p {
   .lesson-item {
     padding: 1rem 1.2rem;
     gap: 1rem;
-    text-align: center;
   }
   
   .lesson-name {
@@ -372,10 +372,5 @@ p {
   background: rgba(247, 199, 44, 0.1);
   box-shadow: 0 1px 4px rgba(33,40,80,0.15);
 }
-@media (max-width: 767px) {
-  .back-arrow {
-    top: 1rem;
-    left: 1rem;
-  }
-}
+
 </style>
