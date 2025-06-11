@@ -928,4 +928,12 @@ export default {
 .fade-leave-from, .fade-enter-to {
   opacity: 1;
 }
+
+.module-title {
+  position: absolute;
+  right: -100px;
+  bottom: -50px;
+font-size: 2.5rem;
+  color:whitesmoke
+}
 </style>
