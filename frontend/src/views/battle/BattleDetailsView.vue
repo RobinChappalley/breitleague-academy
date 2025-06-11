@@ -695,7 +695,6 @@ const getAvatarStyle = (player) => {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* PLAYERS COMPARISON */
