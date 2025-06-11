@@ -66,9 +66,6 @@
             {{ player.score.toLocaleString('fr-CH').replace(/\u202F/g, "'") }} PTS
           </div>
         </div>
-
-        <!-- See All Button -->
-        <button class="see-all-btn" @click="seeAll" v-if="!showingAll">SEE ALL</button>
       </div>
     </div>
 
