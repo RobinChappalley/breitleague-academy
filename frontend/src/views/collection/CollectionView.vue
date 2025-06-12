@@ -196,25 +196,27 @@ onMounted(async () => {
 
 <style scoped>
 .collection-page {
-  background-color: #072c54;
+  background-color: #0d4f97;
   color: white;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   padding-left: 280px;
-  overflow-y: hidden;
+  overflow-y: auto; /* autorise le scroll */
 }
 
 .watch-details {
   background-color: #072c54;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
+  padding-bottom: 15rem;
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
-  flex: 1;
+  flex: 0 0 auto;
   box-sizing: border-box;
-  overflow: hidden;
+  flex-wrap: wrap; /* autorise wrap */
 }
 
 .watch-info {
@@ -256,18 +258,19 @@ onMounted(async () => {
 
 .watches-grid {
   background-color: #0d4f97;
-  flex: 0 0 auto;
   padding: 2rem;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  row-gap: 3rem;
-  column-gap: 2rem;
+  flex-grow: 1;
+  grid-template-columns: repeat(auto-fit, minmax(170px, auto));
+  justify-content: start;
+  row-gap: 2rem;
+  column-gap: 15rem;
   box-sizing: border-box;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
   overflow-y: auto;
-  max-height: 50vh;
-  min-height: 200px;
+  height: auto;
+  min-height: 0px;
 }
 
 .watch-item {
@@ -277,8 +280,9 @@ onMounted(async () => {
 }
 
 .watch-item img {
-  width: 100%;
+  width: clamp(100px, 20vw, 150px);
   height: auto;
+  object-fit: contain;
 }
 
 .favorite-star {
@@ -317,6 +321,10 @@ onMounted(async () => {
     padding-left: 0;
     padding-top: 1rem;
   }
+  .watches-grid {
+    column-gap: 2rem; /* réduit sur petits écrans */
+    padding: 1rem; /* réduit un peu les bords */
+  }
   .watch-details {
     flex-direction: row;
     align-items: center;
@@ -353,6 +361,11 @@ onMounted(async () => {
     flex-direction: column;
     align-items: center;
     padding: 1rem;
+  }
+  .watches-grid {
+    row-gap: 0.5rem;
+    column-gap: 1rem;
+    padding: 0.5rem;
   }
   .watch-info {
     order: 2;
