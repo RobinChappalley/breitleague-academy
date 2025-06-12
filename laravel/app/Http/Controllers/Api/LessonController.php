@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Http\Resources\LessonResource;
 use App\Models\Lesson;
+use App\Models\Theory;
 
 class LessonController extends Controller
 {
@@ -48,5 +47,34 @@ class LessonController extends Controller
         return response()->json([
             'message' => 'Deleting lessons is not allowed on this endpoint.'
         ], 405);
+    }
+
+    /**
+     * Récupérer toutes les théories d'une leçon avec leurs questions
+     */
+    public function getTheories($lessonId)
+    {
+        try {
+            $theories = Theory::where('lesson_id', $lessonId)
+                ->with(['questions' => function($query) {
+                    $query->with('choices')->orderBy('position_order');
+                }])
+                ->orderBy('position_order')
+                ->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $theories
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Erreur getTheories: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la récupération des théories',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

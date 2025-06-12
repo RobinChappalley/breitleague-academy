@@ -136,3 +136,81 @@ export const fetchModules = async () => {
   return data.data
 }
 
+// Ajouter ces nouvelles fonctions à la fin du fichier
+export const learningService = {
+  // Récupérer une théorie avec ses questions
+  async getTheory(theoryId) {
+    await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+      credentials: 'include'
+    })
+
+    const csrfToken = decodeURIComponent(
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1] ?? ''
+    )
+
+    const response = await fetch(`${API_BASE_URL}/theories/${theoryId}`, {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'X-XSRF-TOKEN': csrfToken
+      }
+    })
+
+    if (!response.ok) throw new Error('Erreur lors du chargement de la théorie')
+    return await response.json()
+  },
+
+  // Récupérer une question avec ses choix
+  async getQuestion(questionId) {
+    await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+      credentials: 'include'
+    })
+
+    const csrfToken = decodeURIComponent(
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1] ?? ''
+    )
+
+    const response = await fetch(`${API_BASE_URL}/questions/${questionId}`, {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'X-XSRF-TOKEN': csrfToken
+      }
+    })
+
+    if (!response.ok) throw new Error('Erreur lors du chargement de la question')
+    return await response.json()
+  },
+
+  // Récupérer toutes les théories d'une leçon
+  async getLessonTheories(lessonId) {
+    await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+      credentials: 'include'
+    })
+
+    const csrfToken = decodeURIComponent(
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1] ?? ''
+    )
+
+    const response = await fetch(`${API_BASE_URL}/lessons/${lessonId}/theories`, {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'X-XSRF-TOKEN': csrfToken
+      }
+    })
+
+    if (!response.ok) throw new Error('Erreur lors du chargement des théories')
+    return await response.json()
+  }
+}
+

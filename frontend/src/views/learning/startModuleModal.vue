@@ -38,9 +38,8 @@
 </template>
 
 <script>
-import {useRouter} from "vue-router";
+import { useRouter } from "vue-router";
 
-const router = useRouter()
 export default {
   name: 'StartModuleModal',
   props: {
@@ -56,12 +55,20 @@ export default {
   
   emits: ['close', 'module-started'],
   
+  // ⚠️ AJOUTER setup() pour utiliser useRouter
+  setup() {
+    const router = useRouter()
+    return { router }
+  },
+  
   methods: {
     closeModal() {
       this.$emit('close');
     },
     
     startModule() {
+      console.log('Starting module with data:', this.moduleData);
+      
       // Émet l'événement avec les données hardcodées du module Histoire
       this.$emit('module-started', {
         moduleId: 'history',
@@ -72,8 +79,11 @@ export default {
       
       // Ferme le modal
       this.closeModal();
-      const firstLessonId = this.moduleData.id
-      this.$router.push('/lesson/${firstLessonId}')
+      
+      // ⚠️ CORRIGER : Utiliser this.router au lieu de this.$router
+      // ⚠️ CORRIGER : Utiliser des backticks `` au lieu de quotes ''
+      const firstLessonId = this.moduleData.id || 1;
+      this.router.push(`/learning/${firstLessonId}`);
     }
   }
 }
