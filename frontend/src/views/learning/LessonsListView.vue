@@ -64,7 +64,8 @@ const loadModulesAndLessons = async () => {
 
 const openLesson = (lessonId) => {
   console.log(`Opening lesson: ${lessonId}`)
-  router.push(`/ressources/lesson/${lessonId}`)
+  // Toujours rediriger vers HistoireView
+  router.push('/ressources/history')
 }
 
 onMounted(() => {
