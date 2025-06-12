@@ -35,4 +35,8 @@ class LoginController extends Controller
             'username' => $user->username,
         ]);
     }
+    public function csrf()
+{
+return csrf_token();
+}
 }

@@ -28,7 +28,9 @@ Route::middleware('auth:sanctum')->get('api/user', function () {
     ]);
 });
 
-Route::post('/login', [LoginController::class, 'login']);
+Route::post('api/login', [LoginController::class, 'login']);
+
+Route::get('api/csrf', [LoginController::class, 'csrf']);
 
 Route::post('/logout', function (Request $request) {
     Auth::logout();
