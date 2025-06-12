@@ -119,11 +119,11 @@
 
         <div class="popup-stats">
           <div class="stat-item">
-            <span class="stat-label">BATTLE WIN</span>
+            <p class="stat-label">BATTLE WIN</p>
             <span class="stat-value">{{ selectedPlayer?.battleWin }}</span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">BATTLE LOST</span>
+            <p class="stat-label">BATTLE LOST</p>
             <span class="stat-value">{{ selectedPlayer?.battleLost }}</span>
           </div>
         </div>
@@ -425,7 +425,7 @@ console.log('RankingView component loaded')
 
 /* MAIN CONTENT */
 .main-content {
-  padding: 2rem;
+  
   padding-bottom: 120px;
   max-width: 800px;
   margin: 0 auto;
@@ -438,10 +438,8 @@ console.log('RankingView component loaded')
 }
 
 .ranking-title {
-  font-size: 3rem;
-  font-weight: 700;
   color: #f7c72c;
-  margin: 0 0 2rem 0;
+  margin-top: 1.8rem;
   text-transform: uppercase;
   letter-spacing: 2px;
 }
@@ -841,8 +839,6 @@ console.log('RankingView component loaded')
 .stat-label {
   display: block;
   color: #f7c72c;
-  font-size: 0.9rem;
-  font-weight: 600;
   margin-bottom: 0.5rem;
 }
 
@@ -872,8 +868,6 @@ console.log('RankingView component loaded')
 
 .watches-header h3 {
   color: white;
-  font-size: 1rem;
-  font-weight: 600;
   margin: 0;
 }
 
@@ -954,9 +948,7 @@ console.log('RankingView component loaded')
     font-size: 1.4rem;
   }
 
-  .ranking-title {
-    font-size: 3.5rem;
-  }
+
 }
 
 @media (min-width: 1024px) {
@@ -999,9 +991,6 @@ console.log('RankingView component loaded')
     font-size: 1.5rem;
   }
 
-  .ranking-title {
-    font-size: 4rem;
-  }
 }
 
 /* MOBILE (moins de 768px) */
@@ -1014,7 +1003,6 @@ console.log('RankingView component loaded')
   }
 
   .main-content {
-    padding: 1rem;
     padding-bottom: 180px; /* Plus d'espace : footer fixe (100px) + navbar mobile (70px) + marge (10px) */
   }
 
@@ -1052,9 +1040,6 @@ console.log('RankingView component loaded')
     font-size: 1rem;
   }
 
-  .ranking-title {
-    font-size: 2rem;
-  }
 
   .ranking-item {
     padding: 0.8rem 1rem;
@@ -1084,7 +1069,6 @@ console.log('RankingView component loaded')
 /* TRÈS PETIT MOBILE (moins de 480px) */
 @media (max-width: 479px) {
   .main-content {
-    padding: 1rem;
     padding-bottom: 190px; /* Encore plus d'espace sur très petit mobile */
   }
 

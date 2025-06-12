@@ -4,7 +4,7 @@
       <!-- Header avec meilleur spacing -->
       <div class="battle-header">
         <h1 class="battle-title">BATTLES</h1>
-        <h2 class="section-title">THEY CHALLENGED YOU</h2>
+        <p class="section-title">THEY CHALLENGED YOU</p>
       </div>
 
       <!-- They Challenged You Section -->
@@ -55,9 +55,9 @@
       <!-- You Challenged Them Section -->
       <div class="section">
         <div class="section-header">
-          <h2 class="section-title">YOU CHALLENGED THEM</h2>
+          <p class="section-title">YOU CHALLENGED THEM</p>
           <div class="slots-info">
-            <span class="slots-counter">{{ outgoingChallenges.length }}/5 slots used</span>
+            <span class="slots-counter text-mini">{{ outgoingChallenges.length }}/5 slots used</span>
             <div class="slots-bar">
               <div 
                 class="slots-fill" 
@@ -120,7 +120,7 @@
 
       <!-- Finished Battles Section -->
       <div class="section">
-        <h2 class="section-title">FINISHED BATTLES</h2>
+        <p class="section-title">FINISHED BATTLES</p>
         <div class="battle-grid">
           <div 
             v-for="battle in finishedBattles" 
@@ -629,34 +629,25 @@ const currentQuestion = computed(() => {
 }
 
 /* HEADER */
-.battle-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
 
 .battle-title {
-  font-size: 2.5rem;
-  font-weight: 700;
   color: #F7C72C;
-  margin: 0;
+  margin-top: 1.8rem;
+  margin-bottom: 1rem;
   text-transform: uppercase;
+  text-align: center;
   letter-spacing: 2px;
   text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* SECTIONS */
 .section {
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
 }
 
 .section-title {
-  font-size: 1.3rem;
   color: white;
-  margin-bottom: 1.5rem;
-  text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-align: center;
+  text-align: left;
 }
 
 /* HEADER SECTION - NOUVEAU */
@@ -664,7 +655,6 @@ const currentQuestion = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
   flex-wrap: wrap;
   gap: 1rem;
 }
@@ -906,7 +896,6 @@ const currentQuestion = computed(() => {
 .invitation-label {
   font-size: 0.7rem;
   color: #F7C72C;
-  font-weight: 600;
   margin-left: 0.5rem;
   white-space: nowrap;
 }
@@ -1091,14 +1080,7 @@ const currentQuestion = computed(() => {
     max-width: 100%;
   }
   
-  .battle-title {
-    font-size: 2rem;
-    letter-spacing: 1px;
-  }
   
-  .section-title {
-    font-size: 1.1rem;
-  }
   
   .battle-card {
     padding: 1rem;
@@ -1140,9 +1122,6 @@ const currentQuestion = computed(() => {
     font-size: 0.8rem;
   }
   
-  .invitation-label {
-    font-size: 0.6rem;
-  }
 }
 
 /* PETIT TABLET (768px à 1023px) - NOUVEAU BREAKPOINT */
@@ -1159,19 +1138,11 @@ const currentQuestion = computed(() => {
     padding: 0 0.5rem;
   }
   
-  .battle-title {
-    font-size: 2.8rem;
-    letter-spacing: 2px;
-  }
   
   .section {
     margin-bottom: 2.5rem;
   }
   
-  .section-title {
-    font-size: 1.4rem;
-    text-align: left;
-  }
   
   .battle-card {
     padding: 1.3rem;
@@ -1212,9 +1183,6 @@ const currentQuestion = computed(() => {
     font-size: 0.85rem;
   }
   
-  .invitation-label {
-    font-size: 0.65rem;
-  }
 }
 
 /* DESKTOP (1024px et plus) */
@@ -1228,22 +1196,14 @@ const currentQuestion = computed(() => {
   
   .main-content {
     max-width: 900px;
-    padding: 0 1rem;
+
   }
   
-  .battle-title {
-    font-size: 3.5rem;
-    letter-spacing: 3px;
-  }
   
   .section {
     margin-bottom: 3.5rem;
   }
-  
-  .section-title {
-    font-size: 1.8rem;
-    text-align: left;
-  }
+
   
   .battle-card {
     padding: 1.5rem;
@@ -1284,31 +1244,19 @@ const currentQuestion = computed(() => {
     font-size: 0.9rem;
   }
   
-  .invitation-label {
-    font-size: 0.7rem;
-  }
 }
 
 /* TRÈS PETIT MOBILE (479px et moins) - AMÉLIORÉ */
 @media (max-width: 479px) {
   .battle-page {
-    padding: 0.5rem;
+    padding: 1rem;
     padding-bottom: 80px;
-  }
-  
-  .battle-title {
-    font-size: 1.6rem;
-    letter-spacing: 1px;
   }
   
   .section {
     margin-bottom: 2rem;
   }
   
-  .section-title {
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-  }
   
   .battle-card {
     padding: 0.8rem;
@@ -1375,10 +1323,6 @@ const currentQuestion = computed(() => {
     font-size: 0.6rem;
   }
   
-  .invitation-label {
-    font-size: 0.4rem;
-    margin-left: 0.2rem;
-  }
   
   /* Cards d'invitation */
   .invite-card {
@@ -1426,13 +1370,6 @@ const currentQuestion = computed(() => {
     padding: 0.4rem;
   }
   
-  .battle-title {
-    font-size: 1.4rem;
-  }
-  
-  .section-title {
-    font-size: 0.8rem;
-  }
   
   .battle-card {
     padding: 0.6rem;
@@ -1472,10 +1409,6 @@ const currentQuestion = computed(() => {
     width: 18px;
     height: 18px;
     font-size: 0.55rem;
-  }
-  
-  .invitation-label {
-    font-size: 0.35rem;
   }
   
   .invite-card {

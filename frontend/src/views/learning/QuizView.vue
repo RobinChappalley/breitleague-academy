@@ -35,8 +35,7 @@
         <!-- Validation Button -->
         <div class="button-section">
           <!-- Cancel/Close Button -->
-          <button 
-            v-if="showResult && !currentQuestion.answers[selectedAnswer]?.correct" 
+          <button
             class="cancel-btn"
             @click="resetQuestion"
           >
@@ -45,7 +44,7 @@
           
           <!-- Next Button -->
           <button 
-            class="next-btn"
+            class="next-btn primary-btn"
             :class="{ 'disabled': selectedAnswer === null && !showResult }"
             @click="handleNext"
             :disabled="selectedAnswer === null && !showResult"
@@ -61,7 +60,10 @@
 <script setup>
 import { ref, computed } from 'vue'
 
+import { useRouter } from 'vue-router'  
+
 // Props
+const router = useRouter() 
 const props = defineProps({
   questionData: {
     type: Object,
@@ -116,8 +118,9 @@ const handleNext = () => {
 }
 
 const resetQuestion = () => {
-  selectedAnswer.value = null
-  showResult.value = false
+ if (confirm('Êtes-vous sûr de vouloir quitter le quiz ? Votre progression sera perdue.')) {
+    router.push('/')
+  }
 }
 
 console.log('QuizView component loaded')
@@ -243,24 +246,20 @@ console.log('QuizView component loaded')
 }
 
 .cancel-btn {
-  background: rgba(239, 68, 68, 0.8);
-  color: white;
+  background: #F7C72C;
+  color: #072C54;
   border: none;
   width: 50px;
   height: 50px;
-  border-radius: 50%;
-  font-size: 1.2rem;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
 }
 
-.cancel-btn:hover {
-  background: rgba(239, 68, 68, 1);
-  transform: translateY(-2px);
-}
 
 .next-btn {
   background: #F7C72C;
@@ -268,14 +267,13 @@ console.log('QuizView component loaded')
   border: none;
   padding: 1rem 3rem;
   border-radius: 8px;
-  font-weight: 700;
-  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
   flex: 1;
   max-width: 300px;
+  height: 50px;
 }
 
 .next-btn:hover:not(.disabled) {
@@ -400,8 +398,8 @@ console.log('QuizView component loaded')
   }
   
   .cancel-btn {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     font-size: 1rem;
   }
 }

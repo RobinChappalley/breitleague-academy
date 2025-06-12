@@ -66,7 +66,7 @@ onUnmounted(() => {
   background-color: #001638;
   padding: 20px 0;
   border-radius: 0;
-  z-index: 1000;
+  z-index: 999;
 }
 
 .logo {
@@ -168,7 +168,7 @@ onUnmounted(() => {
     padding: 0;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    z-index: 1000;
+    z-index: 999;
   }
 
   .logo {
