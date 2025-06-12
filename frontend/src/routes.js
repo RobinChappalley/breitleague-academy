@@ -36,7 +36,7 @@ export const routes = [
     meta: { hideNavBar: true }
   },
   { path: '/ressources/history', component: HistoireView, meta: { hideNavBar: true } },
-  { path: '/learning/:lessonId', component: LearningFlowView, props: true },
+  { path: '/lesson/:lessonId', component: LearningFlowView, meta:{hideNavBar:true}, props: true },
   {
     path: '/:pathMatch(.*)*',
     redirect: (to) => {
@@ -47,4 +47,5 @@ export const routes = [
       }
     }
   }
+
 ]
