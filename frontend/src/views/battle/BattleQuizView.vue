@@ -1388,8 +1388,7 @@ onUnmounted(() => {
 /* RESPONSIVE */
 @media (min-width: 768px) {
   .battle-quiz-page {
-    margin-left: 280px;
-    width: calc(100% - 280px);
+    width: 100%;
     padding: 2rem;
     padding-bottom: 2rem;
   }
