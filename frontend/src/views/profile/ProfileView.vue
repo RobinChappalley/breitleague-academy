@@ -108,7 +108,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { userService } from '@/services/api'
+import { userService, getCurrentUser } from '@/services/api'
 
 const router = useRouter()
 
@@ -141,16 +141,7 @@ const loadUserProfile = async () => {
     console.log("Chargement de l'utilisateur connecté...")
 
     // 1️⃣ Récupérer l'utilisateur connecté
-    const res = await fetch('http://localhost:8000/api/user', {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
-    })
-
-    if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
-
-    const connectedUser = await res.json()
+    const connectedUser = await getCurrentUser.getCurrentUserId()
     console.log('Utilisateur connecté:', connectedUser)
 
     // 2️⃣ Appeler ton API pour charger les infos complètes du user

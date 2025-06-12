@@ -1,5 +1,22 @@
 // frontend/src/services/api.js
 const API_BASE_URL = 'http://localhost:8000/api/v1'
+const API_BASE_URL_USER = 'http://localhost:8000'
+
+export const getCurrentUser = {
+  async getCurrentUserId() {
+    const res = await fetch(`${API_BASE_URL_USER}/api/user`, {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`)
+    }
+
+    return res.json()
+  }
+}
 
 export const userService = {
   async getUser(id) {
@@ -124,15 +141,13 @@ export const fetchProgression = async (userid) => {
 }
 
 export const fetchModule = async (moduleId) => {
-const module = await fetch(`${API_BASE_URL}/modules/${moduleId}`, {})
-const data = await module.json()
-return data.data
+  const module = await fetch(`${API_BASE_URL}/modules/${moduleId}`, {})
+  const data = await module.json()
+  return data.data
 }
-
 
 export const fetchModules = async () => {
   const modules = await fetch(`${API_BASE_URL}/modules`, {})
   const data = await modules.json()
   return data.data
 }
-
