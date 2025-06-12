@@ -1,4 +1,3 @@
-// frontend/src/services/api.js
 const API_BASE_URL = 'http://localhost:8000/api/v1'
 
 export const userService = {
@@ -34,9 +33,7 @@ export const userService = {
 }
 
 export const battleService = {
-  // Récupérer tous les utilisateurs disponibles pour un battle
   async getAvailableUsers() {
-    // Token CSRF comme dans LoginView
     await fetch('http://localhost:8000/sanctum/csrf-cookie', {
       credentials: 'include'
     })
@@ -60,7 +57,6 @@ export const battleService = {
     return await response.json()
   },
 
-  // Récupérer toutes les questions (utilise ta route existante)
   async getQuestions() {
     await fetch('http://localhost:8000/sanctum/csrf-cookie', {
       credentials: 'include'
@@ -74,7 +70,6 @@ export const battleService = {
     )
 
     const response = await fetch(`${API_BASE_URL}/questions`, {
-      // Utilise ta route existante
       credentials: 'include',
       headers: {
         Accept: 'application/json',
@@ -86,7 +81,6 @@ export const battleService = {
     return await response.json()
   },
 
-  // Récupérer tous les choix (utilise ta route existante)
   async getChoices() {
     await fetch('http://localhost:8000/sanctum/csrf-cookie', {
       credentials: 'include'
@@ -100,7 +94,6 @@ export const battleService = {
     )
 
     const response = await fetch(`${API_BASE_URL}/choices`, {
-      // Récupérer TOUS les choix
       credentials: 'include',
       headers: {
         Accept: 'application/json',
