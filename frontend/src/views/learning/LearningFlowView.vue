@@ -78,55 +78,54 @@ const currentStep = ref(1)
 const lessonIndex = ref(0)
 
 // Tracking pour la progression
-const lessonAnswers = ref([]) // CORRIGÉ: Fermeture de parenthèse manquante
+const lessonAnswers = ref(loadAnswersFromLocalStorage()) // CORRIGÉ: Fermeture de parenthèse manquante
 const completedLessonNumber = ref(1)
 
 // Sample lessons data avec différents types de questions
-const lessons = ref([
-  {
-    theory: {
-      title: "L'AVENGER",
-      content: [
-        "Robuste et audacieuse, l'Avenger est inspirée de l'héritage aéronautique de Breitling.",
-        "Relancée en 2019, elle est ultralegible même avec des gants, et depuis 2022, elle embarque le calibre Breitling 01."
-      ]
-    },
-    question: {
-      type: "multiple-choice",
-      question: "Quelle est la principale caractéristique de l'Avenger relancée en 2019 ?",
-      answers: [
-        { text: "Ultra-résistante", correct: false },
-        { text: "Ultra-légible", correct: true },
-        { text: "Ultra-mince", correct: false },
-        { text: "Ultra-connectée", correct: false }
-      ]
-    }
+const lessons = ref([{
+  theory: {
+    title: "THE AVENGER",
+    content: [
+      "Robust and bold, the Avenger is inspired by Breitling’s aeronautical legacy.",
+      "Reintroduced in 2019, it is ultra-legible even with gloves, and since 2022, it features the Breitling 01 caliber."
+    ]
   },
+  question: {
+    type: "multiple-choice",
+    question: "What is the main feature of the Avenger reintroduced in 2019?",
+    answers: [
+      { text: "Ultra-resistant", correct: false },
+      { text: "Ultra-legible", correct: true },
+      { text: "Ultra-thin", correct: false },
+      { text: "Ultra-connected", correct: false }
+    ]
+  }
+},
   {
     theory: {
-      title: "LE NAVITIMER",
+      title: "THE NAVITIMER",
       content: [
-        "Le Navitimer est l'icône absolue de Breitling depuis 1952.",
-        "Cette montre d'aviateur emblématique combine chronographe et règle à calcul circulaire."
+        "The Navitimer has been Breitling’s ultimate icon since 1952.",
+        "This legendary pilot’s watch combines chronograph and circular slide rule."
       ]
     },
     question: {
       type: "true-false",
-      question: "Le Navitimer a été lancé en 1952.",
+      question: "The Navitimer was launched in 1952.",
       correctAnswer: "true"
     }
   },
   {
     theory: {
-      title: "LES COLLECTIONS",
+      title: "THE COLLECTIONS",
       content: [
-        "Breitling propose plusieurs collections emblématiques.",
-        "Chaque collection a ses propres caractéristiques et calibres spécifiques."
+        "Breitling offers several emblematic collections.",
+        "Each collection has its own specific features and calibers."
       ]
     },
     question: {
       type: "matching",
-      instruction: "Associez chaque montre à son calibre",
+      instruction: "Match each watch to its caliber",
       pairs: [
         { left: "Navitimer", right: "B01" },
         { left: "Premier", right: "B09" },
@@ -139,13 +138,13 @@ const lessons = ref([
     theory: {
       title: "IDENTIFICATION",
       content: [
-        "Savoir identifier les montres Breitling est essentiel.",
-        "Chaque modèle a des caractéristiques visuelles distinctives."
+        "Knowing how to identify Breitling watches is essential.",
+        "Each model has distinctive visual characteristics."
       ]
     },
     question: {
       type: "drag-drop",
-      question: "Quel modèle possède un calibre Breitling B23 ?",
+      question: "Which model features a Breitling B23 caliber?",
       watches: [
         { name: "Premier", image: "/images/watches/premier.jpg" },
         { name: "Navitimer", image: "/images/watches/navitimer.jpg" },
@@ -155,7 +154,18 @@ const lessons = ref([
       correctAnswer: 1
     }
   }
+
 ])
+
+function saveAnswersToLocalStorage(answers) {
+  localStorage.setItem('breitling-lesson-answers', JSON.stringify(answers));
+}
+
+function loadAnswersFromLocalStorage() {
+  const saved = localStorage.getItem('breitling-lesson-answers');
+  return saved ? JSON.parse(saved) : [];
+}
+
 
 // Computed
 const currentLesson = computed(() => lessons.value[lessonIndex.value])
@@ -202,6 +212,9 @@ const handleAnswer = (answerData) => {
     correct: answerData.correct || answerData.allCorrect || false,
     data: answerData
   })
+  saveAnswersToLocalStorage(lessonAnswers.value);
+
+
 }
 
 const handleLessonFinish = () => {
