@@ -1,10 +1,10 @@
 // frontend/src/services/api.js
 const API_BASE_URL = 'http://localhost:8000/api/v1'
-const API_BASE_URL_USER = 'http://localhost:8000'
+const BACKEND_URL = 'http://localhost:8000'
 
 export const getCurrentUser = {
   async getCurrentUserId() {
-    const res = await fetch(`${API_BASE_URL_USER}/api/user`, {
+    const res = await fetch(`${BACKEND_URL}/api/user`, {
       credentials: 'include',
       headers: {
         Accept: 'application/json'

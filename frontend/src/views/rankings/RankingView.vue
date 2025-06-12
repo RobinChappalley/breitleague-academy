@@ -163,6 +163,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { userService, getCurrentUser } from '@/services/api'
 
 // Data
 const selectedFilter = ref('world')
@@ -326,16 +327,8 @@ const currentUser = ref({
 const loadCurrentUser = async () => {
   try {
     // Étape 1 : Vérifier que l'utilisateur est connecté
-    const res1 = await fetch('http://localhost:8000/api/user', {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
-    })
-    if (!res1.ok) throw new Error('Utilisateur non authentifié')
-    const userData = await res1.json()
-
-    const userId = userData.id
+    const connectedUser = await getCurrentUser.getCurrentUserId()
+    const userId = connectedUser.id
     //console.log(userId)
 
     // Étape 2 : Charger les vraies infos utilisateur via /v1/users/{id}

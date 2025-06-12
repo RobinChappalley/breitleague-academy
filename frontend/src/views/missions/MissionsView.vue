@@ -65,7 +65,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { userService } from '@/services/api'
+import { userService, getCurrentUser } from '@/services/api'
 const router = useRouter()
 
 const goBack = () => {
@@ -150,27 +150,18 @@ const getAllMissions = async () => {
 
     console.log("Chargement de l'utilisateur connecté...")
 
-    //Récupérer l'utilisateur connecté
-    const res = await fetch('http://localhost:8000/api/user', {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
-    })
+    // Récupérer l'utilisateur connecté via getCurrentUserId
+    const connectedUser = await getCurrentUser.getCurrentUserId()
+    console.log('Utilisateur connecté:', connectedUser)
 
-    if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
-
-    const connectedUser = await res.json()
-
-    //Charger infos complètes du user
+    // Charger infos complètes du user
     const response = await userService.getUser(connectedUser.id)
-
     user.value = response.data || response
 
-    //Charger les missions
+    // Charger les missions
     const userMissions = user.value.missions || []
 
-    // 4️⃣ Pour chaque mission, aller chercher le reward lié + ajouter user_mission_id
+    // Pour chaque mission, aller chercher le reward lié + ajouter user_mission_id
     const missionsWithRewards = await Promise.all(
       userMissions.map(async (mission) => {
         try {
@@ -190,7 +181,7 @@ const getAllMissions = async () => {
               ...mission,
               reward: null,
               progress: mission.pivot.is_completed === 1 ? 100 : 0,
-              completed: false, // NE PAS le mettre égal à is_completed !
+              completed: false,
               user_mission_id: mission.pivot.id
             }
           }
@@ -201,7 +192,7 @@ const getAllMissions = async () => {
             ...mission,
             reward: rewardData.data,
             progress: mission.pivot.is_completed === 1 ? 100 : 0,
-            completed: false, // pareil
+            completed: false,
             user_mission_id: mission.pivot.id
           }
         } catch (err) {
@@ -221,6 +212,7 @@ const getAllMissions = async () => {
     missions.value = missionsWithRewards
   } catch (err) {
     error.value = err
+    console.error('Erreur dans getAllMissions:', err)
   } finally {
     isLoading.value = false
   }

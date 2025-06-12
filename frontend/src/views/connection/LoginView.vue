@@ -21,6 +21,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { getCurrentUser } from '@/services/api'
 
 const username = ref('')
 const password = ref('')
@@ -70,26 +71,16 @@ const login = async () => {
 
 const fetchUser = async () => {
   try {
-    const res = await fetch('http://localhost:8000/api/user', {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
-    })
+    const connectedUser = await getCurrentUser.getCurrentUserId()
+    console.log('Utilisateur connecté:', connectedUser)
 
-    if (!res.ok) {
-      currentUser.value = null
-      localStorage.removeItem('isLoggedIn')
-      return
-    }
-
-    const data = await res.json()
-    currentUser.value = data
+    currentUser.value = connectedUser
     localStorage.setItem('isLoggedIn', 'true')
 
-    // Si l'utilisateur est connecté → rediriger vers "/"
     router.push('/')
-  } catch {
+  } catch (err) {
+    // Si erreur (fetch échoué ou 401), on déconnecte
+    console.error('Error fetching user:', err)
     currentUser.value = null
     localStorage.removeItem('isLoggedIn')
   }

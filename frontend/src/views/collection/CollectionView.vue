@@ -66,7 +66,7 @@
 </template>
 
 <script setup>
-import { userService } from '@/services/api'
+import { userService, getCurrentUser } from '@/services/api'
 import { ref, onMounted } from 'vue'
 
 const backendUrl = 'http://localhost:8000'
@@ -83,16 +83,10 @@ const fetchWatches = async () => {
   try {
     errorWatches.value = null
 
-    const fetchCurrentUser = await fetch('http://localhost:8000/api/user', {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
-    })
+    const connectedUser = await getCurrentUser.getCurrentUserId()
+    console.log('Utilisateur connecté:', connectedUser)
 
-    const data = await fetchCurrentUser.json()
-
-    const res = await userService.getUser(data.id)
+    const res = await userService.getUser(connectedUser.id)
     const dataUser = res.data
 
     watches.value = dataUser.rewards.map((reward) => ({
@@ -117,16 +111,10 @@ const fetchFavorites = async () => {
   try {
     errorFavorites.value = null
 
-    const fetchCurrentUser = await fetch('http://localhost:8000/api/user', {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
-    })
+    const user = await getCurrentUser.getCurrentUserId()
+    console.log('Utilisateur connecté:', user)
 
-    const data = await fetchCurrentUser.json()
-
-    const res = await userService.getUser(data.id)
+    const res = await userService.getUser(user.id) // <- correction ici
     const dataUser = res.data
 
     favoriteIds.value = Array.isArray(dataUser.rewards)
@@ -139,8 +127,6 @@ const fetchFavorites = async () => {
       watch.isFavorite = favoriteIds.value.includes(watch.id)
     })
   } catch (err) {
-    // Ici attention : ne pas dire "You haven't earned rewards" par défaut !
-    // On distingue "aucun favori" (normal) et "erreur réseau / auth" (anormal)
     errorFavorites.value = 'Error loading favorites'
     favoriteIds.value = []
     console.warn('Missing or empty auth:', err.message)
