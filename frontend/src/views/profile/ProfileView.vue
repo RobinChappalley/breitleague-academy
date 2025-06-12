@@ -37,8 +37,12 @@
           <div class="country-info">
             <h2 class="flag">{{ user.pos?.country_flag || '🌍' }}</h2>
           </div>
-          <p class="store-info text-secondary">Store : {{ user.pos?.address || 'Non renseigné' }}</p>
-          <p class="reseller-since text-secondary">Reseller since {{ user.signup_year || '2020' }}</p>
+          <p class="store-info text-secondary">
+            Store : {{ user.pos?.address || 'Non renseigné' }}
+          </p>
+          <p class="reseller-since text-secondary">
+            Reseller since {{ user.signup_year || '2020' }}
+          </p>
         </div>
       </div>
 
@@ -133,7 +137,6 @@ const loadUserProfile = async () => {
     isLoading.value = true
     error.value = null
 
-
     // Récupérer l'utilisateur connecté
     const res = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
@@ -145,7 +148,6 @@ const loadUserProfile = async () => {
     if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
 
     const connectedUser = await res.json()
-   
 
     // API pour charger les infos complètes du user
     const response = await userService.getUser(connectedUser.id)
@@ -169,7 +171,6 @@ const loadUserRewards = async (userId) => {
     const user = response.data
 
     userRewards.value = user.rewards || []
-
   } catch (err) {
     console.error('Erreur lors du chargement de l’utilisateur:', err.message)
     userRewards.value = []
@@ -230,7 +231,7 @@ const logout = async () => {
   min-height: 100vh;
   width: 100%;
   background: linear-gradient(135deg, #072c54 0%, #1e3a8a 100%);
-  
+
   padding: 1rem;
   padding-bottom: 100px;
   box-sizing: border-box;
@@ -406,8 +407,6 @@ const logout = async () => {
   max-width: 400px;
 }
 
-
-
 .country {
   font-weight: 600;
 }
@@ -544,7 +543,14 @@ const logout = async () => {
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.8);
 }
-
+.watch-placeholder img,
+.watch-item img {
+  max-width: 120px;
+  max-height: 120px;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
 /* USER INFO SECTION */
 .user-info-section {
   background: rgba(255, 255, 255, 0.1);
@@ -644,6 +650,12 @@ const logout = async () => {
   .score-value {
     font-size: 3rem;
   }
+
+  .watch-placeholder img,
+  .watch-item img {
+    max-width: 50%;
+    max-height: 100%;
+  }
 }
 
 @media (max-width: 767px) {
@@ -661,6 +673,12 @@ const logout = async () => {
 
   .stat-item {
     padding: 1rem;
+  }
+
+  .watch-placeholder img,
+  .watch-item img {
+    max-width: 100%;
+    max-height: 100%;
   }
 }
 </style>
