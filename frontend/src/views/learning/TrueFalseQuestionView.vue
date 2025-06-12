@@ -26,7 +26,7 @@
             }"
             @click="selectAnswer('true')"
           >
-            Vrai
+            True
           </div>
           
           <div 
@@ -38,7 +38,7 @@
             }"
             @click="selectAnswer('false')"
           >
-            Faux
+            False
           </div>
         </div>
 

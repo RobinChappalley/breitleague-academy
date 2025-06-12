@@ -126,8 +126,8 @@
         <!-- SI AUCUNE BATAILLE -->
         <div v-if="finishedBattles.length === 0" class="empty-battles">
           <div class="empty-icon">🎯</div>
-          <h3>Aucune bataille terminée</h3>
-          <p>Jouez votre première bataille pour voir l'historique ici !</p>
+          <h3>No battle found</h3>
+          <p> Play your first battle today to see it in your history</p>
         </div>
         
         <!-- SI DES BATAILLES EXISTENT -->
