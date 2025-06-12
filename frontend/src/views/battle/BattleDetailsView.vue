@@ -2,207 +2,313 @@
   <div class="battle-details-page">
     <!-- Header -->
     <div class="details-header">
-      <button class="close-btn" @click="closeBattleDetails">✕</button>
-      <h1 class="details-title">BATTLE DETAILS</h1>
+      <h1 class="details-title">BATTLE RESULTS</h1>
+    </div>
+
+    <!-- Battle Status Banner -->
+    <div class="battle-status-banner">
+      <div class="status-content" :class="{ 'victory': isPlayerWinner, 'defeat': !isPlayerWinner && !isTie, 'tie': isTie }">
+        <div class="status-icon">
+          <svg v-if="isPlayerWinner" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          <svg v-else-if="isTie" width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          <svg v-else width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z"/>
+          </svg>
+        </div>
+        <div class="status-text">
+          <div class="status-main">{{ isPlayerWinner ? 'VICTORY' : (isTie ? 'TIE GAME' : 'DEFEAT') }}</div>
+          <div class="status-sub">{{ isPlayerWinner ? 'Excellent performance!' : (isTie ? 'Great match!' : 'Keep training!') }}</div>
+        </div>
+      </div>
     </div>
 
     <!-- Players Comparison -->
-    <div class="players-comparison">
-      <div class="player-section" :class="{ 'winner': isPlayerWinner }">
-        <div class="player-info">
-          <div class="avatar" :style="getAvatarStyle(currentPlayer)">
-            <!-- AFFICHER L'IMAGE D'AVATAR SI DISPONIBLE -->
-            <img 
-              v-if="currentPlayer.avatar && currentPlayer.avatar !== currentPlayer.name?.charAt(0)" 
-              :src="getAvatarUrl(currentPlayer)" 
-              :alt="currentPlayer.name"
-              class="avatar-image"
-            />
-            <!-- SINON AFFICHER L'INITIALE -->
-            <span v-else class="avatar-initial">{{ currentPlayer.name?.charAt(0) || 'Y' }}</span>
-          </div>
-          <h3 class="player-name">{{ currentPlayer.name }}</h3>
-          <span class="flag">{{ currentPlayer.flag }}</span>
-        </div>
-        
-        <div class="battle-result">
-          <div class="result-badge" v-if="isPlayerWinner">
-            <span class="result-text">You won!</span>
-          </div>
-        </div>
-
-        <!-- Player Stats -->
-        <div class="player-stats">
-          <div class="stat-row">
-            <span class="stat-label">Correct Answers:</span>
-            <span class="stat-value">{{ playerCorrectAnswers }}/{{ totalQuestions }}</span>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">Total Time:</span>
-            <span class="stat-value">{{ formatTime(playerTotalTime) }}</span>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">Average Time:</span>
-            <span class="stat-value">{{ formatTime(playerAverageTime) }}</span>
+    <div class="battle-comparison">
+      <!-- Player Card -->
+      <div class="player-card" :class="{ 'winner-card': isPlayerWinner }">
+        <div class="card-header">
+          <div class="player-identity">
+            <div class="avatar-section">
+              <div class="avatar" :style="getAvatarStyle(currentPlayer)">
+                <img 
+                  v-if="currentPlayer.avatar && currentPlayer.avatar !== currentPlayer.name?.charAt(0)" 
+                  :src="getAvatarUrl(currentPlayer)" 
+                  :alt="currentPlayer.name"
+                  class="avatar-image"
+                />
+                <span v-else class="avatar-initial">{{ currentPlayer.name?.charAt(0) || 'Y' }}</span>
+              </div>
+              <div class="winner-indicator" v-if="isPlayerWinner">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+            </div>
+            <div class="player-details">
+              <h3 class="player-name">{{ currentPlayer.name }}</h3>
+              <span class="player-country">{{ currentPlayer.flag }}</span>
+            </div>
           </div>
         </div>
 
-        <!-- Player Answers -->
-        <div class="answers-list">
-          <div 
-            v-for="(answer, index) in playerAnswers" 
-            :key="index"
-            class="answer-indicator"
-            :class="{ 
-              'correct': answer.correct, 
-              'incorrect': !answer.correct 
-            }"
-          >
-            <div class="question-number">Q{{ index + 1 }}</div>
-            <div class="check-mark" v-if="answer.correct">✓</div>
-            <div class="x-mark" v-else>✕</div>
-            <div class="answer-time">{{ formatTime(answer.time) }}</div>
-            <span class="points">{{ answer.correct ? '+100' : '+0' }}</span>
+        <div class="performance-overview">
+          <div class="score-display">
+            <div class="score-label">Final Score</div>
+            <div class="score-value">{{ playerFinalScore }}</div>
           </div>
-        </div>
 
-        <div class="player-score">
-          <div class="score-label">Final Score:</div>
-          <div class="score-value">{{ playerFinalScore }}</div>
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="stat-number">{{ playerCorrectAnswers }}/{{ totalQuestions }}</div>
+              <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">{{ formatTime(playerTotalTime) }}</div>
+              <div class="stat-label">Total Time</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">{{ formatTime(playerAverageTime) }}</div>
+              <div class="stat-label">Avg Time</div>
+            </div>
+          </div>
+
+          <div class="questions-performance">
+            <div class="performance-title">Question Results</div>
+            <div class="performance-grid">
+              <div 
+                v-for="(answer, index) in playerAnswers" 
+                :key="index"
+                class="question-result"
+                :class="{ 'correct-result': answer.correct, 'incorrect-result': !answer.correct }"
+              >
+                <div class="question-label">Q{{ index + 1 }}</div>
+                <div class="result-indicator">
+                  <svg v-if="answer.correct" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                  <svg v-else width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                  </svg>
+                </div>
+                <div class="time-display">{{ formatTime(answer.time) }}</div>
+                <div class="points-earned">{{ answer.correct ? '+100' : '0' }}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- VS Divider -->
-      <div class="vs-divider">
-        <span class="vs-text">VS</span>
+      <!-- VS Separator -->
+      <div class="vs-separator">
+        <div class="vs-line"></div>
+        <div class="vs-circle">
+          <span class="vs-text">VS</span>
+        </div>
+        <div class="vs-line"></div>
       </div>
 
-      <div class="player-section" :class="{ 'winner': !isPlayerWinner && !isTie }">
-        <div class="player-info">
-          <div class="avatar" :style="getAvatarStyle(opponent)">
-            <!-- AFFICHER L'IMAGE D'AVATAR SI DISPONIBLE -->
-            <img 
-              v-if="opponent.avatar && opponent.avatar !== opponent.name?.charAt(0)" 
-              :src="getAvatarUrl(opponent)" 
-              :alt="opponent.name"
-              class="avatar-image"
-            />
-            <!-- SINON AFFICHER L'INITIALE -->
-            <span v-else class="avatar-initial">{{ opponent.name?.charAt(0) || 'O' }}</span>
-          </div>
-          <h3 class="player-name">{{ opponent.name }}</h3>
-          <span class="flag">{{ opponent.flag }}</span>
-        </div>
-
-        <div class="battle-result">
-          <div class="result-badge" v-if="!isPlayerWinner && !isTie">
-            <span class="result-text">Winner!</span>
-          </div>
-        </div>
-
-        <!-- Opponent Stats -->
-        <div class="player-stats">
-          <div class="stat-row">
-            <span class="stat-label">Correct Answers:</span>
-            <span class="stat-value">{{ opponentCorrectAnswers }}/{{ totalQuestions }}</span>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">Total Time:</span>
-            <span class="stat-value">{{ formatTime(opponentTotalTime) }}</span>
-          </div>
-          <div class="stat-row">
-            <span class="stat-label">Average Time:</span>
-            <span class="stat-value">{{ formatTime(opponentAverageTime) }}</span>
+      <!-- Opponent Card -->
+      <div class="player-card" :class="{ 'winner-card': !isPlayerWinner && !isTie }">
+        <div class="card-header">
+          <div class="player-identity">
+            <div class="avatar-section">
+              <div class="avatar" :style="getAvatarStyle(opponent)">
+                <img 
+                  v-if="opponent.avatar && opponent.avatar !== opponent.name?.charAt(0)" 
+                  :src="getAvatarUrl(opponent)" 
+                  :alt="opponent.name"
+                  class="avatar-image"
+                />
+                <span v-else class="avatar-initial">{{ opponent.name?.charAt(0) || 'O' }}</span>
+              </div>
+              <div class="winner-indicator" v-if="!isPlayerWinner && !isTie">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+            </div>
+            <div class="player-details">
+              <h3 class="player-name">{{ opponent.name }}</h3>
+              <span class="player-country">{{ opponent.flag }}</span>
+            </div>
           </div>
         </div>
 
-        <!-- Opponent Answers -->
-        <div class="answers-list">
-          <div 
-            v-for="(answer, index) in opponentAnswers" 
-            :key="index"
-            class="answer-indicator"
-            :class="{ 
-              'correct': answer.correct, 
-              'incorrect': !answer.correct 
-            }"
-          >
-            <div class="question-number">Q{{ index + 1 }}</div>
-            <div class="check-mark" v-if="answer.correct">✓</div>
-            <div class="x-mark" v-else>✕</div>
-            <div class="answer-time">{{ formatTime(answer.time) }}</div>
-            <span class="points">{{ answer.correct ? '+100' : '+0' }}</span>
+        <div class="performance-overview">
+          <div class="score-display">
+            <div class="score-label">Final Score</div>
+            <div class="score-value">{{ opponentFinalScore }}</div>
           </div>
-        </div>
 
-        <div class="player-score">
-          <div class="score-label">Final Score:</div>
-          <div class="score-value">{{ opponentFinalScore }}</div>
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="stat-number">{{ opponentCorrectAnswers }}/{{ totalQuestions }}</div>
+              <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">{{ formatTime(opponentTotalTime) }}</div>
+              <div class="stat-label">Total Time</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">{{ formatTime(opponentAverageTime) }}</div>
+              <div class="stat-label">Avg Time</div>
+            </div>
+          </div>
+
+          <div class="questions-performance">
+            <div class="performance-title">Question Results</div>
+            <div class="performance-grid">
+              <div 
+                v-for="(answer, index) in opponentAnswers" 
+                :key="index"
+                class="question-result"
+                :class="{ 'correct-result': answer.correct, 'incorrect-result': !answer.correct }"
+              >
+                <div class="question-label">Q{{ index + 1 }}</div>
+                <div class="result-indicator">
+                  <svg v-if="answer.correct" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                  <svg v-else width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                  </svg>
+                </div>
+                <div class="time-display">{{ formatTime(answer.time) }}</div>
+                <div class="points-earned">{{ answer.correct ? '+100' : '0' }}</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Points Summary -->
     <div class="points-summary">
-      <div class="points-box" :class="{ 'positive': pointsChange >= 0, 'negative': pointsChange < 0 }">
-        <div class="points-change">{{ pointsChange >= 0 ? '+' : '' }}{{ pointsChange }}PTS</div>
+      <div class="points-card" :class="{ 'points-gain': pointsChange >= 0, 'points-loss': pointsChange < 0 }">
+        <div class="points-icon">
+          <svg v-if="pointsChange >= 0" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 14l5-5 5 5z"/>
+          </svg>
+          <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 10l5 5 5-5z"/>
+          </svg>
+        </div>
+        <div class="points-info">
+          <div class="points-amount">{{ pointsChange >= 0 ? '+' : '' }}{{ pointsChange }}</div>
+          <div class="points-label">POINTS {{ pointsChange >= 0 ? 'GAINED' : 'LOST' }}</div>
+        </div>
       </div>
     </div>
 
-    <!-- Questions Review -->
-    <div class="questions-review">
-      <h2 class="review-title">DETAILED ANSWERS</h2>
+    <!-- Detailed Analysis (Collapsible) -->
+    <div class="detailed-analysis">
+      <div class="analysis-header" @click="toggleAnalysis">
+        <h2 class="analysis-title">DETAILED ANALYSIS</h2>
+        <div class="analysis-toggle">
+          <svg 
+            width="20" 
+            height="20" 
+            viewBox="0 0 24 24" 
+            fill="currentColor"
+            :class="{ 'rotated': showAnalysis }"
+          >
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+          </svg>
+        </div>
+      </div>
       
-      <div 
-        v-for="(question, index) in questionsData" 
-        :key="index"
-        class="question-review"
-      >
-        <h3 class="question-title">QUESTION {{ index + 1 }}</h3>
-        <p class="question-text">{{ question.text }}</p>
-        
-        <div class="answers-comparison">
-          <div class="comparison-row">
-            <div class="player-answer-section">
-              <span class="answer-label">Your answer:</span>
-              <div class="answer-details">
-                <span 
-                  class="answer-text" 
-                  :class="{ 
-                    'correct': playerAnswers[index].correct, 
-                    'incorrect': !playerAnswers[index].correct 
-                  }"
+      <div class="analysis-content" v-show="showAnalysis">
+        <div class="questions-breakdown">
+          <div 
+            v-for="(question, index) in questionsData" 
+            :key="index"
+            class="question-analysis"
+          >
+            <div class="question-header" @click="toggleQuestion(index)">
+              <div class="question-number">{{ index + 1 }}</div>
+              <div class="question-text">{{ question.text }}</div>
+              <div class="question-toggle">
+                <svg 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="currentColor"
+                  :class="{ 'rotated': expandedQuestions.includes(index) }"
                 >
-                  {{ playerAnswers[index].text }}
-                </span>
-                <span class="answer-time-detail">
-                  {{ formatTime(playerAnswers[index].time) }}
-                </span>
+                  <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                </svg>
               </div>
             </div>
             
-            <div class="opponent-answer-section">
-              <span class="answer-label">{{ opponent.name }}:</span>
-              <div class="answer-details">
-                <span 
-                  class="answer-text" 
-                  :class="{ 
-                    'correct': opponentAnswers[index].correct, 
-                    'incorrect': !opponentAnswers[index].correct 
-                  }"
-                >
-                  {{ opponentAnswers[index].text }}
-                </span>
-                <span class="answer-time-detail">
-                  {{ formatTime(opponentAnswers[index].time) }}
-                </span>
+            <div class="question-details" v-show="expandedQuestions.includes(index)">
+              <div class="answers-breakdown">
+                <div class="answer-comparison">
+                  <div class="player-answer">
+                    <div class="answer-player-info">
+                      <div class="mini-avatar" :style="getAvatarStyle(currentPlayer)">
+                        <span class="mini-initial">{{ currentPlayer.name?.charAt(0) || 'Y' }}</span>
+                      </div>
+                      <span class="answer-player-name">Your Answer</span>
+                    </div>
+                    <div class="answer-content">
+                      <div class="answer-value" :class="{ 'correct-answer': playerAnswers[index].correct, 'incorrect-answer': !playerAnswers[index].correct }">
+                        {{ playerAnswers[index].text }}
+                      </div>
+                      <div class="answer-metadata">
+                        <span class="answer-time">{{ formatTime(playerAnswers[index].time) }}</span>
+                        <div class="answer-status" :class="{ 'status-correct': playerAnswers[index].correct, 'status-incorrect': !playerAnswers[index].correct }">
+                          <svg v-if="playerAnswers[index].correct" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                          </svg>
+                          <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="player-answer">
+                    <div class="answer-player-info">
+                      <div class="mini-avatar" :style="getAvatarStyle(opponent)">
+                        <span class="mini-initial">{{ opponent.name?.charAt(0) || 'O' }}</span>
+                      </div>
+                      <span class="answer-player-name">{{ opponent.name }}</span>
+                    </div>
+                    <div class="answer-content">
+                      <div class="answer-value" :class="{ 'correct-answer': opponentAnswers[index].correct, 'incorrect-answer': !opponentAnswers[index].correct }">
+                        {{ opponentAnswers[index].text }}
+                      </div>
+                      <div class="answer-metadata">
+                        <span class="answer-time">{{ formatTime(opponentAnswers[index].time) }}</span>
+                        <div class="answer-status" :class="{ 'status-correct': opponentAnswers[index].correct, 'status-incorrect': !opponentAnswers[index].correct }">
+                          <svg v-if="opponentAnswers[index].correct" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                          </svg>
+                          <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="correct-answer-reveal">
+                  <div class="correct-indicator">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <span class="correct-label">Correct Answer</span>
+                  </div>
+                  <div class="correct-answer-text">{{ question.correctAnswer }}</div>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div class="correct-answer-section">
-            <span class="answer-label">Correct answer:</span>
-            <span class="answer-text correct">{{ question.correctAnswer }}</span>
           </div>
         </div>
       </div>
@@ -211,7 +317,10 @@
     <!-- Actions -->
     <div class="battle-actions">
       <button class="btn-return" @click="returnToBattles">
-        Return to Battles
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        <span>Return to Battles</span>
       </button>
     </div>
   </div>
@@ -225,6 +334,10 @@ const router = useRouter()
 const route = useRoute()
 
 const battleId = route.params.id
+
+// UI State
+const showAnalysis = ref(false)
+const expandedQuestions = ref([])
 
 // Données par défaut
 const currentPlayer = ref({
@@ -281,31 +394,36 @@ const questionsData = ref([
   }
 ])
 
-// FONCTION POUR RÉCUPÉRER L'URL DE L'AVATAR
+// UI Methods
+const toggleAnalysis = () => {
+  showAnalysis.value = !showAnalysis.value
+}
+
+const toggleQuestion = (index) => {
+  const idx = expandedQuestions.value.indexOf(index)
+  if (idx > -1) {
+    expandedQuestions.value.splice(idx, 1)
+  } else {
+    expandedQuestions.value.push(index)
+  }
+}
+
+// Data Methods
 const getAvatarUrl = (user) => {
-  console.log('🖼️ Getting avatar for user:', user)
-  
   if (!user || !user.avatar) {
-    console.log('❌ No avatar data for user:', user?.name)
     return null
   }
   
-  // Si c'est juste une lettre (fallback), ne pas afficher d'image
   if (typeof user.avatar === 'string' && user.avatar.length === 1) {
-    console.log('❌ Avatar is just initial:', user.avatar)
     return null
   }
   
-  // Construire l'URL complète
   const avatarUrl = user.avatar.startsWith('http') ? user.avatar : `http://localhost:8000/${user.avatar}`
-  console.log('✅ Avatar URL for', user.name, ':', avatarUrl)
   
   return avatarUrl
 }
 
-// FONCTION POUR MAPPER pos_id EN DRAPEAU (UNIFIÉE)
 const getCountryFlag = (posIdOrCountry) => {
-  // Si c'est un code pays (string)
   if (typeof posIdOrCountry === 'string') {
     const flagsByCode = {
       'DE': '🇩🇪',
@@ -322,50 +440,29 @@ const getCountryFlag = (posIdOrCountry) => {
     return flagsByCode[posIdOrCountry] || '🌍'
   }
   
-  // Si c'est un pos_id (number)
   const flagMapping = {
-    1: '🇨🇭', // Suisse
-    2: '🇫🇷', // France
-    3: '🇩🇪', // Allemagne
-    4: '🇮🇹', // Italie
-    5: '🇪🇸', // Espagne
-    6: '🇵🇹', // Portugal
-    7: '🇷🇴', // Roumanie
-    8: '🇺🇸', // États-Unis
-    9: '🇬🇧', // Royaume-Uni
-    10: '🇧🇪' // Belgique
+    1: '🇨🇭', 2: '🇫🇷', 3: '🇩🇪', 4: '🇮🇹', 5: '🇪🇸', 
+    6: '🇵🇹', 7: '🇷🇴', 8: '🇺🇸', 9: '🇬🇧', 10: '🇧🇪'
   }
   
-  console.log('🚩 Converting pos_id to flag:', posIdOrCountry, '->', flagMapping[posIdOrCountry])
   return flagMapping[posIdOrCountry] || '🇨🇭'
 }
 
-// FONCTION POUR RÉCUPÉRER LE DRAPEAU
 const getUserFlag = (userData) => {
-  // 1. Essayer d'abord depuis pos.country_flag (la vraie source)
   if (userData.pos && userData.pos.country_flag) {
-    console.log('✅ Flag from pos.country_flag:', userData.pos.country_flag)
     return userData.pos.country_flag
   }
   
-  // 2. Fallback sur le mapping pos_id si pas de country_flag
   if (userData.pos_id) {
     const flagFromPosId = getCountryFlag(userData.pos_id)
-    console.log('⚠️ Fallback flag from pos_id mapping:', flagFromPosId)
     return flagFromPosId
   }
   
-  // 3. Fallback final
-  console.log('❌ No flag found, using default')
   return '🇨🇭'
 }
 
-// FONCTION POUR CHARGER LES DONNÉES UTILISATEUR ACTUEL
 const loadCurrentUserData = async () => {
   try {
-    console.log('🔄 Loading current user data...')
-    
-    // 1. Récupérer l'utilisateur authentifié
     const userResponse = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
       headers: { 'Accept': 'application/json' }
@@ -376,25 +473,19 @@ const loadCurrentUserData = async () => {
     }
     
     const userData = await userResponse.json()
-    console.log('📋 Raw authenticated user data:', userData)
     
-    // 2. Récupérer les données complètes via ton API (AVEC POS)
     const fullUserResponse = await fetch(`http://localhost:8000/api/v1/users/${userData.id}`, {
       credentials: 'include',
       headers: { 'Accept': 'application/json' }
     })
     
-    let fullUserData = userData // Fallback sur les données de base
+    let fullUserData = userData
     
     if (fullUserResponse.ok) {
       const fullUserResponseData = await fullUserResponse.json()
       fullUserData = fullUserResponseData.data || fullUserResponseData || userData
-      console.log('📋 Full user data from API:', fullUserData)
-    } else {
-      console.warn('⚠️ Could not fetch full user data, using basic auth data')
     }
     
-    // 3. METTRE À JOUR currentPlayer avec les VRAIES données
     currentPlayer.value = {
       id: fullUserData.id || userData.id,
       name: fullUserData.username || userData.username || 'YOU',
@@ -402,14 +493,7 @@ const loadCurrentUserData = async () => {
       flag: getUserFlag(fullUserData) || '🇨🇭'
     }
     
-    console.log('✅ Current player loaded:', currentPlayer.value)
-    console.log('🖼️ Avatar path:', currentPlayer.value.avatar)
-    console.log('🚩 Flag from pos:', fullUserData.pos?.country_flag)
-    
   } catch (error) {
-    console.warn('⚠️ Error loading current user data:', error)
-    
-    // Fallback en cas d'erreur
     currentPlayer.value = {
       id: 1,
       name: 'YOU',
@@ -419,27 +503,18 @@ const loadCurrentUserData = async () => {
   }
 }
 
-// Charger les données depuis l'API UNIQUEMENT
 onMounted(async () => {
-  console.log('🔄 BattleDetailsView mounted with battleId:', battleId)
-  
-  // 1. D'abord charger les données utilisateur
   await loadCurrentUserData()
   
-  // 2. NOUVEAU : Charger les données de bataille depuis l'API UNIQUEMENT
   if (battleId) {
     await loadBattleFromAPI(battleId)
   } else {
-    console.error('❌ Aucun ID de bataille fourni')
     router.push('/battle')
   }
 })
 
-// NOUVELLE FONCTION : Charger une bataille depuis l'API
 const loadBattleFromAPI = async (battleId) => {
   try {
-    console.log('🔄 Chargement de la bataille depuis l\'API:', battleId)
-    
     const response = await fetch(`http://localhost:8000/api/v1/battles/${battleId}`, {
       credentials: 'include',
       headers: { 'Accept': 'application/json' }
@@ -452,23 +527,13 @@ const loadBattleFromAPI = async (battleId) => {
     const battleDetail = await response.json()
     const battle = battleDetail.data || battleDetail
     
-    console.log('📋 Bataille récupérée depuis l\'API:', battle)
-    console.log('📋 Challenger summary:', battle.challenger_summary)
-    console.log('📋 Challenged summary:', battle.challenged_summary)
-    
-    // Vérifier qu'on a les données nécessaires
     if (!battle.challenger_summary || !battle.challenged_summary) {
       throw new Error('Données de bataille incomplètes')
     }
     
-    // DÉTERMINER QUI EST LE JOUEUR ACTUEL
     const isCurrentUserChallenger = battle.challenger_id === currentPlayer.value.id
     
     if (isCurrentUserChallenger) {
-      // L'utilisateur actuel est le challenger
-      console.log('✅ L\'utilisateur actuel est le challenger')
-      
-      // Mettre à jour l'adversaire (challenged)
       opponent.value = {
         id: battle.challenged?.id || battle.challenged_id,
         name: battle.challenged?.username || battle.challenged?.name || 'Adversaire',
@@ -476,14 +541,12 @@ const loadBattleFromAPI = async (battleId) => {
         flag: battle.challenged?.pos?.country_flag || getCountryCodeSafe(battle.challenged) || '🇨🇭'
       }
       
-      // Mettre à jour les réponses du joueur (challenger)
       playerAnswers.value = (battle.challenger_summary?.answers || []).map(answer => ({
         correct: answer.correct || false,
         text: answer.selectedAnswer || answer.text || 'Pas de réponse',
         time: answer.time || 0
       }))
       
-      // Mettre à jour les réponses de l'adversaire (challenged)
       opponentAnswers.value = (battle.challenged_summary?.answers || []).map(answer => ({
         correct: answer.correct || false,
         text: answer.selectedAnswer || answer.text || 'Pas de réponse',
@@ -491,10 +554,6 @@ const loadBattleFromAPI = async (battleId) => {
       }))
       
     } else {
-      // L'utilisateur actuel est le challenged
-      console.log('✅ L\'utilisateur actuel est le challenged')
-      
-      // Mettre à jour l'adversaire (challenger)
       opponent.value = {
         id: battle.challenger?.id || battle.challenger_id,
         name: battle.challenger?.username || battle.challenger?.name || 'Adversaire',
@@ -502,14 +561,12 @@ const loadBattleFromAPI = async (battleId) => {
         flag: battle.challenger?.pos?.country_flag || getCountryCodeSafe(battle.challenger) || '🇨🇭'
       }
       
-      // Mettre à jour les réponses du joueur (challenged)
       playerAnswers.value = (battle.challenged_summary?.answers || []).map(answer => ({
         correct: answer.correct || false,
         text: answer.selectedAnswer || answer.text || 'Pas de réponse',
         time: answer.time || 0
       }))
       
-      // Mettre à jour les réponses de l'adversaire (challenger)
       opponentAnswers.value = (battle.challenger_summary?.answers || []).map(answer => ({
         correct: answer.correct || false,
         text: answer.selectedAnswer || answer.text || 'Pas de réponse',
@@ -517,34 +574,23 @@ const loadBattleFromAPI = async (battleId) => {
       }))
     }
     
-    // Mettre à jour les questions (depuis challenger_summary car elles sont identiques)
     if (battle.challenger_summary?.questionsData?.length) {
       questionsData.value = battle.challenger_summary.questionsData
     }
     
-    console.log('✅ Toutes les données ont été chargées depuis l\'API')
-    console.log('- Adversaire:', opponent.value.name)
-    console.log('- Questions:', questionsData.value.length)
-    console.log('- Réponses joueur:', playerAnswers.value.length)
-    console.log('- Réponses adversaire:', opponentAnswers.value.length)
-    
   } catch (error) {
-    console.error('❌ Erreur lors du chargement de la bataille:', error)
     alert(`Erreur lors du chargement de la bataille: ${error.message}`)
     router.push('/battle')
   }
 }
 
-// FONCTION UTILITAIRE : Version sécurisée de getCountryCode
 const getCountryCodeSafe = (user) => {
   if (!user) return '🇨🇭'
   
-  // 1. Essayer depuis pos.country_flag
   if (user.pos && user.pos.country_flag) {
     return user.pos.country_flag
   }
   
-  // 2. Fallback sur pos_id
   if (user.pos_id) {
     const countryMapping = {
       1: '🇨🇭', 2: '🇫🇷', 3: '🇩🇪', 4: '🇮🇹', 5: '🇪🇸', 
@@ -556,15 +602,10 @@ const getCountryCodeSafe = (user) => {
   return '🇨🇭'
 }
 
-const closeBattleDetails = () => {
-  router.push('/battle')
-}
-
 const returnToBattles = () => {
   router.push('/battle')
 }
 
-// Computed Properties
 const totalQuestions = computed(() => questionsData.value.length)
 
 const playerCorrectAnswers = computed(() => 
@@ -593,7 +634,7 @@ const opponentAverageTime = computed(() =>
 
 const playerFinalScore = computed(() => {
   const correctScore = playerCorrectAnswers.value * 100
-  const timeBonus = Math.max(0, (150 - playerTotalTime.value) * 2) // Bonus pour rapidité
+  const timeBonus = Math.max(0, (150 - playerTotalTime.value) * 2) 
   return Math.round(correctScore + timeBonus)
 })
 
@@ -617,7 +658,6 @@ const pointsChange = computed(() => {
   return -70
 })
 
-// Methods
 const formatTime = (seconds) => {
   if (seconds < 60) {
     return `${seconds.toFixed(1)}s`
@@ -656,132 +696,153 @@ const getAvatarStyle = (player) => {
   overflow-y: auto;
 }
 
-/* HEADER */
+/* Header */
 .details-header {
-  position: relative;
   text-align: center;
-  margin-bottom: 1rem;
-  padding: 0.8rem 0;
-}
-
-.close-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: #F7C72C;
-  color: #072C54;
-  border: none;
-  border-radius: 8px;
-  width: 32px;
-  height: 32px;
-  font-size: 0.9rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.close-btn:hover {
-  background: #E6B625;
-  transform: scale(1.05);
+  margin-bottom: 2rem;
+  padding: 1rem 0;
 }
 
 .details-title {
-  font-size: 1.6rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 800;
   color: #F7C72C;
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* Battle Status Banner */
+.battle-status-banner {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.status-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 2rem;
+  border-radius: 16px;
+  backdrop-filter: blur(15px);
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+.status-content.victory {
+  background: rgba(76, 175, 80, 0.15);
+  border-color: #4CAF50;
+}
+
+.status-content.defeat {
+  background: rgba(244, 67, 54, 0.15);
+  border-color: #F44336;
+}
+
+.status-content.tie {
+  background: rgba(247, 199, 44, 0.15);
+  border-color: #F7C72C;
+}
+
+.status-icon svg {
+  color: inherit;
+}
+
+.status-content.victory .status-icon {
+  color: #4CAF50;
+}
+
+.status-content.defeat .status-icon {
+  color: #F44336;
+}
+
+.status-content.tie .status-icon {
+  color: #F7C72C;
+}
+
+.status-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.status-main {
+  font-size: 1.4rem;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-/* PLAYERS COMPARISON */
-.players-comparison {
+.status-content.victory .status-main {
+  color: #4CAF50;
+}
+
+.status-content.defeat .status-main {
+  color: #F44336;
+}
+
+.status-content.tie .status-main {
+  color: #F7C72C;
+}
+
+.status-sub {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Battle Comparison */
+.battle-comparison {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-  margin-bottom: 1.5rem;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
-.vs-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.8rem 0;
-  position: relative;
-  order: 2;
-}
-
-.vs-divider::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 10%;
-  right: 10%;
-  height: 2px;
-  background: linear-gradient(to right, transparent, #F7C72C, transparent);
-  transform: translateY(-50%);
-}
-
-.vs-text {
-  background: #072C54;
-  padding: 0.4rem 0.8rem;
-  border: 2px solid #F7C72C;
+.player-card {
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 20px;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #F7C72C;
-  z-index: 1;
-  position: relative;
-}
-
-.player-section {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 1rem;
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
 }
 
-.player-section:first-child {
-  order: 1;
-}
-
-.player-section:last-child {
-  order: 3;
-}
-
-.player-section.winner {
+.player-card.winner-card {
   border-color: #4CAF50;
-  background: rgba(76, 175, 80, 0.1);
-  box-shadow: 0 0 15px rgba(76, 175, 80, 0.2);
+  box-shadow: 0 0 25px rgba(76, 175, 80, 0.2);
+  background: rgba(76, 175, 80, 0.08);
 }
 
-.player-info {
-  text-align: center;
-  margin-bottom: 0.8rem;
+.card-header {
+  margin-bottom: 1.5rem;
+}
+
+.player-identity {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar-section {
+  position: relative;
 }
 
 .avatar {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 1.2rem;
-  margin: 0 auto 0.6rem auto;
-  border: 3px solid #F7C72C;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  overflow: hidden; /* IMPORTANT pour les images */
+  font-size: 1.5rem;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-/* STYLES POUR LES IMAGES D'AVATAR */
 .avatar-image {
   width: 100%;
   height: 100%;
@@ -796,828 +857,664 @@ const getAvatarStyle = (player) => {
   text-transform: uppercase;
 }
 
-.player-name {
-  margin: 0 0 0.3rem 0;
-  font-size: 0.9rem;
-  font-weight: 600;
+.winner-indicator {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #4CAF50;
   color: white;
-}
-
-.flag {
-  font-size: 1rem;
-}
-
-.battle-result {
-  height: 35px;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.8rem;
+  border: 2px solid white;
+  box-shadow: 0 2px 10px rgba(76, 175, 80, 0.4);
 }
 
-.result-badge {
-  background: #4CAF50;
+.player-details {
+  flex: 1;
+}
+
+.player-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem 0;
   color: white;
-  padding: 0.4rem 0.8rem;
-  border-radius: 15px;
-  font-weight: 600;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
 }
 
-/* PLAYER STATS */
-.player-stats {
-  margin-bottom: 1rem;
-  padding: 0.8rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
+.player-country {
+  font-size: 1.1rem;
 }
 
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.4rem;
-  font-size: 0.8rem;
-}
-
-.stat-row:last-child {
-  margin-bottom: 0;
-}
-
-.stat-label {
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-}
-
-.stat-value {
-  font-weight: 600;
-  color: #F7C72C;
-}
-
-/* ANSWERS LIST */
-.answers-list {
+.performance-overview {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  margin-bottom: 1rem;
+  gap: 1.5rem;
 }
 
-.answer-indicator {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.6rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.7rem;
-}
-
-.answer-indicator.correct {
-  background: rgba(76, 175, 80, 0.2);
-  border: 1px solid #4CAF50;
-}
-
-.answer-indicator.incorrect {
-  background: rgba(244, 67, 54, 0.2);
-  border: 1px solid #F44336;
-}
-
-.question-number {
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.7);
-  min-width: 22px;
-}
-
-.check-mark, .x-mark {
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 0.7rem;
-  color: white;
-}
-
-.check-mark {
-  background: #4CAF50;
-}
-
-.x-mark {
-  background: #F44336;
-}
-
-.answer-time {
-  font-size: 0.6rem;
-  color: rgba(255, 255, 255, 0.6);
-  flex: 1;
+.score-display {
   text-align: center;
-}
-
-.points {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #F7C72C;
-  min-width: 32px;
-  text-align: right;
-}
-
-/* PLAYER SCORE */
-.player-score {
-  border-top: 2px solid rgba(255, 255, 255, 0.2);
-  padding-top: 0.8rem;
-  text-align: center;
+  padding: 1.2rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  border-top: 3px solid rgba(247, 199, 44, 0.5);
 }
 
 .score-label {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .score-value {
-  font-size: 1.8rem;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #F7C72C;
+  text-shadow: 0 0 20px rgba(247, 199, 44, 0.3);
+}
+
+.stats-grid {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.stat-box {
+  flex: 1;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+.stat-number {
+  font-size: 1rem;
   font-weight: 700;
   color: #F7C72C;
+  margin-bottom: 0.3rem;
 }
 
-/* POINTS SUMMARY */
+.stat-label {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.questions-performance {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.performance-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.performance-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.question-result {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.question-result.correct-result {
+  background: rgba(76, 175, 80, 0.15);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.question-result.incorrect-result {
+  background: rgba(244, 67, 54, 0.15);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.question-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  min-width: 25px;
+}
+
+.result-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.question-result.correct-result .result-indicator {
+  background: #4CAF50;
+}
+
+.question-result.incorrect-result .result-indicator {
+  background: #F44336;
+}
+
+.time-display {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  flex: 1;
+  text-align: center;
+}
+
+.points-earned {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #F7C72C;
+  min-width: 35px;
+  text-align: right;
+}
+
+.vs-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0;
+  order: 2;
+}
+
+.vs-line {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(247, 199, 44, 0.5), transparent);
+}
+
+.vs-circle {
+  background: linear-gradient(135deg, #F7C72C 0%, #FFD700 100%);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 1rem;
+  box-shadow: 0 0 20px rgba(247, 199, 44, 0.3);
+}
+
+.vs-text {
+  font-weight: 800;
+  color: #072C54;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+/* Points Summary */
 .points-summary {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-.points-box {
-  display: inline-block;
-  padding: 0.8rem 1.6rem;
-  border-radius: 12px;
-  font-size: 1.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.points-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 2rem;
+  border-radius: 16px;
   border: 2px solid;
+  backdrop-filter: blur(10px);
 }
 
-.points-box.positive {
-  background: rgba(76, 175, 80, 0.2);
+.points-card.points-gain {
+  background: rgba(76, 175, 80, 0.15);
   border-color: #4CAF50;
+}
+
+.points-card.points-loss {
+  background: rgba(244, 67, 54, 0.15);
+  border-color: #F44336;
+}
+
+.points-icon svg {
+  color: inherit;
+}
+
+.points-card.points-gain .points-icon {
   color: #4CAF50;
 }
 
-.points-box.negative {
-  background: rgba(244, 67, 54, 0.2);
-  border-color: #F44336;
+.points-card.points-loss .points-icon {
   color: #F44336;
 }
 
-/* QUESTIONS REVIEW */
-.questions-review {
-  margin-bottom: 1.5rem;
+.points-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.review-title {
-  font-size: 1.3rem;
+.points-amount {
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.points-card.points-gain .points-amount {
+  color: #4CAF50;
+}
+
+.points-card.points-loss .points-amount {
+  color: #F44336;
+}
+
+.points-label {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Detailed Analysis (Collapsible) */
+.detailed-analysis {
+  margin-bottom: 2rem;
+}
+
+.analysis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.analysis-header:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(247, 199, 44, 0.3);
+}
+
+.analysis-title {
+  font-size: 1.2rem;
   font-weight: 700;
   color: #F7C72C;
-  text-align: center;
-  margin-bottom: 1rem;
+  margin: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-.question-review {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.analysis-toggle svg {
+  color: #F7C72C;
+  transition: transform 0.3s ease;
 }
 
-.question-title {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #F7C72C;
-  margin: 0 0 0.6rem 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.analysis-toggle svg.rotated {
+  transform: rotate(180deg);
+}
+
+.analysis-content {
+  padding-top: 1rem;
+}
+
+.questions-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.question-analysis {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.question-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.question-header:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.question-number {
+  background: #F7C72C;
+  color: #072C54;
+  font-weight: 800;
+  font-size: 0.8rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 12px;
+  min-width: 40px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .question-text {
   font-size: 0.9rem;
   line-height: 1.4;
-  margin-bottom: 1rem;
   color: white;
+  font-weight: 500;
+  flex: 1;
 }
 
-.answers-comparison {
+.question-toggle svg {
+  color: rgba(255, 255, 255, 0.6);
+  transition: transform 0.3s ease;
+}
+
+.question-toggle svg.rotated {
+  transform: rotate(180deg);
+}
+
+.question-details {
+  padding: 0 1rem 1rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.answers-breakdown {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.answer-comparison {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.player-answer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.answer-player-info {
+  display: flex;
+  align-items: center;
   gap: 0.8rem;
+  min-width: 120px;
 }
 
-.comparison-row {
+.mini-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: white;
+  flex-shrink: 0;
 }
 
-.player-answer-section,
-.opponent-answer-section,
-.correct-answer-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
+.mini-initial {
+  text-transform: uppercase;
 }
 
-.answer-label {
-  font-size: 0.7rem;
+.answer-player-name {
+  font-size: 0.8rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.8);
 }
 
-.answer-details {
+.answer-content {
+  flex: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.4rem;
+  gap: 1rem;
 }
 
-.answer-text {
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
+.answer-value {
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
   flex: 1;
 }
 
-.answer-text.correct {
+.answer-value.correct-answer {
   background: rgba(76, 175, 80, 0.2);
   color: #4CAF50;
-  border: 1px solid #4CAF50;
+  border: 1px solid rgba(76, 175, 80, 0.3);
 }
 
-.answer-text.incorrect {
+.answer-value.incorrect-answer {
   background: rgba(244, 67, 54, 0.2);
   color: #F44336;
-  border: 1px solid #F44336;
+  border: 1px solid rgba(244, 67, 54, 0.3);
 }
 
-.answer-time-detail {
-  font-size: 0.6rem;
+.answer-metadata {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.answer-time {
+  font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.6);
-  min-width: 35px;
+  min-width: 40px;
   text-align: right;
 }
 
-/* BATTLE ACTIONS */
+.answer-status {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.answer-status.status-correct {
+  background: #4CAF50;
+}
+
+.answer-status.status-incorrect {
+  background: #F44336;
+}
+
+.correct-answer-reveal {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(247, 199, 44, 0.1);
+  border: 1px solid rgba(247, 199, 44, 0.2);
+  border-radius: 12px;
+  margin-top: 0.5rem;
+}
+
+.correct-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 120px;
+}
+
+.correct-indicator svg {
+  color: #F7C72C;
+}
+
+.correct-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #F7C72C;
+}
+
+.correct-answer-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #F7C72C;
+  background: rgba(247, 199, 44, 0.1);
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(247, 199, 44, 0.2);
+  flex: 1;
+}
+
+/* Actions */
 .battle-actions {
   display: flex;
   justify-content: center;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
 }
 
 .btn-return {
-  padding: 0.9rem 1.5rem;
-  border: none;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem 2rem;
   background: #F7C72C;
   color: #072C54;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .btn-return:hover {
   background: #E6B625;
   transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(247, 199, 44, 0.3);
 }
 
-/* RESPONSIVE SMALL TABLET (576px et plus) */
-@media (min-width: 576px) {
-  .battle-details-page {
-    padding: 1.2rem;
-    padding-bottom: 100px;
-  }
-  
-  .details-title {
-    font-size: 1.8rem;
-  }
-  
-  .close-btn {
-    width: 35px;
-    height: 35px;
-    font-size: 1rem;
-  }
-  
-  .player-section {
-    padding: 1.2rem;
-  }
-  
-  .avatar {
-    width: 55px;
-    height: 55px;
-    font-size: 1.3rem;
-  }
-  
-  .score-value {
-    font-size: 2rem;
-  }
-  
-  .points-box {
-    font-size: 1.8rem;
-    padding: 1rem 2rem;
-  }
-  
-  .question-review {
-    padding: 1.2rem;
-  }
-}
-
-/* RESPONSIVE TABLET (768px et plus) */
+/* Responsive */
 @media (min-width: 768px) {
   .battle-details-page {
     margin-left: 280px;
     width: calc(100% - 280px);
-    padding: 1.5rem;
-    padding-bottom: 2rem;
+    padding: 2rem;
   }
   
-  .details-title {
-    font-size: 2.2rem;
-    letter-spacing: 2px;
-  }
-  
-  .close-btn {
-    width: 38px;
-    height: 38px;
-    font-size: 1.1rem;
-  }
-  
-  .players-comparison {
+  .battle-comparison {
     flex-direction: row;
-    gap: 1.5rem;
     align-items: flex-start;
   }
   
-  .player-section {
+  .player-card {
     flex: 1;
-    padding: 1.5rem;
   }
   
-  .vs-divider {
+  .vs-separator {
     flex-direction: column;
-    justify-content: center;
-    width: 60px;
-    height: auto;
-    order: 2;
-    margin: 1.5rem 0;
-    padding: 1rem 0;
+    width: 80px;
+    height: 200px;
+    order: 0;
   }
   
-  .vs-divider::before {
+  .vs-line {
     width: 2px;
-    height: 180px;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    background: linear-gradient(to bottom, transparent, #F7C72C, transparent);
-    transform: translateX(-50%);
+    height: 80px;
+    background: linear-gradient(180deg, transparent, rgba(247, 199, 44, 0.5), transparent);
   }
   
-  .vs-text {
-    font-size: 1.3rem;
-    padding: 0.5rem 1rem;
-  }
-  
-  .avatar {
-    width: 70px;
-    height: 70px;
-    font-size: 1.7rem;
-  }
-  
-  .player-name {
-    font-size: 1.1rem;
-  }
-  
-  .battle-result {
-    height: 45px;
-  }
-  
-  .result-badge {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
-  }
-  
-  .stat-row {
-    font-size: 0.9rem;
-  }
-  
-  .answer-indicator {
-    padding: 0.8rem;
-    font-size: 0.8rem;
-    gap: 0.6rem;
-  }
-  
-  .check-mark, .x-mark {
-    width: 22px;
-    height: 22px;
-    font-size: 0.8rem;
-  }
-  
-  .question-number {
-    font-size: 0.7rem;
-    min-width: 25px;
-  }
-  
-  .answer-time {
-    font-size: 0.7rem;
-  }
-  
-  .points {
-    font-size: 0.8rem;
-    min-width: 35px;
-  }
-  
-  .score-value {
-    font-size: 2.3rem;
-  }
-  
-  .points-box {
-    font-size: 2.2rem;
-    padding: 1.1rem 2.2rem;
-  }
-  
-  .question-review {
-    padding: 1.5rem;
-  }
-  
-  .comparison-row {
+  .answer-comparison {
     flex-direction: row;
     gap: 1.5rem;
   }
   
-  .player-answer-section,
-  .opponent-answer-section {
+  .player-answer {
     flex: 1;
   }
-  
-  .battle-actions {
-    justify-content: center;
-    max-width: 300px;
-    margin: 2rem auto 0 auto;
-  }
-  
-  .btn-return {
-    font-size: 1rem;
-    padding: 1rem 2rem;
-  }
 }
 
-/* RESPONSIVE LARGE DESKTOP (1024px et plus) */
-@media (min-width: 1024px) {
-  .battle-details-page {
-    margin-left: 280px;
-    width: calc(100% - 280px);
-    padding: 2.5rem;
-  }
-  
-  .details-title {
-    font-size: 2.8rem;
-    letter-spacing: 3px;
-  }
-  
-  .close-btn {
-    width: 42px;
-    height: 42px;
-    font-size: 1.2rem;
-  }
-  
-  .players-comparison {
-    gap: 2.5rem;
-    max-width: 1100px;
-    margin: 0 auto 2.5rem auto;
-  }
-  
-  .player-section {
-    padding: 2rem;
-  }
-  
-  .vs-divider {
-    width: 80px;
-    margin: 2rem 0;
-  }
-  
-  .vs-divider::before {
-    height: 220px;
-  }
-  
-  .vs-text {
-    font-size: 1.5rem;
-  }
-  
-  .avatar {
-    width: 85px;
-    height: 85px;
-    font-size: 2rem;
-  }
-  
-  .player-name {
-    font-size: 1.3rem;
-  }
-  
-  .score-value {
-    font-size: 2.8rem;
-  }
-  
-  .points-box {
-    font-size: 2.8rem;
-    padding: 1.3rem 2.8rem;
-  }
-  
-  .questions-review {
-    max-width: 900px;
-    margin: 0 auto 2.5rem auto;
-  }
-  
-  .review-title {
-    font-size: 1.8rem;
-  }
-  
-  .question-review {
-    padding: 2rem;
-  }
-  
-  .question-title {
-    font-size: 1.1rem;
-  }
-  
-  .question-text {
-    font-size: 1rem;
-  }
-}
-
-/* RESPONSIVE TRÈS LARGE DESKTOP (1200px et plus) */
-@media (min-width: 1200px) {
-  .players-comparison {
-    max-width: 1200px;
-    gap: 3rem;
-  }
-  
-  .player-section {
-    padding: 2.5rem;
-  }
-  
-  .avatar {
-    width: 90px;
-    height: 90px;
-    font-size: 2.2rem;
-  }
-  
-  .score-value {
-    font-size: 3rem;
-  }
-  
-  .points-box {
-    font-size: 3rem;
-    padding: 1.5rem 3rem;
-  }
-  
-  .questions-review {
-    max-width: 1000px;
-  }
-  
-  .question-review {
-    padding: 2.5rem;
-  }
-}
-
-/* RESPONSIVE MOBILE (767px et moins) */
 @media (max-width: 767px) {
   .battle-details-page {
     margin-left: 0;
     width: 100%;
-    padding: 0.8rem;
+    padding: 1rem;
     padding-bottom: 80px;
   }
   
-  .details-header {
-    margin-bottom: 0.8rem;
+  .battle-comparison {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .player-card:first-child {
+    order: 1;
+  }
+  
+  .vs-separator {
+    order: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0;
+  }
+  
+  .player-card:last-child {
+    order: 3;
+  }
+  
+  .vs-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(247, 199, 44, 0.5), transparent);
   }
   
   .details-title {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
   }
   
-  .close-btn {
-    width: 28px;
-    height: 28px;
-    font-size: 0.8rem;
+  .status-content {
+    padding: 1rem 1.5rem;
   }
   
-  .players-comparison {
-    gap: 0.6rem;
-    margin-bottom: 1.2rem;
-  }
-  
-  .vs-divider {
-    padding: 0.6rem 0;
-  }
-  
-  .vs-text {
-    font-size: 0.9rem;
-    padding: 0.3rem 0.6rem;
-  }
-  
-  .player-section {
-    padding: 0.8rem;
+  .status-main {
+    font-size: 1.2rem;
   }
   
   .avatar {
-    width: 45px;
-    height: 45px;
-    font-size: 1.1rem;
-  }
-  
-  .player-name {
-    font-size: 0.8rem;
-  }
-  
-  .battle-result {
-    height: 30px;
-  }
-  
-  .result-badge {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.6rem;
-  }
-  
-  .player-stats {
-    padding: 0.6rem;
-  }
-  
-  .stat-row {
-    font-size: 0.7rem;
-    margin-bottom: 0.3rem;
-  }
-  
-  .answer-indicator {
-    padding: 0.5rem;
-    font-size: 0.6rem;
-    gap: 0.3rem;
-  }
-  
-  .check-mark, .x-mark {
-    width: 16px;
-    height: 16px;
-    font-size: 0.6rem;
-  }
-  
-  .question-number {
-    font-size: 0.5rem;
-    min-width: 18px;
-  }
-  
-  .answer-time {
-    font-size: 0.5rem;
-  }
-  
-  .points {
-    font-size: 0.6rem;
-    min-width: 28px;
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
   }
   
   .score-value {
-    font-size: 1.4rem;
+    font-size: 2rem;
   }
   
-  .points-box {
-    font-size: 1.3rem;
-    padding: 0.6rem 1.2rem;
+  .points-amount {
+    font-size: 1.5rem;
   }
   
-  .review-title {
-    font-size: 1.1rem;
-  }
-  
-  .question-review {
-    padding: 0.8rem;
-  }
-  
-  .question-title {
-    font-size: 0.8rem;
+  .analysis-title {
+    font-size: 1rem;
   }
   
   .question-text {
     font-size: 0.8rem;
-  }
-  
-  .answer-text {
-    font-size: 0.7rem;
-    padding: 0.25rem 0.5rem;
-  }
-  
-  .answer-time-detail {
-    font-size: 0.5rem;
-    min-width: 28px;
-  }
-  
-  .btn-rematch,
-  .btn-return {
-    padding: 0.7rem 1.2rem;
-    font-size: 0.8rem;
-  }
-}
-
-/* RESPONSIVE TRÈS PETIT MOBILE (480px et moins) */
-@media (max-width: 479px) {
-  .battle-details-page {
-    padding: 0.6rem;
-    padding-bottom: 80px;
-  }
-  
-  .details-title {
-    font-size: 1.2rem;
-    letter-spacing: 0.5px;
-  }
-  
-  .close-btn {
-    width: 26px;
-    height: 26px;
-    font-size: 0.7rem;
-  }
-  
-  .player-section {
-    padding: 0.6rem;
-  }
-  
-  .avatar {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
-  }
-  
-  .points-box {
-    font-size: 1.1rem;
-    padding: 0.5rem 1rem;
-  }
-  
-  .answer-indicator {
-    padding: 0.4rem;
-  }
-  
-  .question-review {
-    padding: 0.6rem;
-  }
-  
-  .btn-rematch,
-  .btn-return {
-    padding: 0.6rem 1rem;
-    font-size: 0.7rem;
-  }
-}
-
-/* RESPONSIVE EXTRA PETIT MOBILE (360px et moins) */
-@media (max-width: 360px) {
-  .battle-details-page {
-    padding: 0.5rem;
-  }
-  
-  .details-title {
-    font-size: 1.1rem;
-  }
-  
-  .close-btn {
-    width: 24px;
-    height: 24px;
-    font-size: 0.6rem;
-  }
-  
-  .vs-text {
-    font-size: 0.8rem;
-  }
-  
-  .avatar {
-    width: 38px;
-    height: 38px;
-    font-size: 0.9rem;
-  }
-  
-  .score-value {
-    font-size: 1.2rem;
-  }
-  
-  .points-box {
-    font-size: 1rem;
-    padding: 0.4rem 0.8rem;
   }
 }
 </style>

@@ -17,7 +17,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { userService, fetchModules } from '@/services/api'
+import { userService, fetchModules, getCurrentUser } from '@/services/api'
 import { watch } from 'vue'
 
 const progression = ref(null)
@@ -26,13 +26,8 @@ const modules = ref([])
 onMounted(async () => {
   try {
     // récupérer user
-    const fetchCurrentUser = await fetch('http://localhost:8000/api/user', {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
-    })
-    const user = await fetchCurrentUser.json()
+    const user = await getCurrentUser.getCurrentUserId()
+    console.log('Utilisateur connecté:', user)
 
     //récupérer progression
     const resUser = await userService.getUser(user.id)
@@ -75,14 +70,8 @@ const isDataReady = computed(() => {
 watch(overallProgress, async (newValue) => {
   if (progression.value) {
     try {
-      // récupérer user.id
-      const fetchCurrentUser = await fetch('http://localhost:8000/api/user', {
-        credentials: 'include',
-        headers: {
-          Accept: 'application/json'
-        }
-      })
-      const user = await fetchCurrentUser.json()
+      const user = await getCurrentUser.getCurrentUserId()
+      console.log('Utilisateur connecté:', user)
 
       // récupérer user complet pour vérifier is_BS
       const resUser = await userService.getUser(user.id)

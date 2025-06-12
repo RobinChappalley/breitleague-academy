@@ -128,7 +128,7 @@ const resetQuestion = () => {
 .quiz-page {
   width: 100vw;
   min-height: 100vh;
-  background: linear-gradient(135deg, #072C54 0%, #1e3a8a 100%);
+  background: #072C54;
   color: white;
   padding: 0;
   margin: 0;

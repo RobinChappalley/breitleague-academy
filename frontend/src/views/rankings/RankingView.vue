@@ -163,6 +163,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { userService, getCurrentUser, BACKEND_URL, fetchAllUsers } from '@/services/api'
 
 // Data
 const selectedFilter = ref('world')
@@ -250,22 +251,13 @@ const rankingPlayers = ref([])
 
 const loadUsersRanking = async () => {
   try {
-    const res = await fetch('http://localhost:8000/api/v1/users', {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
-    })
-
-    if (!res.ok) throw new Error('Erreur lors du chargement des utilisateurs')
-
-    const data = await res.json()
+    const data = await fetchAllUsers()
 
     rankingPlayers.value = data.data
       .filter((user) => user.is_BS === true)
       .map((user, index) => ({
         id: user.id,
-        rank: index + 1, 
+        rank: index + 1,
         name: user.username.toUpperCase(),
         country: user.pos?.country || 'Unknown',
         score: user.elo_score || 0,
@@ -286,7 +278,7 @@ const loadUsersRanking = async () => {
               }))
           : []
       }))
-      
+
       .sort((a, b) => b.score - a.score)
       .map((player, index) => ({
         ...player,
@@ -298,7 +290,7 @@ const loadUsersRanking = async () => {
 }
 
 const getRewardImageUrl = (photoName) => {
-  return `http://localhost:8000/${photoName}`
+  return `${BACKEND_URL}/${photoName}`
 }
 
 const currentUser = ref({
@@ -319,26 +311,12 @@ const currentUser = ref({
 const loadCurrentUser = async () => {
   try {
     // Étape 1 : Vérifier que l'utilisateur est connecté
-    const res1 = await fetch('http://localhost:8000/api/user', {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
-    })
-    if (!res1.ok) throw new Error('Utilisateur non authentifié')
-    const userData = await res1.json()
-
-    const userId = userData.id
+    const connectedUser = await getCurrentUser.getCurrentUserId()
+    const userId = connectedUser.id
+    //console.log(userId)
 
     // Étape 2 : Charger les vraies infos utilisateur via /v1/users/{id}
-    const res2 = await fetch(`http://localhost:8000/api/v1/users/${userId}`, {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
-    })
-    if (!res2.ok) throw new Error('Erreur chargement données utilisateur')
-    const fullUser = await res2.json()
+    const fullUser = await userService.getUser(userId)
     const userDataFull = fullUser.data
 
     // Étape 3 : Chercher le rank si présent dans le classement
@@ -387,9 +365,9 @@ const availableCountries = computed(() => {
 
 const getAvatarUrl = (avatarPath) => {
   if (avatarPath) {
-    return `http://localhost:8000/${avatarPath}`
+    return `${BACKEND_URL}/${avatarPath}`
   }
-  return '/images/icones/default_avatar.png' 
+  return '/images/icones/default_avatar.png'
 }
 
 onMounted(() => {
@@ -413,7 +391,7 @@ onMounted(() => {
 
 /* MAIN CONTENT */
 .main-content {
-  
+
   padding-bottom: 120px;
   max-width: 800px;
   margin: 0 auto;
@@ -900,15 +878,15 @@ onMounted(() => {
   .ranking-page {
     margin-left: 280px;
     width: calc(100% - 280px);
-    padding-bottom: 0; 
+    padding-bottom: 0;
   }
 
   .main-content {
-    padding-bottom: 120px; 
+    padding-bottom: 120px;
   }
 
   .user-position-footer {
-    left: 280px; 
+    left: 280px;
     padding: 1.5rem 2rem;
   }
 
@@ -948,7 +926,7 @@ onMounted(() => {
   }
 
   .main-content {
-    padding-bottom: 140px; 
+    padding-bottom: 140px;
   }
 
   .user-position-footer {
@@ -993,17 +971,17 @@ onMounted(() => {
   .main-content {
 
     padding-bottom: 180px;
- 
+
   }
 
   .user-position-footer {
-    left: 0; 
+    left: 0;
     padding: 0.8rem 1rem;
-    bottom: 70px; 
+    bottom: 70px;
   }
 
   .see-all-btn {
-    margin: 2rem 0 3rem 0; 
+    margin: 2rem 0 3rem 0;
   }
 
   .user-ranking-item {
@@ -1060,7 +1038,7 @@ onMounted(() => {
 @media (max-width: 479px) {
   .main-content {
     padding: 1rem;
-    padding-bottom: 190px; 
+    padding-bottom: 190px;
 
   }
 
