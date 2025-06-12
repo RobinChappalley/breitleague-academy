@@ -5,7 +5,6 @@ import {useRoute} from "vue-router";
 const route = useRoute()
 
 const showNavbar = computed(() => {
-  // Par défaut affichée, sauf si meta.hideNavbar == true
   return !route.meta.hideNavBar
 })
 

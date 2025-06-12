@@ -154,7 +154,6 @@ const transformQuestionsToQCM = (questionsData, choicesData) => {
       const questionChoices = choicesData.filter(choice => choice.question_id === question.id)
       if (questionChoices.length < 2) return null
 
-      // Amélioration pour gérer différentes structures de données possibles
       const correctChoiceId = question.correct_answer_text?.correct_choice_id || 
                              question.correct_choice_id ||
                              question.correct_answer_id
@@ -224,11 +223,9 @@ const completeTest = () => {
     userAnswers: userAnswers.value
   })
   
-  // Navigation vers la page de résultats avec les paramètres
-  // Si tu utilises 'name', assure-toi que la route est bien définie dans ton router
-  // Sinon, utilise 'path' comme ci-dessous
+
   router.push({
-    path: '/checkpoint-results',  // ou utilise name: 'CheckpointResults' si défini
+    path: '/checkpoint-results',  
     query: {
       score: finalScore.value,
       passed: testPassed.value,

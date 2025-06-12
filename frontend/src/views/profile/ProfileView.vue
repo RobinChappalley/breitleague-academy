@@ -17,12 +17,9 @@
           <div class="profile-avatar">
             <div class="avatar-placeholder">
               <img :src="getUserInitial()" alt="User's Avatar" class="avatar-image" />
-
-              <!--<span>{{ getUserInitial() }}</span>-->
-              <!-- L'initiale au centre -->
             </div>
           </div>
-          <!-- Badge Breitling SVG sur le bord -->
+          <!-- Badge Breitling SVG -->
           <div v-if="user.is_BS" class="breitling-badge-avatar" title="Breitling Specialist">
             <img
               src="/images/icones/breitlingspecialist_badge.svg"
@@ -46,7 +43,6 @@
         </div>
       </div>
 
-      <!-- Rest of the template remains the same -->
       <div class="content-container">
         <!-- Score Section -->
         <div class="score-section">
@@ -138,9 +134,8 @@ const loadUserProfile = async () => {
     isLoading.value = true
     error.value = null
 
-    console.log("Chargement de l'utilisateur connecté...")
 
-    // 1️⃣ Récupérer l'utilisateur connecté
+    // Récupérer l'utilisateur connecté
     const res = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
       headers: {
@@ -151,14 +146,12 @@ const loadUserProfile = async () => {
     if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
 
     const connectedUser = await res.json()
-    console.log('Utilisateur connecté:', connectedUser)
+   
 
-    // 2️⃣ Appeler ton API pour charger les infos complètes du user
+    // API pour charger les infos complètes du user
     const response = await userService.getUser(connectedUser.id)
-    console.log('Réponse API user:', response)
 
     user.value = response.data || response
-    console.log('User complet chargé:', user.value)
 
     // Charger les rewards
     await loadUserRewards(user.value.id)
@@ -178,7 +171,6 @@ const loadUserRewards = async (userId) => {
 
     userRewards.value = user.rewards || []
 
-    console.log('Utilisateur chargé:', user)
   } catch (err) {
     console.error('Erreur lors du chargement de l’utilisateur:', err.message)
     userRewards.value = []
@@ -203,7 +195,6 @@ const goToCollection = () => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('🚀 ProfileView mounted, loading ...')
   loadUserProfile()
 })
 const logout = async () => {
@@ -225,7 +216,6 @@ const logout = async () => {
       }
     })
 
-    // Nettoyer le localStorage
     localStorage.removeItem('isLoggedIn')
 
     // Redirige vers la page de login

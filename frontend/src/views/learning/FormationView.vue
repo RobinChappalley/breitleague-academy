@@ -440,8 +440,6 @@ export default {
     },
 
     handleModuleStarted(data) {
-      console.log('Module started:', data)
-      // Redirection vers la première leçon
       this.$router.push(`/LearningFlowView.vue`)
     },
 
@@ -477,12 +475,9 @@ export default {
 
     async changeModule(direction = 'next') {
       if (this.isWatchTransitioning) return;
-      console.log(this.showLessonPoints);
       this.spinDirection = direction === 'next' ? 'right' : 'left';
       this.showLessonPoints = false;
-      console.log(this.showLessonPoints);
 
-      console.log('Changing module:', direction);
 
       // 1. Calculer le prochain index
       let nextIndex;
@@ -491,8 +486,6 @@ export default {
       } else {
         nextIndex = this.currentModuleIndex === 0 ? this.modules.length - 1 : this.currentModuleIndex - 1;
       }
-
-      console.log('Current index:', this.currentModuleIndex, 'Next index:', nextIndex);
 
       // 2. Démarrer la transition
       this.isWatchTransitioning = true;
@@ -529,7 +522,6 @@ export default {
         this.lessons = mappedLessons;
 
         this.isWatchTransitioning = false;
-        console.log('Module changed to:', newModule.title);
       }, 400);
     },
 

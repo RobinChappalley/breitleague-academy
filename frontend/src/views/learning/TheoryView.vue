@@ -34,7 +34,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-// Props pour recevoir les données de la théorie
+
 const props = defineProps({
   theoryData: {
     type: Object,
@@ -65,11 +65,7 @@ const emit = defineEmits(['next-step'])
 // Methods
 const nextStep = () => {
   emit('next-step')
-  console.log('Going to next step')
 }
-
-console.log('TheoryView component loaded')
-
 
 </script>
 

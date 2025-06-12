@@ -63,16 +63,13 @@ const loadModulesAndLessons = async () => {
 }
 
 const openLesson = (lessonId) => {
-  console.log(`Opening lesson: ${lessonId}`)
-  // Toujours rediriger vers HistoireView
-  router.push('/ressources/history')
+  router.push(`/ressources/history`)
 }
 
 onMounted(() => {
   loadModulesAndLessons()
 })
 
-console.log('LessonsListView component loaded')
 </script>
 
 <style scoped>
@@ -283,7 +280,7 @@ p {
   .lessons-page {
     margin-left: 0;
     width: 100%;
-    padding-bottom: 80px; /* Navbar mobile */
+    padding-bottom: 80px; 
   }
   
   .lessons-content {

@@ -2,7 +2,8 @@
   <div class="battle-quiz-page">
     <!-- Battle Header Info -->
     <div class="battle-header">
-      <!-- UTILISATEUR AUTHENTIFIÉ-->
+      <!-- UTILISATEUR AUTHENTIFIÉ -->
+
       <div class="player-info">
         <div class="avatar" :style="getAvatarStyle(currentPlayer)">
           <img 
@@ -20,7 +21,7 @@
       </div>
       
       <div class="vs-indicator">VS</div>
-      
+
       <!-- ADVERSAIRE -->
       <div class="opponent-info">
         <div class="opponent-details">

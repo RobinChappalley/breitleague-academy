@@ -15,7 +15,6 @@
           <p class="question-text">{{ currentQuestion.instruction }}</p>
         </div>
 
-        <!-- Matching Grid - 2 colonnes -->
         <div class="matching-grid" ref="matchingGrid">
           <!-- Colonne de gauche -->
           <div class="left-column">
@@ -82,7 +81,6 @@
 
         <!-- Validation Button -->
         <div class="button-section">
-          <!-- Next Button - Toujours visible -->
           <button 
             class="next-btn"
             :class="{ 'disabled': !allCorrect }"
@@ -129,12 +127,11 @@ const currentQuestion = ref(props.questionData)
 const showResult = ref(false)
 const selectedLeftIndex = ref(null)
 const selectedRightIndex = ref(null)
-const matches = ref([]) // Stocke les paires validées: [{ leftIndex: 0, rightIndex: 2, matchId: 0 }]
+const matches = ref([]) 
 const matchingGrid = ref(null)
 
 const progress = computed(() => (props.currentStep / props.totalSteps) * 100)
 
-// Préparer les items avec mélange de la colonne droite
 const leftItems = ref(
   currentQuestion.value.pairs.map((pair, index) => ({
     text: pair.left,
@@ -147,7 +144,7 @@ const leftItems = ref(
 
 const rightItems = ref(
   [...currentQuestion.value.pairs]
-    .sort(() => Math.random() - 0.5) // Mélanger
+    .sort(() => Math.random() - 0.5) 
     .map((pair, index) => ({
       text: pair.right,
       originalIndex: currentQuestion.value.pairs.findIndex(p => p.right === pair.right),
@@ -185,14 +182,12 @@ const emit = defineEmits(['next-step', 'answer-selected'])
 const createMatch = () => {
   const leftIndex = selectedLeftIndex.value
   const rightIndex = selectedRightIndex.value
-  const matchId = matches.value.length // ID unique pour chaque paire
+  const matchId = matches.value.length 
   
-  // Vérifier immédiatement si la paire est correcte
   const leftOriginal = leftItems.value[leftIndex].originalIndex
   const rightOriginal = rightItems.value[rightIndex].originalIndex
   const isCorrect = leftOriginal === rightOriginal
   
-  // Marquer comme appariés avec l'ID de match et le statut correct/incorrect
   leftItems.value[leftIndex].matched = true
   leftItems.value[leftIndex].matchId = matchId
   leftItems.value[leftIndex].correct = isCorrect
@@ -200,34 +195,27 @@ const createMatch = () => {
   rightItems.value[rightIndex].matchId = matchId
   rightItems.value[rightIndex].correct = isCorrect
   
-  // Ajouter la paire aux matches
   matches.value.push({ leftIndex, rightIndex, matchId, correct: isCorrect })
   
   // Reset selections
   selectedLeftIndex.value = null
   selectedRightIndex.value = null
   
-  // Enlever complètement le déclenchement automatique
 }
 
-// Supprimer complètement la méthode checkAnswers
 
-// Nouvelle méthode pour permettre de défaire une paire incorrecte
 const selectLeft = (index) => {
   if (showResult.value) return
   
-  // Si l'item est déjà apparié et incorrect, permettre de le désapparier
   if (leftItems.value[index].matched && !leftItems.value[index].correct) {
     unmatchPair(index, 'left')
     return
   }
   
-  // Si l'item est déjà apparié et correct, ne rien faire
   if (leftItems.value[index].matched) return
   
   selectedLeftIndex.value = selectedLeftIndex.value === index ? null : index
   
-  // Si on a une sélection de chaque côté, créer la paire
   if (selectedLeftIndex.value !== null && selectedRightIndex.value !== null) {
     createMatch()
   }
@@ -236,24 +224,20 @@ const selectLeft = (index) => {
 const selectRight = (index) => {
   if (showResult.value) return
   
-  // Si l'item est déjà apparié et incorrect, permettre de le désapparier
   if (rightItems.value[index].matched && !rightItems.value[index].correct) {
     unmatchPair(index, 'right')
     return
   }
   
-  // Si l'item est déjà apparié et correct, ne rien faire
   if (rightItems.value[index].matched) return
   
   selectedRightIndex.value = selectedRightIndex.value === index ? null : index
   
-  // Si on a une sélection de chaque côté, créer la paire
   if (selectedLeftIndex.value !== null && selectedRightIndex.value !== null) {
     createMatch()
   }
 }
 
-// Nouvelle méthode pour défaire une paire incorrecte
 const unmatchPair = (index, side) => {
   let matchToRemove
   
@@ -261,12 +245,10 @@ const unmatchPair = (index, side) => {
     const matchId = leftItems.value[index].matchId
     matchToRemove = matches.value.find(match => match.matchId === matchId)
     
-    // Réinitialiser les items
     leftItems.value[index].matched = false
     leftItems.value[index].correct = false
     leftItems.value[index].matchId = null
     
-    // Trouver et réinitialiser l'item de droite correspondant
     const rightIndex = matchToRemove.rightIndex
     rightItems.value[rightIndex].matched = false
     rightItems.value[rightIndex].correct = false
@@ -275,19 +257,16 @@ const unmatchPair = (index, side) => {
     const matchId = rightItems.value[index].matchId
     matchToRemove = matches.value.find(match => match.matchId === matchId)
     
-    // Réinitialiser les items
     rightItems.value[index].matched = false
     rightItems.value[index].correct = false
     rightItems.value[index].matchId = null
     
-    // Trouver et réinitialiser l'item de gauche correspondant
     const leftIndex = matchToRemove.leftIndex
     leftItems.value[leftIndex].matched = false
     leftItems.value[leftIndex].correct = false
     leftItems.value[leftIndex].matchId = null
   }
   
-  // Supprimer la paire des matches
   const matchIndex = matches.value.findIndex(match => match.matchId === matchToRemove.matchId)
   if (matchIndex !== -1) {
     matches.value.splice(matchIndex, 1)
@@ -297,7 +276,6 @@ const unmatchPair = (index, side) => {
 const handleNext = () => {
   if (!allCorrect.value) return
   
-  // Valider et passer à l'étape suivante directement
   emit('answer-selected', {
     questionIndex: props.currentStep - 1,
     matches: matches.value.map(match => ({
@@ -436,7 +414,7 @@ const handleNext = () => {
   color: white;
   cursor: pointer ;
   position: relative;
-  border-style: dashed ; /* Bordure en pointillés pour montrer que c'est modifiable */
+  border-style: dashed ; 
 }
 
 .match-item.incorrect:hover {
@@ -492,10 +470,8 @@ const handleNext = () => {
   background: #ef4444;
   color: white;
   font-size: 1rem;
-  /* Enlever l'animation de rotation */
 }
 
-/* Enlever complètement @keyframes rotate */
 
 /* BUTTONS */
 .button-section {

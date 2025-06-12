@@ -112,7 +112,6 @@ const handleNext = () => {
   if (selectedAnswer.value === null && !showResult.value) return
   
   emit('next-step')
-  console.log('Going to next step')
 }
 
 const resetQuestion = () => {
@@ -120,7 +119,6 @@ const resetQuestion = () => {
   showResult.value = false
 }
 
-console.log('QuizView component loaded')
 </script>
 
 <style scoped>

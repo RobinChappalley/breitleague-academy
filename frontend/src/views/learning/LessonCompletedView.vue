@@ -112,14 +112,16 @@ const animateProgress = () => {
 
 const handleFinish = () => {
   emit('finish')
+
   emit('next-lesson')
 
   router.push('/')// ou 'back-to-menu' selon le contexte
+
 }
 
 // Lifecycle
 onMounted(() => {
-  // Petit délai avant de démarrer l'animation
+  
   setTimeout(() => {
     animateProgress()
   }, 500)
