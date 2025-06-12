@@ -65,6 +65,7 @@ export const fetchAllUsers = async () => {
 }
 
 export const battleService = {
+  // Récupérer tous les utilisateurs disponibles pour un battle
   async getAvailableUsers() {
     // Token CSRF comme dans LoginView
     await fetch(`${SANCTUM_URL}`, {
@@ -90,6 +91,7 @@ export const battleService = {
     return await response.json()
   },
 
+  // Récupérer toutes les questions (utilise ta route existante)
   async getQuestions() {
     await fetch(`${SANCTUM_URL}`, {
       credentials: 'include'
@@ -103,6 +105,7 @@ export const battleService = {
     )
 
     const response = await fetch(`${API_BASE_URL}/questions`, {
+      // Utilise ta route existante
       credentials: 'include',
       headers: {
         Accept: 'application/json',
@@ -114,6 +117,7 @@ export const battleService = {
     return await response.json()
   },
 
+  // Récupérer tous les choix (utilise ta route existante)
   async getChoices() {
     await fetch(`${SANCTUM_URL}`, {
       credentials: 'include'
@@ -127,6 +131,7 @@ export const battleService = {
     )
 
     const response = await fetch(`${API_BASE_URL}/choices`, {
+      // Récupérer TOUS les choix
       credentials: 'include',
       headers: {
         Accept: 'application/json',
@@ -156,6 +161,84 @@ export const fetchModules = async () => {
   const modules = await fetch(`${API_BASE_URL}/modules`, {})
   const data = await modules.json()
   return data.data
+}
+
+// Ajouter ces nouvelles fonctions à la fin du fichier
+export const learningService = {
+  // Récupérer une théorie avec ses questions
+  async getTheory(theoryId) {
+    await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+      credentials: 'include'
+    })
+
+    const csrfToken = decodeURIComponent(
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1] ?? ''
+    )
+
+    const response = await fetch(`${API_BASE_URL}/theories/${theoryId}`, {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'X-XSRF-TOKEN': csrfToken
+      }
+    })
+
+    if (!response.ok) throw new Error('Erreur lors du chargement de la théorie')
+    return await response.json()
+  },
+
+  // Récupérer une question avec ses choix
+  async getQuestion(questionId) {
+    await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+      credentials: 'include'
+    })
+
+    const csrfToken = decodeURIComponent(
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1] ?? ''
+    )
+
+    const response = await fetch(`${API_BASE_URL}/questions/${questionId}`, {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'X-XSRF-TOKEN': csrfToken
+      }
+    })
+
+    if (!response.ok) throw new Error('Erreur lors du chargement de la question')
+    return await response.json()
+  },
+
+  // Récupérer toutes les théories d'une leçon
+  async getLessonTheories(lessonId) {
+    await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+      credentials: 'include'
+    })
+
+    const csrfToken = decodeURIComponent(
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1] ?? ''
+    )
+
+    const response = await fetch(`${API_BASE_URL}/lessons/${lessonId}/theories`, {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        'X-XSRF-TOKEN': csrfToken
+      }
+    })
+
+    if (!response.ok) throw new Error('Erreur lors du chargement des théories')
+    return await response.json()
+  }
 }
 
 
