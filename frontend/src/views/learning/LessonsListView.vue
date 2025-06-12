@@ -106,7 +106,6 @@ const goBack = () => {
 const openLesson = (lessonId) => {
   console.log(`Opening lesson: ${lessonId}`)
   router.push(`/ressources/history`)
-  // Ici tu pourras ajouter la navigation vers la leçon spécifique
 }
 
 console.log('LessonsListView component loaded')
@@ -320,7 +319,7 @@ p {
   .lessons-page {
     margin-left: 0;
     width: 100%;
-    padding-bottom: 80px; /* Navbar mobile */
+    padding-bottom: 80px; 
   }
   
   .lessons-content {

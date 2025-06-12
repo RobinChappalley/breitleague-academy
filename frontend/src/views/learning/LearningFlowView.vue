@@ -73,12 +73,12 @@ import DragDropQuestionView from './DragDropQuestionView.vue'
 import LessonCompletedView from './LessonCompletedView.vue'
 
 // Reactive data
-const currentView = ref('theory') // 'theory', 'quiz', 'completed'
+const currentView = ref('theory') 
 const currentStep = ref(1)
 const lessonIndex = ref(0)
 
 // Tracking pour la progression
-const lessonAnswers = ref([]) // CORRIGÉ: Fermeture de parenthèse manquante
+const lessonAnswers = ref([]) 
 const completedLessonNumber = ref(1)
 
 // Sample lessons data avec différents types de questions
@@ -181,12 +181,10 @@ const goToQuestion = () => {
 
 const nextLesson = () => {
   if (lessonIndex.value < lessons.value.length - 1) {
-    // Aller à la leçon suivante
     lessonIndex.value++
     currentView.value = 'theory'
     currentStep.value++
   } else {
-    // Toutes les leçons terminées, montrer l'écran de completion
     completedLessonNumber.value = lessonIndex.value + 1
     currentView.value = 'completed'
     console.log('Toutes les leçons terminées!')
@@ -196,7 +194,6 @@ const nextLesson = () => {
 const handleAnswer = (answerData) => {
   console.log('Answer selected:', answerData)
   
-  // Ajouter la réponse au tracking de la leçon
   lessonAnswers.value.push({
     questionIndex: answerData.questionIndex || lessonIndex.value,
     correct: answerData.correct || answerData.allCorrect || false,
@@ -209,7 +206,6 @@ const handleLessonFinish = () => {
 }
 
 const startNextLesson = () => {
-  // Reset pour une nouvelle leçon
   lessonAnswers.value = []
   
   if (lessonIndex.value < lessons.value.length - 1) {
@@ -218,14 +214,11 @@ const startNextLesson = () => {
     currentStep.value++
   } else {
     console.log('Toutes les leçons terminées!')
-    // Ici tu peux rediriger vers le menu principal
   }
 }
 
 const backToMenu = () => {
-  // Rediriger vers le menu principal ou la liste des leçons
   console.log('Back to menu')
-  // emit('back-to-menu') si tu veux communiquer avec le parent
 }
 
 console.log('LearningFlowView component loaded')

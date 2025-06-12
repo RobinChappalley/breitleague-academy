@@ -77,7 +77,7 @@ const props = defineProps({
     type: Object,
     default: () => ({
       question: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
-      correctAnswer: "true" // "true" ou "false"
+      correctAnswer: "true" 
     })
   },
   currentStep: {

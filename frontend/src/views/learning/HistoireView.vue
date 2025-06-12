@@ -166,14 +166,13 @@ console.log('HistoireView component loaded')
   padding: 0;
   display: flex;
   flex-direction: column;
-  /* Ajouter padding pour la navbar mobile */
   padding-bottom: 80px;
 }
 
 /* HERO SECTION */
 .hero-section {
   width: 100%;
-  height: 40vh; /* Réduire pour laisser place à la navbar */
+  height: 40vh; 
   background: #000000;
   display: flex;
   align-items: center;
@@ -198,7 +197,7 @@ console.log('HistoireView component loaded')
 .onboarding-section {
   background: #072C54;
   flex: 1;
-  padding: 1.5rem 1rem; /* Réduire padding mobile */
+  padding: 1.5rem 1rem; 
   min-height: 60vh;
 }
 
@@ -208,14 +207,14 @@ console.log('HistoireView component loaded')
 }
 
 .section-header {
-  margin-bottom: 1.5rem; /* Réduire margin mobile */
+  margin-bottom: 1.5rem;
 }
 
 .section-tag {
   display: inline-block;
   background: rgba(255, 255, 255, 0.2);
   color: #FFFFFF;
-  padding: 0.4rem 0.8rem; /* Réduire padding mobile */
+  padding: 0.4rem 0.8rem; 
   border-radius: 4px;
   
   letter-spacing: 1px;
@@ -234,7 +233,7 @@ console.log('HistoireView component loaded')
 
 .content-block {
   background: rgba(255, 255, 255, 0.1);
-  padding: 1.5rem 1rem; /* Réduire padding mobile */
+  padding: 1.5rem 1rem; 
   border-radius: 8px;
   backdrop-filter: blur(10px);
   margin-bottom: 1.5rem;

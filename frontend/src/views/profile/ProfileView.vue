@@ -17,12 +17,9 @@
           <div class="profile-avatar">
             <div class="avatar-placeholder">
               <img :src="getUserInitial()" alt="User's Avatar" class="avatar-image" />
-
-              <!--<span>{{ getUserInitial() }}</span>-->
-              <!-- L'initiale au centre -->
             </div>
           </div>
-          <!-- Badge Breitling SVG sur le bord -->
+          <!-- Badge Breitling SVG -->
           <div v-if="user.is_BS" class="breitling-badge-avatar" title="Breitling Specialist">
             <img
               src="/images/icones/breitlingspecialist_badge.svg"
@@ -46,7 +43,6 @@
         </div>
       </div>
 
-      <!-- Rest of the template remains the same -->
       <div class="content-container">
         <!-- Score Section -->
         <div class="score-section">
@@ -140,7 +136,7 @@ const loadUserProfile = async () => {
 
     console.log("Chargement de l'utilisateur connecté...")
 
-    // 1️⃣ Récupérer l'utilisateur connecté
+    // Récupérer l'utilisateur connecté
     const res = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
       headers: {
@@ -153,7 +149,7 @@ const loadUserProfile = async () => {
     const connectedUser = await res.json()
     console.log('Utilisateur connecté:', connectedUser)
 
-    // 2️⃣ Appeler ton API pour charger les infos complètes du user
+    // API pour charger les infos complètes du user
     const response = await userService.getUser(connectedUser.id)
     console.log('Réponse API user:', response)
 
@@ -225,7 +221,6 @@ const logout = async () => {
       }
     })
 
-    // Nettoyer le localStorage
     localStorage.removeItem('isLoggedIn')
 
     // Redirige vers la page de login

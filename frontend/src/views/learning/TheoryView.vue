@@ -35,7 +35,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-// Props pour recevoir les données de la théorie
+
 const props = defineProps({
   theoryData: {
     type: Object,

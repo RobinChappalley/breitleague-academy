@@ -62,7 +62,6 @@ export default {
     },
     
     startModule() {
-      // Émet l'événement avec les données hardcodées du module Histoire
       this.$emit('module-started', {
         moduleId: 'history',
         moduleTitle: 'Breitling History',
@@ -70,7 +69,6 @@ export default {
         totalLessons: 5
       });
       
-      // Ferme le modal
       this.closeModal();
       const firstLessonId = this.moduleData.id
       this.$router.push('/lesson/${firstLessonId}')
@@ -99,13 +97,13 @@ export default {
   padding: 0;
   max-width: 420px;
   width: 90%;
-  max-height: 85vh; /* ✅ CORRIGÉ : Réduit de 90vh à 85vh */
+  max-height: 85vh; 
   position: relative;
   animation: modalSlideIn 0.3s ease-out;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  display: flex; /* ✅ AJOUTÉ : Layout flex */
-  flex-direction: column; /* ✅ AJOUTÉ : Colonne pour contrôler l'espace */
+  display: flex; 
+  flex-direction: column; 
 }
 
 @keyframes modalSlideIn {
@@ -145,9 +143,9 @@ export default {
 .modal-header {
   background: linear-gradient(135deg, #072C54 0%, #1e3a8a 100%);
   color: white;
-  padding: 2.5rem 2rem 2rem 2rem; /* ✅ CORRIGÉ : Réduit de 3rem à 2.5rem */
+  padding: 2.5rem 2rem 2rem 2rem; 
   text-align: left;
-  flex-shrink: 0; /* ✅ AJOUTÉ : Empêche la compression */
+  flex-shrink: 0; 
 }
 
 .modal-title {
@@ -167,15 +165,15 @@ export default {
 }
 
 .modal-content {
-  padding: 1.5rem 2rem; /* ✅ CORRIGÉ : Réduit de 2rem à 1.5rem */
+  padding: 1.5rem 2rem; 
   color: #333;
-  overflow-y: auto; /* ✅ AJOUTÉ : Permet le scroll si nécessaire */
-  flex: 1; /* ✅ AJOUTÉ : Prend l'espace disponible */
-  max-height: calc(85vh - 180px); /* ✅ AJOUTÉ : Limite la hauteur */
+  overflow-y: auto; 
+  flex: 1; 
+  max-height: calc(85vh - 180px);
 }
 
 .module-description {
-  margin-bottom: 1.5rem; /* ✅ CORRIGÉ : Réduit de 2rem à 1.5rem */
+  margin-bottom: 1.5rem; 
 }
 
 .module-description p {
@@ -186,14 +184,14 @@ export default {
 .module-summary {
   background: white;
   border-radius: 12px;
-  padding: 1.3rem; /* ✅ CORRIGÉ : Réduit de 1.5rem à 1.3rem */
-  margin-bottom: 0; /* ✅ CORRIGÉ : Supprime la marge du bas */
+  padding: 1.3rem; 
+  margin-bottom: 0; 
   border-left: 4px solid #F7C72C;
 }
 
 .module-summary h3 {
   color: #072C54;
-  margin: 0 0 0.8rem 0; /* ✅ CORRIGÉ : Réduit de 1rem à 0.8rem */
+  margin: 0 0 0.8rem 0; 
 }
 
 .module-summary ul {
@@ -203,15 +201,15 @@ export default {
 
 .module-summary li {
   color: #555;
-  margin-bottom: 0.4rem; /* ✅ CORRIGÉ : Réduit de 0.5rem à 0.4rem */
+  margin-bottom: 0.4rem; 
   line-height: 1.4;
 }
 
 .modal-actions {
-  padding: 1.2rem 2rem 1.5rem 2rem; /* ✅ CORRIGÉ : Optimise le padding */
+  padding: 1.2rem 2rem 1.5rem 2rem; 
   background: #f5f5f5;
-  flex-shrink: 0; /* ✅ AJOUTÉ : Empêche la compression du bouton */
-  border-radius: 0 0 20px 20px; /* ✅ AJOUTÉ : Coins arrondis */
+  flex-shrink: 0; 
+  border-radius: 0 0 20px 20px; 
 }
 
 .btn-start-learning {
@@ -238,34 +236,34 @@ export default {
   .start-module-modal {
     width: 95%;
     margin: 1rem;
-    max-height: 90vh; /* ✅ CORRIGÉ : Plus d'espace sur mobile */
+    max-height: 90vh; 
   }
   
   .modal-header {
-    padding: 2rem 1.5rem 1.5rem 1.5rem; /* ✅ CORRIGÉ : Réduit le padding */
+    padding: 2rem 1.5rem 1.5rem 1.5rem; 
   }
   
   .modal-content {
-    padding: 1.2rem 1.5rem; /* ✅ CORRIGÉ : Réduit le padding */
-    max-height: calc(90vh - 160px); /* ✅ CORRIGÉ : Ajuste pour mobile */
+    padding: 1.2rem 1.5rem; 
+    max-height: calc(90vh - 160px); 
   }
   
   .modal-actions {
-    padding: 1rem 1.5rem 1.2rem 1.5rem; /* ✅ CORRIGÉ : Réduit le padding */
+    padding: 1rem 1.5rem 1.2rem 1.5rem; 
   }
 }
 
 @media (max-width: 479px) {
   .start-module-modal {
-    max-height: 95vh; /* ✅ CORRIGÉ : Maximum d'espace sur petits écrans */
+    max-height: 95vh; 
   }
   
   .modal-content {
-    max-height: calc(95vh - 140px); /* ✅ CORRIGÉ : Ajuste pour très petits écrans */
+    max-height: calc(95vh - 140px); 
   }
   
   .modal-header {
-    padding: 1.8rem 1.5rem 1.2rem 1.5rem; /* ✅ CORRIGÉ : Encore plus compact */
+    padding: 1.8rem 1.5rem 1.2rem 1.5rem; 
   }
 }
 </style>

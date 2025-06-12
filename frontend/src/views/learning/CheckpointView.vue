@@ -55,7 +55,6 @@ const checkpointData = ref({
 
 // Methods
 const closeModal = () => {
-  // Retourner à la formation view
   router.push('/')
 }
 

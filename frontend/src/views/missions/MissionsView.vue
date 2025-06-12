@@ -18,7 +18,6 @@
         <h1 class="missions-title">MISSIONS</h1>
       </div>
 
-      <!-- Message de succès -->
       <div v-if="successMessage" class="success-message">
         {{ successMessage }}
       </div>
@@ -77,18 +76,15 @@ const user = ref(null)
 const isLoading = ref(false)
 const error = ref(null)
 
-// Missions triées : missions complètes (100%) en haut, puis les autres
 const visibleMissions = computed(() => {
   return missions.value.sort((a, b) => {
-    // Missions à 100% en premier
     if (a.progress === 100 && b.progress !== 100) return -1
     if (a.progress !== 100 && b.progress === 100) return 1
-    // Sinon tri par progression décroissante
     return b.progress - a.progress
   })
 })
 
-const successMessage = ref('') // on ajoute un message
+const successMessage = ref('') 
 
 const claimReward = async (mission) => {
   if (mission.progress === 100 && !mission.completed) {
@@ -170,7 +166,6 @@ const getAllMissions = async () => {
     //Charger les missions
     const userMissions = user.value.missions || []
 
-    // 4️⃣ Pour chaque mission, aller chercher le reward lié + ajouter user_mission_id
     const missionsWithRewards = await Promise.all(
       userMissions.map(async (mission) => {
         try {
@@ -238,7 +233,7 @@ onMounted(async () => {
   background: linear-gradient(135deg, #072c54 0%, #1e3a8a 100%);
   color: white;
   padding: 1rem;
-  padding-bottom: 100px; /* Espace pour navbar mobile */
+  padding-bottom: 100px; 
   box-sizing: border-box;
 }
 
