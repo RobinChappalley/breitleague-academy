@@ -144,33 +144,25 @@ const questions = ref([])
 const showPointsPopup = ref(false)
 const pointsPopupText = ref('')
 
-// FONCTION AMÉLIORÉE : Récupérer l'URL de l'avatar
+// Récupérer l'URL de l'avatar
 const getAvatarUrl = (user) => {
-  console.log('🖼️ Getting avatar for user:', user)
-  
   if (!user || !user.avatar) {
-    console.log('❌ No avatar data for user:', user?.name)
     return null
   }
   
   // Si c'est juste une lettre (fallback), ne pas afficher d'image
   if (typeof user.avatar === 'string' && user.avatar.length === 1) {
-    console.log('❌ Avatar is just initial:', user.avatar)
     return null
   }
   
   // Construire l'URL complète
   const avatarUrl = user.avatar.startsWith('http') ? user.avatar : `http://localhost:8000/${user.avatar}`
-  console.log('✅ Avatar URL for', user.name, ':', avatarUrl)
-  
   return avatarUrl
 }
 
-// FONCTION CORRIGÉE : Récupérer les données utilisateur actuelles
+// Récupérer les données utilisateur actuelles
 const loadCurrentUserData = async () => {
   try {
-    console.log('🔄 Loading current user data...')
-    
     // 1. Récupérer l'utilisateur authentifié
     const userResponse = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
@@ -182,9 +174,8 @@ const loadCurrentUserData = async () => {
     }
     
     const userData = await userResponse.json()
-    console.log('📋 Raw authenticated user data:', userData)
     
-    // 2. Récupérer les données complètes via ton API (AVEC POS)
+    // 2. Récupérer les données complètes via API (AVEC POS)
     const fullUserResponse = await fetch(`http://localhost:8000/api/v1/users/${userData.id}`, {
       credentials: 'include',
       headers: { 'Accept': 'application/json' }
@@ -194,9 +185,6 @@ const loadCurrentUserData = async () => {
     if (fullUserResponse.ok) {
       const fullUserResponseData = await fullUserResponse.json()
       fullUserData = fullUserResponseData.data || fullUserResponseData || userData
-      console.log('📋 Full user data from API:', fullUserData)
-    } else {
-      console.warn('⚠️ Could not fetch full user data, using basic auth data')
     }
     
     currentPlayer.value = {
@@ -205,10 +193,6 @@ const loadCurrentUserData = async () => {
       avatar: fullUserData.avatar || userData.avatar || null,
       flag: getUserFlag(fullUserData) || '🇨🇭' 
     }
-    
-    console.log('✅ Current player loaded:', currentPlayer.value)
-    console.log('🖼️ Avatar path:', currentPlayer.value.avatar)
-    console.log('🚩 Flag from pos:', fullUserData.pos?.country_flag)
     
   } catch (error) {
     console.warn('⚠️ Error loading current user data:', error)
@@ -223,25 +207,18 @@ const loadCurrentUserData = async () => {
   }
 }
 
-
 const getUserFlag = (userData) => {
-
   if (userData.pos && userData.pos.country_flag) {
-    console.log('✅ Flag from pos.country_flag:', userData.pos.country_flag)
     return userData.pos.country_flag
   }
   
-
   if (userData.pos_id) {
     const flagFromPosId = getCountryFlag(userData.pos_id)
-    console.log('⚠️ Fallback flag from pos_id mapping:', flagFromPosId)
     return flagFromPosId
   }
   
-  console.log('❌ No flag found, using default')
   return '🇨🇭'
 }
-
 
 const getCountryFlag = (posId) => {
   const flagMapping = {
@@ -257,20 +234,20 @@ const getCountryFlag = (posId) => {
     10: '🇧🇪' // Belgique
   }
   
-  console.log('🚩 Converting pos_id to flag:', posId, '->', flagMapping[posId])
   return flagMapping[posId] || '🇨🇭'
 }
 
-
 const currentQuestion = computed(() => {
   if (questions.value.length === 0) {
-    console.log('❌ Aucune question disponible')
     return null
   }
   
   const question = questions.value[currentQuestionIndex.value]
-  console.log('🎯 Question actuelle BRUTE:', question)
   
+  const formattedAnswers = question.choices?.map((choice, index) => ({
+    text: choice.text_answer,
+    correct: choice.is_correct
+  })) || []
 
   const result = {
     id: question.id,
@@ -278,33 +255,16 @@ const currentQuestion = computed(() => {
     answers: formattedAnswers
   }
   
-  console.log('✅ Question FINALE pour affichage:', result)
-  console.log('🔍 === RÉSUMÉ DES RÉPONSES ===')
-  result.answers.forEach((answer, index) => {
-    console.log(`   ${index}: "${answer.text}" = ${answer.correct ? '✅ CORRECT' : '❌ incorrect'}`)
-  })
-  
   return result
 })
 
-// CORRIGER formatQuestions() - UTILISER correct_answer_text au lieu de correct_choice_id
 const formatQuestions = async (questionsList) => {
   try {
-    console.log('🔧 === FORMATAGE QUESTIONS AVEC correct_answer_text ===')
-    console.log('📋 Questions reçues:', questionsList)
-    
     questions.value = questionsList.map((q, index) => {
-      console.log(`\n📝 === QUESTION ${index + 1} ===`)
-      console.log(`🆔 ID: ${q.id}`)
-      console.log(`📝 Contenu: ${q.content_default}`)
-      console.log(`🎯 correct_answer_text: ${q.correct_answer_text}`)
-      console.log(`🎯 correct_choice_id: ${q.correct_choice_id}`)
-      
       const choices = q.choices || []
-      console.log(`📋 Choix reçus (${choices.length}):`, choices)
       
       if (choices.length === 0) {
-        console.warn(`⚠️ Aucun choix pour question ${q.id}`)
+        console.warn(`Aucun choix pour question ${q.id}`)
         return {
           id: q.id,
           content_default: q.content_default,
@@ -312,12 +272,10 @@ const formatQuestions = async (questionsList) => {
         }
       }
       
-      // UTILISER correct_answer_text (format JSON string ou array)
       let correctAnswerTexts = []
       
       if (q.correct_answer_text) {
         try {
-          // Si c'est un string JSON, le parser
           if (typeof q.correct_answer_text === 'string') {
             correctAnswerTexts = JSON.parse(q.correct_answer_text)
           } else if (Array.isArray(q.correct_answer_text)) {
@@ -326,59 +284,43 @@ const formatQuestions = async (questionsList) => {
             correctAnswerTexts = [q.correct_answer_text]
           }
         } catch (e) {
-          console.warn('⚠️ Erreur parsing correct_answer_text, fallback sur string direct')
+          console.warn(' Erreur parsing correct_answer_text, fallback sur string direct')
           correctAnswerTexts = [q.correct_answer_text]
         }
       } else {
-        console.warn('⚠️ Pas de correct_answer_text, essai avec correct_choice_id')
-        // Fallback sur correct_choice_id si pas de correct_answer_text
+        console.warn(' Pas de correct_answer_text, essai avec correct_choice_id')
         const correctChoice = choices.find(c => parseInt(c.id) === parseInt(q.correct_choice_id))
         if (correctChoice) {
           correctAnswerTexts = [correctChoice.text_answer]
         } else {
-          console.error('❌ Aucune méthode pour identifier la bonne réponse !')
+          console.error(' Aucune méthode pour identifier la bonne réponse !')
           correctAnswerTexts = []
         }
       }
       
-      console.log(`✅ Réponses correctes identifiées:`, correctAnswerTexts)
-      
       const formattedChoices = choices.map((choice, choiceIndex) => {
-        // COMPARAISON avec correct_answer_text
         const isCorrect = correctAnswerTexts.includes(choice.text_answer)
-        
-        console.log(`\n📝 Choix ${choiceIndex}:`)
-        console.log(`   - ID: ${choice.id}`)
-        console.log(`   - Texte: "${choice.text_answer}"`)
-        console.log(`   - Comparaison avec correct_answer_text: ${isCorrect}`)
-        console.log(`   - Résultat: ${isCorrect ? '✅ CORRECT' : '❌ incorrect'}`)
         
         return {
           id: choice.id,
           text_answer: choice.text_answer,
-          is_correct: isCorrect // BOOLEAN STRICT basé sur correct_answer_text
+          is_correct: isCorrect
         }
       })
       
-      // VÉRIFICATION : une seule réponse correcte
       const correctChoices = formattedChoices.filter(c => c.is_correct)
-      console.log(`\n🔍 Vérification question ${index + 1}:`)
-      console.log(`   - Choix corrects trouvés: ${correctChoices.length}`)
       
       if (correctChoices.length === 0) {
-        console.error(`❌ AUCUNE réponse correcte pour question ${q.id} !`)
-        console.error('❌ correct_answer_text:', correctAnswerTexts)
-        console.error('❌ Choix disponibles:', choices.map(c => c.text_answer))
+        console.error(` AUCUNE réponse correcte pour question ${q.id} !`)
+        console.error(' correct_answer_text:', correctAnswerTexts)
+        console.error(' Choix disponibles:', choices.map(c => c.text_answer))
         
-        // FALLBACK : marquer le premier choix comme correct pour éviter le crash
         if (formattedChoices.length > 0) {
           formattedChoices[0].is_correct = true
-          console.warn('⚠️ FALLBACK: Premier choix marqué comme correct')
+          console.warn(' FALLBACK: Premier choix marqué comme correct')
         }
       } else if (correctChoices.length > 1) {
-        console.error(`❌ PLUSIEURS réponses correctes pour question ${q.id} !`)
-      } else {
-        console.log(`✅ Une seule réponse correcte: "${correctChoices[0].text_answer}"`)
+        console.error(` PLUSIEURS réponses correctes pour question ${q.id} !`)
       }
       
       // Mélanger les choix
@@ -387,37 +329,17 @@ const formatQuestions = async (questionsList) => {
       return {
         id: q.id,
         content_default: q.content_default,
-        choices: shuffledChoices,
-        debug_correct_answer_text: correctAnswerTexts,
-        debug_original_correct_choice_id: q.correct_choice_id
+        choices: shuffledChoices
       }
     })
     
     totalQuestions.value = questions.value.length
-    console.log(`\n✅ === FORMATAGE TERMINÉ ===`)
-    console.log(`📊 Total questions formatées: ${questions.value.length}`)
-    
-    // VÉRIFICATION FINALE
-    questions.value.forEach((q, index) => {
-      const correctChoices = q.choices.filter(c => c.is_correct)
-      console.log(`🔍 Question ${index + 1}: ${correctChoices.length} réponse(s) correcte(s)`)
-      if (correctChoices.length === 1) {
-        console.log(`✅ Bonne réponse: "${correctChoices[0].text_answer}"`)
-      }
-    })
     
   } catch (error) {
-    console.error('❌ Erreur formatage:', error)
+    console.error(' Erreur formatage:', error)
     loadFallbackQuestions()
   }
 }
-
-// Computed
-const progressPercentage = computed(() => {
-  if (totalQuestions.value === 0) return 0
-  return (currentQuestionIndex.value / totalQuestions.value) * 100
-})
-
 
 const loadBattleData = async () => {
   try {
@@ -432,25 +354,18 @@ const loadBattleData = async () => {
           avatar: battleData.value.opponent.avatar,
           flag: battleData.value.opponent.flag || '🇩🇪'
         }
-        
-        console.log('✅ Opponent data loaded:', opponent.value)
-        console.log('🖼️ Opponent avatar:', battleData.value.opponent.avatar)
       }
     }
     
-    // TOUJOURS charger les questions depuis l'API (pas depuis localStorage)
     await loadQuestionsFromAPI()
     
   } catch (error) {
-    console.error('❌ Error loading battle data:', error)
-    await loadQuestionsFromAPI() // Fallback sur l'API
+    console.error(' Error loading battle data:', error)
+    await loadQuestionsFromAPI() 
   }
 }
 
-// AJOUTER la fonction loadFallbackQuestions qui manque
 const loadFallbackQuestions = () => {
-  console.log('🔄 Chargement des questions de fallback...')
-  
   questions.value = [
     {
       id: 1,
@@ -505,50 +420,36 @@ const loadFallbackQuestions = () => {
   ]
   
   totalQuestions.value = questions.value.length
-  console.log('✅ Questions de fallback chargées:', questions.value.length)
 }
 
-// AJOUTER la fonction loadSpecificQuestions qui manque aussi
 const loadSpecificQuestions = async (questionIds) => {
   try {
-    console.log('🎯 Chargement des questions spécifiques:', questionIds)
-    
     if (!Array.isArray(questionIds) || questionIds.length === 0) {
       throw new Error('IDs de questions invalides')
     }
     
-    // Récupérer toutes les questions depuis l'API
     const questionsData = await battleService.getQuestions()
-    console.log('📋 Toutes les questions depuis API:', questionsData)
-    
     const allQuestions = questionsData.data || questionsData || []
-    console.log('📊 Questions disponibles dans l\'API:', allQuestions.length)
     
     if (allQuestions.length === 0) {
       throw new Error('Aucune question disponible dans l\'API')
     }
     
-    // Filtrer les questions par leurs IDs dans l'ordre donné
     const specificQuestions = questionIds.map(id => {
       const found = allQuestions.find(q => q.id === id)
-      console.log(`🔍 Recherche question ID ${id}:`, found ? 'TROUVÉE' : 'NON TROUVÉE')
       return found
-    }).filter(Boolean) // Enlever les undefined
-    
-    console.log(`🎯 Questions spécifiques trouvées: ${specificQuestions.length}/${questionIds.length}`)
+    }).filter(Boolean) 
     
     if (specificQuestions.length === 0) {
       throw new Error('Aucune question spécifique trouvée')
     }
     
-    // Formater les questions trouvées
     await formatQuestions(specificQuestions)
     
   } catch (error) {
-    console.error('❌ Erreur lors du chargement des questions spécifiques:', error)
-    console.warn('⚠️ Fallback sur questions aléatoires')
+    console.error(' Erreur lors du chargement des questions spécifiques:', error)
+    console.warn('Fallback sur questions aléatoires')
     
-    // Fallback : charger des questions aléatoirement
     try {
       const questionsData = await battleService.getQuestions()
       const allQuestions = questionsData.data || questionsData || []
@@ -561,53 +462,16 @@ const loadSpecificQuestions = async (questionIds) => {
         throw new Error('Aucune question disponible')
       }
     } catch (fallbackError) {
-      console.error('❌ Erreur fallback:', fallbackError)
+      console.error(' Erreur fallback:', fallbackError)
       loadFallbackQuestions()
     }
   }
 }
 
-// CORRIGER loadQuestionsFromAPI() avec une gestion d'erreur plus robuste
 const loadQuestionsFromAPI = async () => {
   try {
-    console.log('🔄 Chargement des questions pour cette bataille...')
-    console.log('🎯 battleData:', battleData.value)
-    
-    // Vérifier si on a des questions fixes pour cette bataille (IDs)
-    if (battleData.value?.questions && Array.isArray(battleData.value.questions) && battleData.value.questions.length > 0) {
-      console.log('🎯 Utilisation des questions fixes de la bataille:', battleData.value.questions)
-      await loadSpecificQuestions(battleData.value.questions)
-      return
-    }
-    
-    // Vérifier si l'autre joueur a déjà joué (questions complètes dans son summary)
-    if (battleData.value?.existingQuestions && Array.isArray(battleData.value.existingQuestions) && battleData.value.existingQuestions.length > 0) {
-      console.log('🔄 Utilisation des questions déjà jouées par l\'adversaire')
-      
-      // CORRIGER : Reformater les questions existantes avec la même structure
-      questions.value = battleData.value.existingQuestions.map((q, index) => ({
-        id: q.id || index + 1,
-        content_default: q.text || `Question ${index + 1}`,
-        choices: [
-          { text_answer: q.correctAnswer, is_correct: true },
-          { text_answer: 'Réponse B', is_correct: false },
-          { text_answer: 'Réponse C', is_correct: false },
-          { text_answer: 'Réponse D', is_correct: false }
-        ]
-      }))
-      
-      totalQuestions.value = questions.value.length
-      console.log('✅ Questions formatées depuis l\'adversaire:', questions.value.length)
-      return
-    }
-    
-    // Fallback : charger 5 questions aléatoirement depuis l'API
-    console.log('🎲 Chargement de 5 questions aléatoirement depuis l\'API...')
     const questionsData = await battleService.getQuestions()
-    console.log('📋 Réponse API questions:', questionsData)
-    
     const allQuestions = questionsData.data || questionsData || []
-    console.log('📊 Questions disponibles:', allQuestions.length)
     
     if (allQuestions.length === 0) {
       console.warn('⚠️ Aucune question API, utilisation du fallback')
@@ -615,25 +479,100 @@ const loadQuestionsFromAPI = async () => {
       return
     }
     
-    // Sélectionner 5 questions aléatoirement
-    const shuffled = allQuestions.sort(() => 0.5 - Math.random())
-    const selectedQuestions = shuffled.slice(0, 5)
+    const superShuffleArray = (array) => {
+      const shuffled = [...array]
+      
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+      }
+      
+      const seed = Date.now() % 1000
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const randomFactor1 = Math.random()
+        const randomFactor2 = Math.sin(seed + i)
+        const randomFactor3 = (new Date().getMilliseconds()) / 1000
+        const combinedRandom = Math.abs(randomFactor1 + randomFactor2 + randomFactor3) % 1
+        const j = Math.floor(combinedRandom * (i + 1))
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+      }
+      
+      const chunkSize = Math.max(1, Math.floor(shuffled.length / 10))
+      for (let start = 0; start < shuffled.length; start += chunkSize) {
+        const end = Math.min(start + chunkSize, shuffled.length)
+        const chunk = shuffled.slice(start, end)
+        
+        const rotateBy = Math.floor(Math.random() * chunk.length)
+        const rotatedChunk = [...chunk.slice(rotateBy), ...chunk.slice(0, rotateBy)]
+        
+        for (let i = 0; i < rotatedChunk.length; i++) {
+          shuffled[start + i] = rotatedChunk[i]
+        }
+      }
+      
+      return shuffled
+    }
     
-    console.log('🎯 Questions sélectionnées:', selectedQuestions.length)
+    const superShuffled = superShuffleArray(allQuestions)
+    
+    let selectedQuestions = []
+    
+    if (superShuffled.length >= 20) {
+      const step = Math.floor(superShuffled.length / 10)
+      const usedIndices = new Set()
+      
+      while (selectedQuestions.length < 5 && usedIndices.size < superShuffled.length) {
+        const sectionStart = (selectedQuestions.length * step) % (superShuffled.length - step)
+        const randomInSection = Math.floor(Math.random() * step)
+        const candidateIndex = sectionStart + randomInSection
+        
+        if (!usedIndices.has(candidateIndex) && candidateIndex < superShuffled.length) {
+          selectedQuestions.push(superShuffled[candidateIndex])
+          usedIndices.add(candidateIndex)
+        }
+      }
+      
+      while (selectedQuestions.length < 5) {
+        const randomIndex = Math.floor(Math.random() * superShuffled.length)
+        if (!usedIndices.has(randomIndex)) {
+          selectedQuestions.push(superShuffled[randomIndex])
+          usedIndices.add(randomIndex)
+        }
+      }
+    } else if (superShuffled.length >= 10) {
+      const indices = []
+      const spacing = Math.floor(superShuffled.length / 5)
+      
+      for (let i = 0; i < 5; i++) {
+        const baseIndex = i * spacing
+        const randomOffset = Math.floor(Math.random() * Math.min(spacing, superShuffled.length - baseIndex))
+        indices.push((baseIndex + randomOffset) % superShuffled.length)
+      }
+      
+      const uniqueIndices = [...new Set(indices)]
+      selectedQuestions = uniqueIndices.slice(0, 5).map(index => superShuffled[index])
+      
+      while (selectedQuestions.length < 5 && selectedQuestions.length < superShuffled.length) {
+        const randomIndex = Math.floor(Math.random() * superShuffled.length)
+        const candidate = superShuffled[randomIndex]
+        if (!selectedQuestions.some(q => q.id === candidate.id)) {
+          selectedQuestions.push(candidate)
+        }
+      }
+    } else {
+      selectedQuestions = superShuffled.slice(0, Math.min(5, superShuffled.length))
+    }
+    
     await formatQuestions(selectedQuestions)
     
   } catch (error) {
-    console.error('❌ Erreur lors du chargement des questions depuis API:', error)
-    console.warn('⚠️ Fallback sur questions par défaut')
+    console.error('Erreur lors du chargement des questions depuis API:', error)
+    console.warn('Fallback sur questions par défaut')
     loadFallbackQuestions()
   }
 }
 
-// Methods (le reste des méthodes reste identique...)
 const startTimer = () => {
-  console.log('⏰ Démarrage du timer...')
-  
-  // Nettoyer l'ancien timer si il existe
   if (timerInterval) {
     clearInterval(timerInterval)
     timerInterval = null
@@ -643,7 +582,6 @@ const startTimer = () => {
     if (timeLeft.value > 0) {
       timeLeft.value--
     } else {
-      console.log('⏰ Temps écoulé ! Sélection automatique de null')
       selectAnswer(null) // Temps écoulé
     }
   }, 1000)
@@ -656,116 +594,97 @@ const stopTimer = () => {
   }
 }
 
-// CORRIGER selectAnswer() - Déclarer speedBonus au début
 const selectAnswer = (index) => {
   if (hasAnswered.value) {
-    console.log('⚠️ Réponse déjà donnée, ignoré')
     return
   }
   
-  console.log('\n🎯 === DÉBUT SÉLECTION RÉPONSE ===')
-  console.log(`🎯 Index cliqué: ${index}`)
-  
   // VÉRIFICATIONS DE BASE
   if (!currentQuestion.value) {
-    console.error('❌ currentQuestion.value est null/undefined')
+    console.error(' currentQuestion.value est null/undefined')
     return
   }
   
   if (!currentQuestion.value.answers) {
-    console.error('❌ currentQuestion.value.answers est null/undefined')
+    console.error('currentQuestion.value.answers est null/undefined')
     return
   }
   
   if (index !== null && index >= currentQuestion.value.answers.length) {
-    console.error(`❌ Index ${index} invalide (max: ${currentQuestion.value.answers.length - 1})`)
+    console.error(`Index ${index} invalide (max: ${currentQuestion.value.answers.length - 1})`)
     return
   }
   
-  // Arrêter le timer et marquer comme répondu
   selectedAnswer.value = index
   hasAnswered.value = true
   stopTimer()
-  
-  console.log(`✅ hasAnswered défini à: ${hasAnswered.value}`)
-  console.log(`✅ selectedAnswer défini à: ${selectedAnswer.value}`)
 
   const timeTaken = 30 - timeLeft.value
   playerTime.value += timeTaken
   
-  // DÉCLARER TOUTES LES VARIABLES AU DÉBUT
   let pointsEarned = 0
   let selectedAnswerText = 'Temps écoulé'
   let isCorrect = false
-  let speedBonus = 0 // ✅ DÉCLARER ICI POUR ÉVITER L'ERREUR
+  let speedBonus = 0
   
-  // Gérer le cas où l'utilisateur a répondu (index !== null)
   if (index !== null) {
     const selectedAnswerObj = currentQuestion.value.answers[index]
     isCorrect = selectedAnswerObj.correct === true
     selectedAnswerText = selectedAnswerObj.text
-    
-    console.log(`🔍 Réponse sélectionnée: "${selectedAnswerText}"`)
-    console.log(`🔍 Est correcte: ${isCorrect}`)
-  } else {
-    console.log('⏰ Temps écoulé - aucune réponse sélectionnée')
   }
   
   if (isCorrect) {
-    console.log('🎉 === BONNE RÉPONSE ===')
     playerScore.value++
     
     const basePoints = 100
     
     // CALCUL DU BONUS DE RAPIDITÉ
     if (timeTaken <= 5) {
-      speedBonus = 100 // ⚡ Super rapide
+      speedBonus = 100 
     } else if (timeTaken <= 10) {
-      speedBonus = 75  // 🔥 Très rapide
+      speedBonus = 75  
     } else if (timeTaken <= 15) {
-      speedBonus = 50  // ⚡ Rapide
+      speedBonus = 50  
     } else if (timeTaken <= 20) {
-      speedBonus = 25  // 👍 Correct
+      speedBonus = 25  
     } else {
-      speedBonus = 0   // 😐 Lent
+      speedBonus = 0   
     }
     
     pointsEarned = basePoints + speedBonus
     
     // MESSAGES DE BONUS
     if (speedBonus >= 75) {
-      pointsPopupText.value = `🔥 +${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité)`
+      pointsPopupText.value = ` +${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité)`
     } else if (speedBonus >= 25) {
-      pointsPopupText.value = `⚡ +${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité)`
+      pointsPopupText.value = ` +${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité)`
     } else if (speedBonus > 0) {
-      pointsPopupText.value = `👍 +${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité)`
+      pointsPopupText.value = `+${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité)`
     } else {
-      pointsPopupText.value = `✅ +${pointsEarned} PTS\n(Bonne réponse !)`
+      pointsPopupText.value = ` +${pointsEarned} PTS\n(Bonne réponse !)`
     }
     
     showPointsPopup.value = true
     setTimeout(() => showPointsPopup.value = false, 2500)
   } else {
-    console.log('💥 === MAUVAISE RÉPONSE OU TEMPS ÉCOULÉ ===')
-    
     // speedBonus reste à 0 pour les mauvaises réponses
     pointsEarned = 0
     
     if (index === null) {
-      pointsPopupText.value = `⏰ 0 PTS\n(Temps écoulé !)`
+      pointsPopupText.value = `0 PTS\n(Temps écoulé !)`
     } else if (timeTaken <= 5) {
-      pointsPopupText.value = `💨 0 PTS\n(Trop rapide, mauvaise réponse !)`
+      pointsPopupText.value = ` 0 PTS\n(Trop rapide, mauvaise réponse !)`
     } else if (timeTaken >= 25) {
-      pointsPopupText.value = `🐌 0 PTS\n(Temps presque écoulé...)`
+      pointsPopupText.value = ` 0 PTS\n(Temps presque écoulé...)`
     } else {
-      pointsPopupText.value = `❌ 0 PTS\n(Mauvaise réponse)`
+      pointsPopupText.value = ` 0 PTS\n(Mauvaise réponse)`
     }
     
     showPointsPopup.value = true
     setTimeout(() => showPointsPopup.value = false, 2000)
   }
   
-  // Sauvegarder la réponse (maintenant speedBonus est toujours défini)
+  // Sauvegarder la réponse
   playerAnswers.value.push({
     questionId: currentQuestion.value?.id,
     questionText: currentQuestion.value?.text,
@@ -775,20 +694,15 @@ const selectAnswer = (index) => {
     timeLeft: timeLeft.value,
     points: pointsEarned,
     speedCategory: getSpeedCategory(timeTaken),
-    speedBonus: speedBonus // ✅ MAINTENANT TOUJOURS DÉFINI
+    speedBonus: speedBonus
   })
   
-  console.log('📊 Réponse sauvegardée:', playerAnswers.value[playerAnswers.value.length - 1])
-  
   // Passage à la question suivante
-  console.log('⏳ Programmation du passage à la question suivante dans 2.5s...')
-  
   setTimeout(() => {
-    console.log('🔄 Exécution du passage à la question suivante')
     try {
       nextQuestion()
     } catch (error) {
-      console.error('❌ Erreur dans nextQuestion():', error)
+      console.error(' Erreur dans nextQuestion():', error)
       // Fallback en cas d'erreur
       if (currentQuestionIndex.value < totalQuestions.value - 1) {
         currentQuestionIndex.value++
@@ -801,51 +715,32 @@ const selectAnswer = (index) => {
       }
     }
   }, 2500)
-  
-  console.log('🎯 === FIN SÉLECTION RÉPONSE ===\n')
 }
 
-// NOUVELLE FONCTION : Catégoriser la rapidité
 const getSpeedCategory = (timeTaken) => {
-  if (timeTaken <= 5) return 'lightning' // ⚡ Éclair
-  if (timeTaken <= 10) return 'fast' // 🔥 Rapide
-  if (timeTaken <= 15) return 'good' // ⚡ Bien
-  if (timeTaken <= 20) return 'average' // 👍 Moyen
-  if (timeTaken <= 25) return 'slow' // 😐 Lent
-  return 'very_slow' // 🐌 Très lent
+  if (timeTaken <= 5) return 'lightning'
+  if (timeTaken <= 10) return 'fast'
+  if (timeTaken <= 15) return 'good'
+  if (timeTaken <= 20) return 'average'
+  if (timeTaken <= 25) return 'slow'
+  return 'very_slow'
 }
 
 const nextQuestion = () => {
-  console.log('\n🔄 === PASSAGE À LA QUESTION SUIVANTE ===')
-  console.log(`📊 Index actuel: ${currentQuestionIndex.value}`)
-  console.log(`📊 Total questions: ${totalQuestions.value}`)
-  console.log(`📊 Questions restantes: ${totalQuestions.value - currentQuestionIndex.value - 1}`)
-  
   if (currentQuestionIndex.value < totalQuestions.value - 1) {
-    console.log('➡️ Passage à la question suivante...')
-    
-    // Réinitialiser l'état
     currentQuestionIndex.value++
     timeLeft.value = 30
     hasAnswered.value = false
     selectedAnswer.value = null
     
-    console.log(`✅ Nouvelle question index: ${currentQuestionIndex.value}`)
-    console.log(`✅ Timer réinitialisé: ${timeLeft.value}s`)
-    console.log(`✅ hasAnswered réinitialisé: ${hasAnswered.value}`)
-    
-    // Vérifier que la prochaine question existe
     const nextQ = questions.value[currentQuestionIndex.value]
     if (nextQ) {
-      console.log(`✅ Prochaine question trouvée: "${nextQ.content_default}"`)
       startTimer()
     } else {
-      console.error(`❌ Question ${currentQuestionIndex.value} introuvable !`)
-      console.error('❌ Questions disponibles:', questions.value.length)
+      console.error(` Question ${currentQuestionIndex.value} introuvable !`)
       finishBattle()
     }
   } else {
-    console.log('🏁 Dernière question terminée, fin de bataille')
     finishBattle()
   }
 }
@@ -858,20 +753,11 @@ const finishBattle = async () => {
     ? playerTime.value / playerAnswers.value.length 
     : 0
   
-  // STATISTIQUES PERSONNELLES (pas de comparaison adversaire)
   const perfectAnswers = playerAnswers.value.filter(a => a.correct && a.time <= 10).length
   const goodAnswers = playerAnswers.value.filter(a => a.correct && a.time <= 20).length
   
-  console.log('📊 === STATISTIQUES FINALES ===')
-  console.log(`✅ Score: ${playerScore.value}/${totalQuestions.value}`)
-  console.log(`⚡ Réponses parfaites (≤10s): ${perfectAnswers}`)
-  console.log(`👍 Bonnes réponses (≤20s): ${goodAnswers}`)
-  console.log(`📈 Points totaux: ${playerTotalPoints}`)
-  console.log(`⏱️ Temps moyen: ${playerAverageTime.toFixed(1)}s`)
-  
   try {
     const existingBattleId = battleData.value?.id
-    console.log('🆔 Mise à jour de la bataille:', existingBattleId)
     
     if (!existingBattleId) {
       throw new Error('ID de bataille manquant')
@@ -881,14 +767,11 @@ const finishBattle = async () => {
       credentials: 'include'
     })
 
-    // Déterminer si je suis challenger ou challenged
     const iAmChallenger = battleData.value?.isFirstPlayer === false
     
-    // Préparer les données selon mon rôle
     let updateData = {}
     
     if (iAmChallenger) {
-      // Je suis le challenger, j'ajoute challenger_summary
       updateData = {
         has_challenger_won: null,
         challenger_summary: {
@@ -896,15 +779,15 @@ const finishBattle = async () => {
           totalPoints: playerTotalPoints,
           totalTime: playerTime.value,
           averageTime: playerAverageTime,
-          perfectAnswers: perfectAnswers, // NOUVEAU
-          goodAnswers: goodAnswers, // NOUVEAU
+          perfectAnswers: perfectAnswers,
+          goodAnswers: goodAnswers,
           answers: playerAnswers.value.map(answer => ({
             questionId: answer.questionId,
             selectedAnswer: answer.selectedAnswer,
             correct: answer.correct,
             time: answer.time,
             points: answer.points,
-            speedCategory: answer.speedCategory // NOUVEAU
+            speedCategory: answer.speedCategory
           })),
           questionsData: questions.value.map(q => ({
             id: q.id,
@@ -914,7 +797,6 @@ const finishBattle = async () => {
         }
       }
     } else {
-      // Je suis le challenged, j'ajoute challenged_summary
       updateData = {
         has_challenger_won: null,
         challenged_summary: {
@@ -922,15 +804,15 @@ const finishBattle = async () => {
           totalPoints: playerTotalPoints,
           totalTime: playerTime.value,
           averageTime: playerAverageTime,
-          perfectAnswers: perfectAnswers, // NOUVEAU
-          goodAnswers: goodAnswers, // NOUVEAU
+          perfectAnswers: perfectAnswers,
+          goodAnswers: goodAnswers,
           answers: playerAnswers.value.map(answer => ({
             questionId: answer.questionId,
             selectedAnswer: answer.selectedAnswer,
             correct: answer.correct,
             time: answer.time,
             points: answer.points,
-            speedCategory: answer.speedCategory // NOUVEAU
+            speedCategory: answer.speedCategory
           })),
           questionsData: questions.value.map(q => ({
             id: q.id,
@@ -940,8 +822,6 @@ const finishBattle = async () => {
         }
       }
     }
-    
-    console.log('💾 Données de mise à jour:', updateData)
 
     const csrfToken = decodeURIComponent(
       document.cookie
@@ -969,41 +849,27 @@ const finishBattle = async () => {
     const updatedBattle = await response.json()
     const battle = updatedBattle.data || updatedBattle
     
-    console.log('✅ Tour terminé:', battle)
-    
-    // VÉRIFIER si la bataille est maintenant terminée
     const bothPlayersFinished = battle.challenger_summary && battle.challenged_summary
     
     if (bothPlayersFinished) {
-      console.log('🏁 Bataille terminée ! Redirection vers BattleDetails')
       await router.push(`/battle-details/${existingBattleId}`)
     } else {
-      console.log('⏳ En attente de l\'autre joueur, retour à Battle')
       await router.push('/battle')
     }
     
   } catch (error) {
-    console.error('❌ Erreur lors de la sauvegarde:', error)
+    console.error('Erreur lors de la sauvegarde:', error)
     alert(`Erreur: ${error.message}`)
     router.push('/battle')
   }
 }
 
-// CORRIGER getAnswerClass() avec debug
 const getAnswerClass = (index) => {
   if (!hasAnswered.value) return ''
   
   const selectedAnswerObj = currentQuestion.value?.answers[index]
   const isSelectedAnswer = selectedAnswer.value === index
   const isCorrectAnswer = selectedAnswerObj?.correct === true
-  
-  console.log(`🎨 Style pour réponse ${index}:`, {
-    isSelected: isSelectedAnswer,
-    isCorrect: isCorrectAnswer,
-    answerObj: selectedAnswerObj,
-    correctProperty: selectedAnswerObj?.correct,
-    correctType: typeof selectedAnswerObj?.correct
-  })
   
   if (isSelectedAnswer) {
     return isCorrectAnswer ? 'correct' : 'incorrect'
@@ -1031,23 +897,16 @@ const getAvatarStyle = (player) => {
   }
 }
 
-// Lifecycle - ORDRE DE CHARGEMENT MODIFIÉ
 onMounted(async () => {
-  console.log('🚀 BattleQuizView mounted')
-  
-  // 1. Charger les données du joueur actuel EN PREMIER
   await loadCurrentUserData()
   
-  // 2. Ensuite charger les données de bataille (qui va charger les questions depuis l'API)
   await loadBattleData()
   
-  // 3. Démarrer le timer après un délai
   setTimeout(() => {
     if (questions.value.length > 0) {
-      console.log('⏰ Starting timer...')
       startTimer()
     } else {
-      console.error('❌ Aucune question disponible pour démarrer le timer')
+      console.error(' Aucune question disponible pour démarrer le timer')
     }
   }, 1000)
 })
@@ -1075,7 +934,7 @@ onUnmounted(() => {
   justify-content: space-between;
 }
 
-/* UTILISATEUR AUTHENTIFIÉ (GAUCHE) */
+/* UTILISATEUR AUTHENTIFIÉ  */
 .player-info {
   display: flex;
   align-items: center;
@@ -1088,7 +947,7 @@ onUnmounted(() => {
   text-align: left;
 }
 
-/* ADVERSAIRE (DROITE) */
+/* ADVERSAIRE  */
 .opponent-info {
   display: flex;
   align-items: center;
@@ -1099,7 +958,7 @@ onUnmounted(() => {
 
 .opponent-details {
   text-align: right;
-  order: -1; /* Place le texte avant l'avatar */
+  order: -1; 
 }
 
 .avatar {
@@ -1453,11 +1312,11 @@ onUnmounted(() => {
   }
   
   .opponent-info {
-    flex-direction: row-reverse; /* Avatar à droite, texte à gauche */
+    flex-direction: row-reverse; 
   }
   
   .opponent-details {
-    text-align: left; /* Réajuster l'alignement sur mobile */
+    text-align: left; 
     order: 0;
   }
   
