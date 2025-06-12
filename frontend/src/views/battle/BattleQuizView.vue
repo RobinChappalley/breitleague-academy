@@ -2,7 +2,7 @@
   <div class="battle-quiz-page">
     <!-- Battle Header Info -->
     <div class="battle-header">
-      <!-- UTILISATEUR AUTHENTIFIÉ À GAUCHE -->
+      <!-- UTILISATEUR AUTHENTIFIÉ-->
       <div class="player-info">
         <div class="avatar" :style="getAvatarStyle(currentPlayer)">
           <img 
@@ -21,7 +21,7 @@
       
       <div class="vs-indicator">VS</div>
       
-      <!-- ADVERSAIRE À DROITE -->
+      <!-- ADVERSAIRE -->
       <div class="opponent-info">
         <div class="opponent-details">
           <h3>{{ opponent.name }}</h3>
@@ -114,7 +114,7 @@ const opponent = ref({
   flag: '🇩🇪'
 })
 
-// MODIFIER : Initialisation par défaut plus neutre
+// Initialisation par défaut plus neutre
 const currentPlayer = ref({
   id: null,
   name: 'Chargement...',
@@ -189,8 +189,7 @@ const loadCurrentUserData = async () => {
       headers: { 'Accept': 'application/json' }
     })
     
-    let fullUserData = userData // Fallback sur les données de base
-    
+    let fullUserData = userData 
     if (fullUserResponse.ok) {
       const fullUserResponseData = await fullUserResponse.json()
       fullUserData = fullUserResponseData.data || fullUserResponseData || userData
@@ -199,12 +198,11 @@ const loadCurrentUserData = async () => {
       console.warn('⚠️ Could not fetch full user data, using basic auth data')
     }
     
-    // 3. METTRE À JOUR currentPlayer avec les VRAIES données
     currentPlayer.value = {
       id: fullUserData.id || userData.id,
       name: fullUserData.username || userData.username || 'YOU',
       avatar: fullUserData.avatar || userData.avatar || null,
-      flag: getUserFlag(fullUserData) || '🇨🇭' // UTILISER LA NOUVELLE FONCTION
+      flag: getUserFlag(fullUserData) || '🇨🇭' 
     }
     
     console.log('✅ Current player loaded:', currentPlayer.value)
@@ -224,27 +222,26 @@ const loadCurrentUserData = async () => {
   }
 }
 
-// NOUVELLE FONCTION : Récupérer le drapeau depuis la relation pos
+
 const getUserFlag = (userData) => {
-  // 1. Essayer d'abord depuis pos.country_flag (la vraie source)
+
   if (userData.pos && userData.pos.country_flag) {
     console.log('✅ Flag from pos.country_flag:', userData.pos.country_flag)
     return userData.pos.country_flag
   }
   
-  // 2. Fallback sur le mapping pos_id si pas de country_flag
+
   if (userData.pos_id) {
     const flagFromPosId = getCountryFlag(userData.pos_id)
     console.log('⚠️ Fallback flag from pos_id mapping:', flagFromPosId)
     return flagFromPosId
   }
   
-  // 3. Fallback final
   console.log('❌ No flag found, using default')
   return '🇨🇭'
 }
 
-// GARDER LA FONCTION DE MAPPING COMME FALLBACK
+
 const getCountryFlag = (posId) => {
   const flagMapping = {
     1: '🇨🇭', // Suisse
@@ -263,13 +260,12 @@ const getCountryFlag = (posId) => {
   return flagMapping[posId] || '🇨🇭'
 }
 
-// Computed
+
 const currentQuestion = computed(() => {
   if (questions.value.length === 0) return null
   
   const question = questions.value[currentQuestionIndex.value]
   
-  // UTILISER LA VRAIE STRUCTURE DE TA BASE (text_answer)
   return {
     id: question.id,
     text: question.content_default || question.content_lf_tf || question.content_lf_blank || 'Question sans contenu',
@@ -285,14 +281,12 @@ const progressPercentage = computed(() => {
   return (currentQuestionIndex.value / totalQuestions.value) * 100
 })
 
-// Charger les données de bataille depuis localStorage
 const loadBattleData = () => {
   try {
     const savedBattle = localStorage.getItem('currentBattle')
     if (savedBattle) {
       battleData.value = JSON.parse(savedBattle)
       
-      // Mettre à jour les données de l'adversaire
       if (battleData.value.opponent) {
         opponent.value = {
           id: battleData.value.opponent.id,

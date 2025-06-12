@@ -5,87 +5,29 @@
         <path d="M15 19l-7-7 7-7" stroke="#F7C72C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
+    
+    <!-- Loading state -->
+    <div v-if="loading" class="lessons-content">
+      <div class="loading">Chargement des leçons...</div>
+    </div>
+
     <!-- Main Content -->
-    <div class="lessons-content">
+    <div v-else class="lessons-content">
       <div class="lessons-container">
         <h1 class="section-title">LESSONS RESSOURCES</h1>
         
-        <!-- Onboarding Section -->
-        <div class="section">
-          <h2 class="section-subtitle">ONBOARDING</h2>
+        <!-- Dynamic Modules and Lessons -->
+        <div v-for="module in modules" :key="module.id" class="section">
+          <h2 class="section-subtitle">{{ module.title.toUpperCase() }}</h2>
           
           <div class="lessons-grid">
-            <div class="lesson-item" @click="openLesson('history')">
-              <p>History</p>
-              <button class="read-btn btn-primary">Read</button>
-            </div>
-            
-            <div class="lesson-item" @click="openLesson('inspiration-positioning')">
-              <p>Inspiration and Positioning</p>
-              <button class="read-btn btn-primary">Read</button>
-            </div>
-            
-            <div class="lesson-item" @click="openLesson('understanding-collection')">
-              <p>Understanding the Collection</p>
-              <button class="read-btn btn-primary">Read</button>
-            </div>
-            
-            <div class="lesson-item" @click="openLesson('storytelling')">
-              <p>Storytelling</p>
-              <button class="read-btn btn-primary">Read</button>
-            </div>
-            
-            <div class="lesson-item" @click="openLesson('main-collections')">
-              <p>Main Collections</p>
-              <button class="read-btn btn-primary">Read</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Novelties Section -->
-        <div class="section">
-          <h2 class="section-subtitle">NOVELTIES</h2>
-          
-          <div class="lessons-grid">
-            <div class="lesson-item" @click="openLesson('novelties-1')">
-              <p>Novelties 1</p>
-              <button class="read-btn btn-primary">Read</button>
-            </div>
-            
-            <div class="lesson-item" @click="openLesson('novelties-2')">
-              <p>Novelties 2</p>
-              <button class="read-btn btn-primary">Read</button>
-            </div>
-            
-            <div class="lesson-item" @click="openLesson('novelties-3')">
-              <p>Novelties 3</p>
-              <button class="read-btn btn-primary">Read</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Second Onboarding Section -->
-        <div class="section">
-          <h2 class="section-subtitle">Discovery</h2>
-          
-          <div class="lessons-grid">
-            <div class="lesson-item" @click="openLesson('history-2')">
-              <p>History</p>
-              <button class="read-btn btn-primary">Read</button>
-            </div>
-            
-            <div class="lesson-item" @click="openLesson('inspiration-positioning-2')">
-              <p>Inspiration and Positioning</p>
-              <button class="read-btn btn-primary">Read</button>
-            </div>
-            
-            <div class="lesson-item" @click="openLesson('understanding-collection-2')">
-              <p>Understanding the Collection</p>
-              <button class="read-btn btn-primary">Read</button>
-            </div>
-            
-            <div class="lesson-item" @click="openLesson('storytelling-2')">
-              <p>Storytelling</p>
+            <div 
+              v-for="lesson in module.lessons" 
+              :key="lesson.id"
+              class="lesson-item" 
+              @click="openLesson(lesson.id)"
+            >
+              <p>{{ lesson.title }}</p>
               <button class="read-btn btn-primary">Read</button>
             </div>
           </div>
@@ -96,18 +38,38 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { fetchModules } from '../../services/api.js'
+
 const router = useRouter()
+const modules = ref([])
+const loading = ref(true)
 
 const goBack = () => {
   router.back()
 }
-// Methods
+
+const loadModulesAndLessons = async () => {
+  try {
+    loading.value = true
+    const data = await fetchModules()
+    modules.value = data
+  } catch (error) {
+    console.error('Erreur lors du chargement des modules:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
 const openLesson = (lessonId) => {
   console.log(`Opening lesson: ${lessonId}`)
-  router.push(`/ressources/history`)
-  // Ici tu pourras ajouter la navigation vers la leçon spécifique
+  router.push(`/ressources/lesson/${lessonId}`)
 }
+
+onMounted(() => {
+  loadModulesAndLessons()
+})
 
 console.log('LessonsListView component loaded')
 </script>
@@ -373,4 +335,12 @@ p {
   box-shadow: 0 1px 4px rgba(33,40,80,0.15);
 }
 
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  font-size: 1.2rem;
+  color: #F7C72C;
+}
 </style>
