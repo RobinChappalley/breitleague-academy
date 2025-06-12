@@ -6,9 +6,9 @@
 
       <div class="player-info">
         <div class="avatar" :style="getAvatarStyle(currentPlayer)">
-          <img 
-            v-if="currentPlayer.avatar && currentPlayer.avatar !== currentPlayer.name?.charAt(0)" 
-            :src="getAvatarUrl(currentPlayer)" 
+          <img
+            v-if="currentPlayer.avatar && currentPlayer.avatar !== currentPlayer.name?.charAt(0)"
+            :src="getAvatarUrl(currentPlayer)"
             :alt="currentPlayer.name"
             class="avatar-image"
           />
@@ -19,19 +19,19 @@
           <span class="flag">{{ currentPlayer.flag }}</span>
         </div>
       </div>
-      
-      <div class="vs-indicator">VS</div>
 
-      <!-- ADVERSAIRE -->
+      <div class="vs-indicator">VS</div>
+      
+      <!-- ADVERSAIRE À DROITE -->
       <div class="opponent-info">
         <div class="opponent-details">
           <h3>{{ opponent.name }}</h3>
           <span class="flag">{{ opponent.flag }}</span>
         </div>
         <div class="avatar" :style="getAvatarStyle(opponent)">
-          <img 
-            v-if="opponent.avatar && opponent.avatar !== opponent.name?.charAt(0)" 
-            :src="getAvatarUrl(opponent)" 
+          <img
+            v-if="opponent.avatar && opponent.avatar !== opponent.name?.charAt(0)"
+            :src="getAvatarUrl(opponent)"
             :alt="opponent.name"
             class="avatar-image"
           />
@@ -43,27 +43,20 @@
     <!-- Progress Bar -->
     <div class="progress-container">
       <div class="progress-bar">
-        <div 
-          class="progress-fill"
-          :style="{ width: progressPercentage + '%' }"
-        ></div>
+        <div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
       </div>
-      <div class="question-counter">
-        {{ currentQuestionIndex + 1 }} / {{ totalQuestions }}
-      </div>
+      <div class="question-counter">{{ currentQuestionIndex + 1 }} / {{ totalQuestions }}</div>
     </div>
 
     <!-- Timer -->
     <div class="timer-container">
-      <div class="timer" :class="{ 'warning': timeLeft <= 5 }">
-        {{ timeLeft }}s
-      </div>
+      <div class="timer" :class="{ warning: timeLeft <= 5 }">{{ timeLeft }}s</div>
     </div>
 
     <!-- Question -->
     <div class="question-container" v-if="currentQuestion">
       <h2 class="question-text">{{ currentQuestion.text }}</h2>
-      
+
       <!-- Answer Options -->
       <div class="answers-grid">
         <button
@@ -86,8 +79,8 @@
     </div>
 
     <!-- Popup des points gagnés -->
-    <div 
-      v-if="showPointsPopup" 
+    <div
+      v-if="showPointsPopup"
       class="points-popup"
       :class="{ 'speed-bonus': pointsPopupText.includes('bonus') }"
     >
@@ -149,12 +142,12 @@ const getAvatarUrl = (user) => {
   if (!user || !user.avatar) {
     return null
   }
-  
+
   // Si c'est juste une lettre (fallback), ne pas afficher d'image
   if (typeof user.avatar === 'string' && user.avatar.length === 1) {
     return null
   }
-  
+
   // Construire l'URL complète
   const avatarUrl = user.avatar.startsWith('http') ? user.avatar : `http://localhost:8000/${user.avatar}`
   return avatarUrl
@@ -163,40 +156,43 @@ const getAvatarUrl = (user) => {
 // Récupérer les données utilisateur actuelles
 const loadCurrentUserData = async () => {
   try {
+
     // 1. Récupérer l'utilisateur authentifié
     const userResponse = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
-      headers: { 'Accept': 'application/json' }
+      headers: { Accept: 'application/json' }
     })
-    
+
     if (!userResponse.ok) {
       throw new Error('Failed to fetch authenticated user')
     }
-    
+
     const userData = await userResponse.json()
-    
+
     // 2. Récupérer les données complètes via API (AVEC POS)
     const fullUserResponse = await fetch(`http://localhost:8000/api/v1/users/${userData.id}`, {
       credentials: 'include',
-      headers: { 'Accept': 'application/json' }
+      headers: { Accept: 'application/json' }
     })
     
-    let fullUserData = userData 
+    let fullUserData = userData
     if (fullUserResponse.ok) {
       const fullUserResponseData = await fullUserResponse.json()
       fullUserData = fullUserResponseData.data || fullUserResponseData || userData
     }
-    
+
+
     currentPlayer.value = {
       id: fullUserData.id || userData.id,
       name: fullUserData.username || userData.username || 'YOU',
       avatar: fullUserData.avatar || userData.avatar || null,
-      flag: getUserFlag(fullUserData) || '🇨🇭' 
+      flag: getUserFlag(fullUserData) || '🇨🇭'
     }
+
     
   } catch (error) {
     console.warn('⚠️ Error loading current user data:', error)
-    
+
     // Fallback en cas d'erreur
     currentPlayer.value = {
       id: 1,
@@ -211,12 +207,14 @@ const getUserFlag = (userData) => {
   if (userData.pos && userData.pos.country_flag) {
     return userData.pos.country_flag
   }
-  
+
+
   if (userData.pos_id) {
     const flagFromPosId = getCountryFlag(userData.pos_id)
     return flagFromPosId
   }
-  
+
+
   return '🇨🇭'
 }
 
@@ -233,14 +231,14 @@ const getCountryFlag = (posId) => {
     9: '🇬🇧', // Royaume-Uni
     10: '🇧🇪' // Belgique
   }
-  
+
+
   return flagMapping[posId] || '🇨🇭'
 }
 
 const currentQuestion = computed(() => {
-  if (questions.value.length === 0) {
-    return null
-  }
+  if (questions.value.length === 0) {return null
+}
   
   const question = questions.value[currentQuestionIndex.value]
   
@@ -254,7 +252,7 @@ const currentQuestion = computed(() => {
     text: question.content_default || question.content_if_TF || question.content_if_blank || 'Question sans contenu',
     answers: formattedAnswers
   }
-  
+
   return result
 })
 
@@ -262,7 +260,7 @@ const formatQuestions = async (questionsList) => {
   try {
     questions.value = questionsList.map((q, index) => {
       const choices = q.choices || []
-      
+
       if (choices.length === 0) {
         console.warn(`Aucun choix pour question ${q.id}`)
         return {
@@ -271,9 +269,9 @@ const formatQuestions = async (questionsList) => {
           choices: []
         }
       }
-      
+
       let correctAnswerTexts = []
-      
+
       if (q.correct_answer_text) {
         try {
           if (typeof q.correct_answer_text === 'string') {
@@ -297,24 +295,24 @@ const formatQuestions = async (questionsList) => {
           correctAnswerTexts = []
         }
       }
-      
+
       const formattedChoices = choices.map((choice, choiceIndex) => {
         const isCorrect = correctAnswerTexts.includes(choice.text_answer)
-        
+
         return {
           id: choice.id,
           text_answer: choice.text_answer,
           is_correct: isCorrect
         }
       })
-      
+
       const correctChoices = formattedChoices.filter(c => c.is_correct)
-      
+
       if (correctChoices.length === 0) {
         console.error(` AUCUNE réponse correcte pour question ${q.id} !`)
         console.error(' correct_answer_text:', correctAnswerTexts)
         console.error(' Choix disponibles:', choices.map(c => c.text_answer))
-        
+
         if (formattedChoices.length > 0) {
           formattedChoices[0].is_correct = true
           console.warn(' FALLBACK: Premier choix marqué comme correct')
@@ -322,19 +320,19 @@ const formatQuestions = async (questionsList) => {
       } else if (correctChoices.length > 1) {
         console.error(` PLUSIEURS réponses correctes pour question ${q.id} !`)
       }
-      
+
       // Mélanger les choix
       const shuffledChoices = formattedChoices.sort(() => 0.5 - Math.random())
-      
+
       return {
         id: q.id,
         content_default: q.content_default,
         choices: shuffledChoices
       }
     })
-    
+
     totalQuestions.value = questions.value.length
-    
+
   } catch (error) {
     console.error(' Erreur formatage:', error)
     loadFallbackQuestions()
@@ -346,7 +344,8 @@ const loadBattleData = async () => {
     const savedBattle = localStorage.getItem('currentBattle')
     if (savedBattle) {
       battleData.value = JSON.parse(savedBattle)
-      
+
+
       if (battleData.value.opponent) {
         opponent.value = {
           id: battleData.value.opponent.id,
@@ -356,12 +355,12 @@ const loadBattleData = async () => {
         }
       }
     }
-    
+
     await loadQuestionsFromAPI()
-    
+
   } catch (error) {
     console.error(' Error loading battle data:', error)
-    await loadQuestionsFromAPI() 
+    await loadQuestionsFromAPI()
   }
 }
 
@@ -418,7 +417,7 @@ const loadFallbackQuestions = () => {
       ]
     }
   ]
-  
+
   totalQuestions.value = questions.value.length
 }
 
@@ -427,33 +426,33 @@ const loadSpecificQuestions = async (questionIds) => {
     if (!Array.isArray(questionIds) || questionIds.length === 0) {
       throw new Error('IDs de questions invalides')
     }
-    
+
     const questionsData = await battleService.getQuestions()
     const allQuestions = questionsData.data || questionsData || []
-    
+
     if (allQuestions.length === 0) {
       throw new Error('Aucune question disponible dans l\'API')
     }
-    
+
     const specificQuestions = questionIds.map(id => {
       const found = allQuestions.find(q => q.id === id)
       return found
-    }).filter(Boolean) 
-    
+    }).filter(Boolean)
+
     if (specificQuestions.length === 0) {
       throw new Error('Aucune question spécifique trouvée')
     }
-    
+
     await formatQuestions(specificQuestions)
-    
+
   } catch (error) {
     console.error(' Erreur lors du chargement des questions spécifiques:', error)
     console.warn('Fallback sur questions aléatoires')
-    
+
     try {
       const questionsData = await battleService.getQuestions()
       const allQuestions = questionsData.data || questionsData || []
-      
+
       if (allQuestions.length > 0) {
         const shuffled = allQuestions.sort(() => 0.5 - Math.random())
         const selectedQuestions = shuffled.slice(0, 5)
@@ -472,21 +471,21 @@ const loadQuestionsFromAPI = async () => {
   try {
     const questionsData = await battleService.getQuestions()
     const allQuestions = questionsData.data || questionsData || []
-    
+
     if (allQuestions.length === 0) {
       console.warn('⚠️ Aucune question API, utilisation du fallback')
       loadFallbackQuestions()
       return
     }
-    
+
     const superShuffleArray = (array) => {
       const shuffled = [...array]
-      
+
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
         ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
       }
-      
+
       const seed = Date.now() % 1000
       for (let i = shuffled.length - 1; i > 0; i--) {
         const randomFactor1 = Math.random()
@@ -496,42 +495,42 @@ const loadQuestionsFromAPI = async () => {
         const j = Math.floor(combinedRandom * (i + 1))
         ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
       }
-      
+
       const chunkSize = Math.max(1, Math.floor(shuffled.length / 10))
       for (let start = 0; start < shuffled.length; start += chunkSize) {
         const end = Math.min(start + chunkSize, shuffled.length)
         const chunk = shuffled.slice(start, end)
-        
+
         const rotateBy = Math.floor(Math.random() * chunk.length)
         const rotatedChunk = [...chunk.slice(rotateBy), ...chunk.slice(0, rotateBy)]
-        
+
         for (let i = 0; i < rotatedChunk.length; i++) {
           shuffled[start + i] = rotatedChunk[i]
         }
       }
-      
+
       return shuffled
     }
-    
+
     const superShuffled = superShuffleArray(allQuestions)
-    
+
     let selectedQuestions = []
-    
+
     if (superShuffled.length >= 20) {
       const step = Math.floor(superShuffled.length / 10)
       const usedIndices = new Set()
-      
+
       while (selectedQuestions.length < 5 && usedIndices.size < superShuffled.length) {
         const sectionStart = (selectedQuestions.length * step) % (superShuffled.length - step)
         const randomInSection = Math.floor(Math.random() * step)
         const candidateIndex = sectionStart + randomInSection
-        
+
         if (!usedIndices.has(candidateIndex) && candidateIndex < superShuffled.length) {
           selectedQuestions.push(superShuffled[candidateIndex])
           usedIndices.add(candidateIndex)
         }
       }
-      
+
       while (selectedQuestions.length < 5) {
         const randomIndex = Math.floor(Math.random() * superShuffled.length)
         if (!usedIndices.has(randomIndex)) {
@@ -542,16 +541,16 @@ const loadQuestionsFromAPI = async () => {
     } else if (superShuffled.length >= 10) {
       const indices = []
       const spacing = Math.floor(superShuffled.length / 5)
-      
+
       for (let i = 0; i < 5; i++) {
         const baseIndex = i * spacing
         const randomOffset = Math.floor(Math.random() * Math.min(spacing, superShuffled.length - baseIndex))
         indices.push((baseIndex + randomOffset) % superShuffled.length)
       }
-      
+
       const uniqueIndices = [...new Set(indices)]
       selectedQuestions = uniqueIndices.slice(0, 5).map(index => superShuffled[index])
-      
+
       while (selectedQuestions.length < 5 && selectedQuestions.length < superShuffled.length) {
         const randomIndex = Math.floor(Math.random() * superShuffled.length)
         const candidate = superShuffled[randomIndex]
@@ -562,9 +561,9 @@ const loadQuestionsFromAPI = async () => {
     } else {
       selectedQuestions = superShuffled.slice(0, Math.min(5, superShuffled.length))
     }
-    
+
     await formatQuestions(selectedQuestions)
-    
+
   } catch (error) {
     console.error('Erreur lors du chargement des questions depuis API:', error)
     console.warn('Fallback sur questions par défaut')
@@ -577,7 +576,7 @@ const startTimer = () => {
     clearInterval(timerInterval)
     timerInterval = null
   }
-  
+
   timerInterval = setInterval(() => {
     if (timeLeft.value > 0) {
       timeLeft.value--
@@ -598,18 +597,18 @@ const selectAnswer = (index) => {
   if (hasAnswered.value) {
     return
   }
-  
+
   // VÉRIFICATIONS DE BASE
   if (!currentQuestion.value) {
     console.error(' currentQuestion.value est null/undefined')
     return
   }
-  
+
   if (!currentQuestion.value.answers) {
     console.error('currentQuestion.value.answers est null/undefined')
     return
   }
-  
+
   if (index !== null && index >= currentQuestion.value.answers.length) {
     console.error(`Index ${index} invalide (max: ${currentQuestion.value.answers.length - 1})`)
     return
@@ -621,38 +620,38 @@ const selectAnswer = (index) => {
 
   const timeTaken = 30 - timeLeft.value
   playerTime.value += timeTaken
-  
+
   let pointsEarned = 0
   let selectedAnswerText = 'Temps écoulé'
   let isCorrect = false
   let speedBonus = 0
-  
+
   if (index !== null) {
     const selectedAnswerObj = currentQuestion.value.answers[index]
     isCorrect = selectedAnswerObj.correct === true
     selectedAnswerText = selectedAnswerObj.text
   }
-  
+
   if (isCorrect) {
     playerScore.value++
-    
+
     const basePoints = 100
-    
+
     // CALCUL DU BONUS DE RAPIDITÉ
     if (timeTaken <= 5) {
-      speedBonus = 100 
+      speedBonus = 100
     } else if (timeTaken <= 10) {
-      speedBonus = 75  
+      speedBonus = 75
     } else if (timeTaken <= 15) {
-      speedBonus = 50  
+      speedBonus = 50
     } else if (timeTaken <= 20) {
-      speedBonus = 25  
+      speedBonus = 25
     } else {
-      speedBonus = 0   
+      speedBonus = 0
     }
-    
+
     pointsEarned = basePoints + speedBonus
-    
+
     // MESSAGES DE BONUS
     if (speedBonus >= 75) {
       pointsPopupText.value = ` +${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité)`
@@ -663,13 +662,13 @@ const selectAnswer = (index) => {
     } else {
       pointsPopupText.value = ` +${pointsEarned} PTS\n(Bonne réponse !)`
     }
-    
+
     showPointsPopup.value = true
     setTimeout(() => showPointsPopup.value = false, 2500)
   } else {
     // speedBonus reste à 0 pour les mauvaises réponses
     pointsEarned = 0
-    
+
     if (index === null) {
       pointsPopupText.value = `0 PTS\n(Temps écoulé !)`
     } else if (timeTaken <= 5) {
@@ -679,12 +678,11 @@ const selectAnswer = (index) => {
     } else {
       pointsPopupText.value = ` 0 PTS\n(Mauvaise réponse)`
     }
-    
+
     showPointsPopup.value = true
-    setTimeout(() => showPointsPopup.value = false, 2000)
+    setTimeout(() => (showPointsPopup.value = false), 2000)
   }
-  
-  // Sauvegarder la réponse
+// Sauvegarder la réponse
   playerAnswers.value.push({
     questionId: currentQuestion.value?.id,
     questionText: currentQuestion.value?.text,
@@ -696,8 +694,7 @@ const selectAnswer = (index) => {
     speedCategory: getSpeedCategory(timeTaken),
     speedBonus: speedBonus
   })
-  
-  // Passage à la question suivante
+// Passage à la question suivante
   setTimeout(() => {
     try {
       nextQuestion()
@@ -732,7 +729,7 @@ const nextQuestion = () => {
     timeLeft.value = 30
     hasAnswered.value = false
     selectedAnswer.value = null
-    
+
     const nextQ = questions.value[currentQuestionIndex.value]
     if (nextQ) {
       startTimer()
@@ -747,18 +744,20 @@ const nextQuestion = () => {
 
 const finishBattle = async () => {
   stopTimer()
-  
+
   const playerTotalPoints = playerAnswers.value.reduce((total, answer) => total + answer.points, 0)
-  const playerAverageTime = playerAnswers.value.length > 0 
-    ? playerTime.value / playerAnswers.value.length 
+
+  const playerAverageTime = playerAnswers.value.length > 0
+    ? playerTime.value / playerAnswers.value.length
     : 0
-  
+
+
   const perfectAnswers = playerAnswers.value.filter(a => a.correct && a.time <= 10).length
-  const goodAnswers = playerAnswers.value.filter(a => a.correct && a.time <= 20).length
-  
+
+      const goodAnswers = playerAnswers.value.filter(a => a.correct && a.time <= 20).length
   try {
     const existingBattleId = battleData.value?.id
-    
+
     if (!existingBattleId) {
       throw new Error('ID de bataille manquant')
     }
@@ -768,9 +767,9 @@ const finishBattle = async () => {
     })
 
     const iAmChallenger = battleData.value?.isFirstPlayer === false
-    
+
     let updateData = {}
-    
+
     if (iAmChallenger) {
       updateData = {
         has_challenger_won: null,
@@ -829,28 +828,28 @@ const finishBattle = async () => {
         .find((row) => row.startsWith('XSRF-TOKEN='))
         ?.split('=')[1] ?? ''
     )
-    
+
     const response = await fetch(`http://localhost:8000/api/v1/battles/${existingBattleId}`, {
       method: 'PUT',
       credentials: 'include',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'X-XSRF-TOKEN': csrfToken
       },
       body: JSON.stringify(updateData)
     })
-    
+
     if (!response.ok) {
       const errorText = await response.text()
       throw new Error(`API Error: ${response.status} - ${errorText}`)
     }
-    
+
     const updatedBattle = await response.json()
     const battle = updatedBattle.data || updatedBattle
-    
+
     const bothPlayersFinished = battle.challenger_summary && battle.challenged_summary
-    
+
     if (bothPlayersFinished) {
       await router.push(`/battle-details/${existingBattleId}`)
     } else {
@@ -870,7 +869,7 @@ const getAnswerClass = (index) => {
   const selectedAnswerObj = currentQuestion.value?.answers[index]
   const isSelectedAnswer = selectedAnswer.value === index
   const isCorrectAnswer = selectedAnswerObj?.correct === true
-  
+
   if (isSelectedAnswer) {
     return isCorrectAnswer ? 'correct' : 'incorrect'
   }
@@ -878,7 +877,7 @@ const getAnswerClass = (index) => {
   if (isCorrectAnswer) {
     return 'correct-answer'
   }
-  
+
   return 'disabled'
 }
 
@@ -890,7 +889,7 @@ const getAvatarStyle = (player) => {
     'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
     'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
   ]
-  
+
   const index = (player.id || 0) % gradients.length
   return {
     background: gradients[index]
@@ -901,7 +900,7 @@ onMounted(async () => {
   await loadCurrentUserData()
   
   await loadBattleData()
-  
+
   setTimeout(() => {
     if (questions.value.length > 0) {
       startTimer()
@@ -920,7 +919,7 @@ onUnmounted(() => {
 .battle-quiz-page {
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, #072C54 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #072c54 0%, #1e3a8a 100%);
   color: white;
   padding: 1rem;
   padding-bottom: 100px;
@@ -958,7 +957,7 @@ onUnmounted(() => {
 
 .opponent-details {
   text-align: right;
-  order: -1; 
+  order: -1;
 }
 
 .avatar {
@@ -971,7 +970,7 @@ onUnmounted(() => {
   justify-content: center;
   font-weight: bold;
   font-size: 1.5rem;
-  border: 3px solid #F7C72C;
+  border: 3px solid #f7c72c;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   flex-shrink: 0;
@@ -1005,7 +1004,7 @@ onUnmounted(() => {
 .vs-indicator {
   font-size: 2rem;
   font-weight: 700;
-  color: #F7C72C;
+  color: #f7c72c;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
 }
@@ -1027,7 +1026,7 @@ onUnmounted(() => {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #F7C72C 0%, #E6B625 100%);
+  background: linear-gradient(90deg, #f7c72c 0%, #e6b625 100%);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -1035,7 +1034,7 @@ onUnmounted(() => {
 .question-counter {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #F7C72C;
+  color: #f7c72c;
 }
 
 /* TIMER */
@@ -1048,7 +1047,7 @@ onUnmounted(() => {
   display: inline-block;
   font-size: 3rem;
   font-weight: 700;
-  color: #F7C72C;
+  color: #f7c72c;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   width: 100px;
@@ -1061,13 +1060,17 @@ onUnmounted(() => {
 }
 
 .timer.warning {
-  color: #FF4444;
+  color: #ff4444;
   animation: pulse 0.5s ease-in-out infinite alternate;
 }
 
 @keyframes pulse {
-  from { transform: scale(1); }
-  to { transform: scale(1.1); }
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
 }
 
 /* QUESTION */
@@ -1106,7 +1109,7 @@ onUnmounted(() => {
 
 .answer-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.2);
-  border-color: #F7C72C;
+  border-color: #f7c72c;
   transform: translateY(-2px);
 }
 
@@ -1117,7 +1120,7 @@ onUnmounted(() => {
 /* COULEURS DES RÉPONSES AMÉLIORÉES */
 .answer-btn.correct {
   background: rgba(76, 175, 80, 0.4) !important;
-  border-color: #4CAF50 !important;
+  border-color: #4caf50 !important;
   color: white !important;
   box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
   animation: correctPulse 0.6s ease-out;
@@ -1125,7 +1128,7 @@ onUnmounted(() => {
 
 .answer-btn.incorrect {
   background: rgba(244, 67, 54, 0.4) !important;
-  border-color: #F44336 !important;
+  border-color: #f44336 !important;
   color: white !important;
   box-shadow: 0 0 15px rgba(244, 67, 54, 0.5);
   animation: incorrectShake 0.6s ease-out;
@@ -1133,8 +1136,8 @@ onUnmounted(() => {
 
 .answer-btn.correct-answer {
   background: rgba(76, 175, 80, 0.2) !important;
-  border-color: #4CAF50 !important;
-  color: #4CAF50 !important;
+  border-color: #4caf50 !important;
+  color: #4caf50 !important;
   animation: correctGlow 0.6s ease-out;
 }
 
@@ -1146,21 +1149,43 @@ onUnmounted(() => {
 
 /* ANIMATIONS */
 @keyframes correctPulse {
-  0% { transform: scale(1); box-shadow: 0 0 0 rgba(76, 175, 80, 0.5); }
-  50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(76, 175, 80, 0.8); }
-  100% { transform: scale(1); box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); }
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(76, 175, 80, 0.5);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+  }
 }
 
 @keyframes incorrectShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  75% { transform: translateX(10px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  75% {
+    transform: translateX(10px);
+  }
 }
 
 @keyframes correctGlow {
-  0% { box-shadow: 0 0 0 rgba(76, 175, 80, 0); }
-  50% { box-shadow: 0 0 15px rgba(76, 175, 80, 0.6); }
-  100% { box-shadow: 0 0 10px rgba(76, 175, 80, 0.3); }
+  0% {
+    box-shadow: 0 0 0 rgba(76, 175, 80, 0);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+  }
 }
 
 /* AFFICHAGE DES POINTS GAGNÉS */
@@ -1170,7 +1195,7 @@ onUnmounted(() => {
   left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(247, 199, 44, 0.95);
-  color: #072C54;
+  color: #072c54;
   padding: 1.5rem 2rem;
   border-radius: 15px;
   font-size: 1.3rem;
@@ -1181,46 +1206,58 @@ onUnmounted(() => {
   text-align: center;
   white-space: pre-line;
   line-height: 1.3;
-  border: 3px solid #072C54;
+  border: 3px solid #072c54;
 }
 
 .points-popup.speed-bonus {
-  background: linear-gradient(135deg, #4CAF50 0%, #F7C72C 100%);
+  background: linear-gradient(135deg, #4caf50 0%, #f7c72c 100%);
   color: white;
-  border-color: #4CAF50;
+  border-color: #4caf50;
   animation: speedBonusShow 2.5s ease-out forwards;
 }
 
 @keyframes speedBonusShow {
-  0% { 
-    opacity: 0; 
-    transform: translate(-50%, -50%) scale(0.5) rotate(-10deg); 
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5) rotate(-10deg);
   }
-  20% { 
-    opacity: 1; 
-    transform: translate(-50%, -50%) scale(1.2) rotate(2deg); 
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2) rotate(2deg);
   }
-  40% { 
-    transform: translate(-50%, -50%) scale(1.1) rotate(-1deg); 
+  40% {
+    transform: translate(-50%, -50%) scale(1.1) rotate(-1deg);
   }
-  60% { 
-    transform: translate(-50%, -50%) scale(1.05) rotate(0.5deg); 
+  60% {
+    transform: translate(-50%, -50%) scale(1.05) rotate(0.5deg);
   }
-  80% { 
-    opacity: 1; 
-    transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
   }
-  100% { 
-    opacity: 0; 
-    transform: translate(-50%, -50%) scale(0.9) rotate(0deg); 
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9) rotate(0deg);
   }
 }
 
 @keyframes pointsShow {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-  80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
 }
 
 /* LOADING STATE */
@@ -1233,55 +1270,58 @@ onUnmounted(() => {
   width: 50px;
   height: 50px;
   border: 4px solid rgba(247, 199, 44, 0.3);
-  border-top: 4px solid #F7C72C;
+  border-top: 4px solid #f7c72c;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem auto;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* RESPONSIVE */
 @media (min-width: 768px) {
   .battle-quiz-page {
-    margin-left: 280px;
-    width: calc(100% - 280px);
+    width: 100%;
     padding: 2rem;
     padding-bottom: 2rem;
   }
-  
+
   .battle-header {
     padding: 3rem 2rem;
   }
-  
+
   .avatar {
     width: 80px;
     height: 80px;
     font-size: 2rem;
   }
-  
+
   .vs-indicator {
     font-size: 3rem;
   }
-  
+
   .question-text {
     font-size: 2rem;
     margin-bottom: 4rem;
   }
-  
+
   .answers-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
-  
+
   .answer-btn {
     padding: 2rem;
     font-size: 1.2rem;
   }
-  
+
   .timer {
     width: 120px;
     height: 120px;
@@ -1296,13 +1336,13 @@ onUnmounted(() => {
     padding: 1rem;
     padding-bottom: 80px;
   }
-  
+
   .battle-header {
     padding: 1rem;
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   /* Mobile : garder la même logique mais en vertical */
   .player-info,
   .opponent-info {
@@ -1310,37 +1350,37 @@ onUnmounted(() => {
     justify-content: center;
     width: 100%;
   }
-  
+
   .opponent-info {
-    flex-direction: row-reverse; 
+    flex-direction: row-reverse;
   }
-  
+
   .opponent-details {
-    text-align: left; 
+    text-align: left;
     order: 0;
   }
-  
+
   .vs-indicator {
     font-size: 1.5rem;
     order: 1;
   }
-  
+
   .avatar {
     width: 50px;
     height: 50px;
     font-size: 1.2rem;
   }
-  
+
   .question-text {
     font-size: 1.2rem;
     margin-bottom: 2rem;
   }
-  
+
   .answer-btn {
     padding: 1rem;
     font-size: 1rem;
   }
-  
+
   .timer {
     width: 80px;
     height: 80px;

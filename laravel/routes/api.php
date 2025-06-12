@@ -60,4 +60,5 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('user-missions', UserMissionController::class)->parameters([
         'user-missions' => 'userMission'
     ]);
+    Route::get('/lessons/{lesson}/theories', [LessonController::class, 'getTheories']);
 });
