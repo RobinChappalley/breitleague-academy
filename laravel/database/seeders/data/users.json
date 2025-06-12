@@ -1,7 +1,7 @@
 [
     {
         "id": 1,
-        "username": "rafael.dupuis",
+        "username": "r.dupuis",
         "email": "rafael.dupuis@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 1,
@@ -141,7 +141,7 @@
     },
     {
         "id": 11,
-        "username": "cedrine",
+        "username": "c.drine",
         "email": "cedrine@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 1,
@@ -156,7 +156,7 @@
 
     {
         "id": 12,
-        "username": "novawilder",
+        "username": "n.wilder",
         "email": "novawilder@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 2,
@@ -170,7 +170,7 @@
     },
     {
         "id": 13,
-        "username": "zanemorton",
+        "username": "z.morton",
         "email": "zanemorton@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 3,
@@ -184,7 +184,7 @@
     },
     {
         "id": 14,
-        "username": "lyrahart",
+        "username": "l.hart",
         "email": "lyrahart@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 4,
@@ -198,7 +198,7 @@
     },
     {
         "id": 15,
-        "username": "kaitorres",
+        "username": "k.torres",
         "email": "kaitorres@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 5,
@@ -212,7 +212,7 @@
     },
     {
         "id": 16,
-        "username": "miaverne",
+        "username": "m.verne",
         "email": "miaverne@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 5,
@@ -226,7 +226,7 @@
     },
     {
         "id": 17,
-        "username": "dorianfox",
+        "username": "d.fox",
         "email": "dorianfox@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 6,
@@ -240,7 +240,7 @@
     },
     {
         "id": 18,
-        "username": "ivykemp",
+        "username": "v.kemp",
         "email": "ivykemp@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 6,
@@ -254,7 +254,7 @@
     },
     {
         "id": 19,
-        "username": "leonvargas",
+        "username": "l.vargas",
         "email": "leonvargas@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 6,
@@ -268,7 +268,7 @@
     },
     {
         "id": 20,
-        "username": "noasavage",
+        "username": "n.savage",
         "email": "noasavage@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 1,
@@ -282,7 +282,7 @@
     },
     {
         "id": 21,
-        "username": "cleoblake",
+        "username": "c.blake",
         "email": "cleoblake@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 9,
@@ -296,7 +296,7 @@
     },
     {
         "id": 22,
-        "username": "nolanray",
+        "username": "t.ray",
         "email": "nolanray@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 8,
@@ -310,7 +310,7 @@
     },
     {
         "id": 23,
-        "username": "ariaknox",
+        "username": "a.knox",
         "email": "ariaknox@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 7,
@@ -324,7 +324,7 @@
     },
     {
         "id": 24,
-        "username": "rubensoto",
+        "username": "r.soto",
         "email": "rubensoto@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 7,
@@ -338,7 +338,7 @@
     },
     {
         "id": 25,
-        "username": "zeldamoon",
+        "username": "z.moon",
         "email": "zeldamoon@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 10,
@@ -352,7 +352,7 @@
     },
     {
         "id": 26,
-        "username": "quentinlane",
+        "username": "q.lane",
         "email": "quentinlane@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 2,
@@ -366,7 +366,7 @@
     },
     {
         "id": 27,
-        "username": "jademarlow",
+        "username": "j.marlow",
         "email": "jademarlow@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 2,
@@ -380,7 +380,7 @@
     },
     {
         "id": 28,
-        "username": "ezrafrost",
+        "username": "e.frost",
         "email": "ezrafrost@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 3,
@@ -394,7 +394,7 @@
     },
     {
         "id": 29,
-        "username": "ninaquinn",
+        "username": "n.quinn",
         "email": "ninaquinn@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 1,
@@ -408,7 +408,7 @@
     },
     {
         "id": 30,
-        "username": "ronansteel",
+        "username": "r.steel",
         "email": "ronansteel@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 3,
@@ -422,7 +422,7 @@
     },
     {
         "id": 31,
-        "username": "violetkerr",
+        "username": "v.kerr",
         "email": "violetkerr@example.com",
         "password": "$2y$12$n5mGe47e4RwEKz4d4OXy3OlSyZuhGyWwODCB9ZsKDfeyxo2E1SICG",
         "pos_id": 6,

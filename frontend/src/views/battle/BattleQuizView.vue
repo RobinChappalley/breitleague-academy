@@ -2,7 +2,8 @@
   <div class="battle-quiz-page">
     <!-- Battle Header Info -->
     <div class="battle-header">
-      <!-- UTILISATEUR AUTHENTIFIÉ À GAUCHE -->
+      <!-- UTILISATEUR AUTHENTIFIÉ -->
+
       <div class="player-info">
         <div class="avatar" :style="getAvatarStyle(currentPlayer)">
           <img
@@ -20,7 +21,7 @@
       </div>
 
       <div class="vs-indicator">VS</div>
-
+      
       <!-- ADVERSAIRE À DROITE -->
       <div class="opponent-info">
         <div class="opponent-details">
@@ -107,7 +108,7 @@ const opponent = ref({
   flag: '🇩🇪'
 })
 
-// MODIFIER : Initialisation par défaut plus neutre
+// Initialisation par défaut plus neutre
 const currentPlayer = ref({
   id: null,
   name: 'Chargement...',
@@ -136,34 +137,25 @@ const questions = ref([])
 const showPointsPopup = ref(false)
 const pointsPopupText = ref('')
 
-// FONCTION AMÉLIORÉE : Récupérer l'URL de l'avatar
+// Récupérer l'URL de l'avatar
 const getAvatarUrl = (user) => {
-  console.log('🖼️ Getting avatar for user:', user)
-
   if (!user || !user.avatar) {
-    console.log('❌ No avatar data for user:', user?.name)
     return null
   }
 
   // Si c'est juste une lettre (fallback), ne pas afficher d'image
   if (typeof user.avatar === 'string' && user.avatar.length === 1) {
-    console.log('❌ Avatar is just initial:', user.avatar)
     return null
   }
 
   // Construire l'URL complète
-  const avatarUrl = user.avatar.startsWith('http')
-    ? user.avatar
-    : `http://localhost:8000/${user.avatar}`
-  console.log('✅ Avatar URL for', user.name, ':', avatarUrl)
-
+  const avatarUrl = user.avatar.startsWith('http') ? user.avatar : `http://localhost:8000/${user.avatar}`
   return avatarUrl
 }
 
-// FONCTION CORRIGÉE : Récupérer les données utilisateur actuelles
+// Récupérer les données utilisateur actuelles
 const loadCurrentUserData = async () => {
   try {
-    console.log('🔄 Loading current user data...')
 
     // 1. Récupérer l'utilisateur authentifié
     const userResponse = await fetch('http://localhost:8000/api/user', {
@@ -176,35 +168,28 @@ const loadCurrentUserData = async () => {
     }
 
     const userData = await userResponse.json()
-    console.log('📋 Raw authenticated user data:', userData)
 
-    // 2. Récupérer les données complètes via ton API (AVEC POS)
+    // 2. Récupérer les données complètes via API (AVEC POS)
     const fullUserResponse = await fetch(`http://localhost:8000/api/v1/users/${userData.id}`, {
       credentials: 'include',
       headers: { Accept: 'application/json' }
     })
-
-    let fullUserData = userData // Fallback sur les données de base
-
+    
+    let fullUserData = userData
     if (fullUserResponse.ok) {
       const fullUserResponseData = await fullUserResponse.json()
       fullUserData = fullUserResponseData.data || fullUserResponseData || userData
-      console.log('📋 Full user data from API:', fullUserData)
-    } else {
-      console.warn('⚠️ Could not fetch full user data, using basic auth data')
     }
 
-    // 3. METTRE À JOUR currentPlayer avec les VRAIES données
+
     currentPlayer.value = {
       id: fullUserData.id || userData.id,
       name: fullUserData.username || userData.username || 'YOU',
       avatar: fullUserData.avatar || userData.avatar || null,
-      flag: getUserFlag(fullUserData) || '🇨🇭' // UTILISER LA NOUVELLE FONCTION
+      flag: getUserFlag(fullUserData) || '🇨🇭'
     }
 
-    console.log('✅ Current player loaded:', currentPlayer.value)
-    console.log('🖼️ Avatar path:', currentPlayer.value.avatar)
-    console.log('🚩 Flag from pos:', fullUserData.pos?.country_flag)
+    
   } catch (error) {
     console.warn('⚠️ Error loading current user data:', error)
 
@@ -218,27 +203,21 @@ const loadCurrentUserData = async () => {
   }
 }
 
-// NOUVELLE FONCTION : Récupérer le drapeau depuis la relation pos
 const getUserFlag = (userData) => {
-  // 1. Essayer d'abord depuis pos.country_flag (la vraie source)
   if (userData.pos && userData.pos.country_flag) {
-    console.log('✅ Flag from pos.country_flag:', userData.pos.country_flag)
     return userData.pos.country_flag
   }
 
-  // 2. Fallback sur le mapping pos_id si pas de country_flag
+
   if (userData.pos_id) {
     const flagFromPosId = getCountryFlag(userData.pos_id)
-    console.log('⚠️ Fallback flag from pos_id mapping:', flagFromPosId)
     return flagFromPosId
   }
 
-  // 3. Fallback final
-  console.log('❌ No flag found, using default')
+
   return '🇨🇭'
 }
 
-// GARDER LA FONCTION DE MAPPING COMME FALLBACK
 const getCountryFlag = (posId) => {
   const flagMapping = {
     1: '🇨🇭', // Suisse
@@ -253,45 +232,120 @@ const getCountryFlag = (posId) => {
     10: '🇧🇪' // Belgique
   }
 
-  console.log('🚩 Converting pos_id to flag:', posId, '->', flagMapping[posId])
+
   return flagMapping[posId] || '🇨🇭'
 }
 
-// Computed
 const currentQuestion = computed(() => {
-  if (questions.value.length === 0) return null
-
+  if (questions.value.length === 0) {return null
+}
+  
   const question = questions.value[currentQuestionIndex.value]
+  
+  const formattedAnswers = question.choices?.map((choice, index) => ({
+    text: choice.text_answer,
+    correct: choice.is_correct
+  })) || []
 
-  // UTILISER LA VRAIE STRUCTURE DE TA BASE (text_answer)
-  return {
+  const result = {
     id: question.id,
-    text:
-      question.content_default ||
-      question.content_lf_tf ||
-      question.content_lf_blank ||
-      'Question sans contenu',
-    answers:
-      question.choices?.map((choice) => ({
-        text: choice.text_answer || choice.content || choice.text,
-        correct: choice.is_correct || choice.correct || false
-      })) || []
+    text: question.content_default || question.content_if_TF || question.content_if_blank || 'Question sans contenu',
+    answers: formattedAnswers
   }
+
+  return result
 })
 
-const progressPercentage = computed(() => {
-  if (totalQuestions.value === 0) return 0
-  return (currentQuestionIndex.value / totalQuestions.value) * 100
-})
+const formatQuestions = async (questionsList) => {
+  try {
+    questions.value = questionsList.map((q, index) => {
+      const choices = q.choices || []
 
-// Charger les données de bataille depuis localStorage
-const loadBattleData = () => {
+      if (choices.length === 0) {
+        console.warn(`Aucun choix pour question ${q.id}`)
+        return {
+          id: q.id,
+          content_default: q.content_default,
+          choices: []
+        }
+      }
+
+      let correctAnswerTexts = []
+
+      if (q.correct_answer_text) {
+        try {
+          if (typeof q.correct_answer_text === 'string') {
+            correctAnswerTexts = JSON.parse(q.correct_answer_text)
+          } else if (Array.isArray(q.correct_answer_text)) {
+            correctAnswerTexts = q.correct_answer_text
+          } else {
+            correctAnswerTexts = [q.correct_answer_text]
+          }
+        } catch (e) {
+          console.warn(' Erreur parsing correct_answer_text, fallback sur string direct')
+          correctAnswerTexts = [q.correct_answer_text]
+        }
+      } else {
+        console.warn(' Pas de correct_answer_text, essai avec correct_choice_id')
+        const correctChoice = choices.find(c => parseInt(c.id) === parseInt(q.correct_choice_id))
+        if (correctChoice) {
+          correctAnswerTexts = [correctChoice.text_answer]
+        } else {
+          console.error(' Aucune méthode pour identifier la bonne réponse !')
+          correctAnswerTexts = []
+        }
+      }
+
+      const formattedChoices = choices.map((choice, choiceIndex) => {
+        const isCorrect = correctAnswerTexts.includes(choice.text_answer)
+
+        return {
+          id: choice.id,
+          text_answer: choice.text_answer,
+          is_correct: isCorrect
+        }
+      })
+
+      const correctChoices = formattedChoices.filter(c => c.is_correct)
+
+      if (correctChoices.length === 0) {
+        console.error(` AUCUNE réponse correcte pour question ${q.id} !`)
+        console.error(' correct_answer_text:', correctAnswerTexts)
+        console.error(' Choix disponibles:', choices.map(c => c.text_answer))
+
+        if (formattedChoices.length > 0) {
+          formattedChoices[0].is_correct = true
+          console.warn(' FALLBACK: Premier choix marqué comme correct')
+        }
+      } else if (correctChoices.length > 1) {
+        console.error(` PLUSIEURS réponses correctes pour question ${q.id} !`)
+      }
+
+      // Mélanger les choix
+      const shuffledChoices = formattedChoices.sort(() => 0.5 - Math.random())
+
+      return {
+        id: q.id,
+        content_default: q.content_default,
+        choices: shuffledChoices
+      }
+    })
+
+    totalQuestions.value = questions.value.length
+
+  } catch (error) {
+    console.error(' Erreur formatage:', error)
+    loadFallbackQuestions()
+  }
+}
+
+const loadBattleData = async () => {
   try {
     const savedBattle = localStorage.getItem('currentBattle')
     if (savedBattle) {
       battleData.value = JSON.parse(savedBattle)
 
-      // Mettre à jour les données de l'adversaire
+
       if (battleData.value.opponent) {
         opponent.value = {
           id: battleData.value.opponent.id,
@@ -299,32 +353,17 @@ const loadBattleData = () => {
           avatar: battleData.value.opponent.avatar,
           flag: battleData.value.opponent.flag || '🇩🇪'
         }
-
-        console.log('✅ Opponent data loaded:', opponent.value)
-        console.log('🖼️ Opponent avatar:', battleData.value.opponent.avatar)
       }
-
-      // Charger les questions depuis la base de données
-      if (battleData.value.questions && battleData.value.questions.length > 0) {
-        questions.value = battleData.value.questions
-        totalQuestions.value = questions.value.length
-
-        console.log('✅ Questions loaded from database:', questions.value.length, 'questions')
-      } else {
-        console.warn('⚠️ No questions found in battle data, using fallback')
-        loadFallbackQuestions()
-      }
-    } else {
-      console.warn('⚠️ No battle data found, using fallback')
-      loadFallbackQuestions()
     }
+
+    await loadQuestionsFromAPI()
+
   } catch (error) {
-    console.error('❌ Error loading battle data:', error)
-    loadFallbackQuestions()
+    console.error(' Error loading battle data:', error)
+    await loadQuestionsFromAPI()
   }
 }
 
-// Questions de fallback si problème avec la base
 const loadFallbackQuestions = () => {
   questions.value = [
     {
@@ -380,16 +419,169 @@ const loadFallbackQuestions = () => {
   ]
 
   totalQuestions.value = questions.value.length
-  console.log('🔄 Using fallback questions:', questions.value.length)
 }
 
-// Methods (le reste des méthodes reste identique...)
+const loadSpecificQuestions = async (questionIds) => {
+  try {
+    if (!Array.isArray(questionIds) || questionIds.length === 0) {
+      throw new Error('IDs de questions invalides')
+    }
+
+    const questionsData = await battleService.getQuestions()
+    const allQuestions = questionsData.data || questionsData || []
+
+    if (allQuestions.length === 0) {
+      throw new Error('Aucune question disponible dans l\'API')
+    }
+
+    const specificQuestions = questionIds.map(id => {
+      const found = allQuestions.find(q => q.id === id)
+      return found
+    }).filter(Boolean)
+
+    if (specificQuestions.length === 0) {
+      throw new Error('Aucune question spécifique trouvée')
+    }
+
+    await formatQuestions(specificQuestions)
+
+  } catch (error) {
+    console.error(' Erreur lors du chargement des questions spécifiques:', error)
+    console.warn('Fallback sur questions aléatoires')
+
+    try {
+      const questionsData = await battleService.getQuestions()
+      const allQuestions = questionsData.data || questionsData || []
+
+      if (allQuestions.length > 0) {
+        const shuffled = allQuestions.sort(() => 0.5 - Math.random())
+        const selectedQuestions = shuffled.slice(0, 5)
+        await formatQuestions(selectedQuestions)
+      } else {
+        throw new Error('Aucune question disponible')
+      }
+    } catch (fallbackError) {
+      console.error(' Erreur fallback:', fallbackError)
+      loadFallbackQuestions()
+    }
+  }
+}
+
+const loadQuestionsFromAPI = async () => {
+  try {
+    const questionsData = await battleService.getQuestions()
+    const allQuestions = questionsData.data || questionsData || []
+
+    if (allQuestions.length === 0) {
+      console.warn('⚠️ Aucune question API, utilisation du fallback')
+      loadFallbackQuestions()
+      return
+    }
+
+    const superShuffleArray = (array) => {
+      const shuffled = [...array]
+
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+      }
+
+      const seed = Date.now() % 1000
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const randomFactor1 = Math.random()
+        const randomFactor2 = Math.sin(seed + i)
+        const randomFactor3 = (new Date().getMilliseconds()) / 1000
+        const combinedRandom = Math.abs(randomFactor1 + randomFactor2 + randomFactor3) % 1
+        const j = Math.floor(combinedRandom * (i + 1))
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+      }
+
+      const chunkSize = Math.max(1, Math.floor(shuffled.length / 10))
+      for (let start = 0; start < shuffled.length; start += chunkSize) {
+        const end = Math.min(start + chunkSize, shuffled.length)
+        const chunk = shuffled.slice(start, end)
+
+        const rotateBy = Math.floor(Math.random() * chunk.length)
+        const rotatedChunk = [...chunk.slice(rotateBy), ...chunk.slice(0, rotateBy)]
+
+        for (let i = 0; i < rotatedChunk.length; i++) {
+          shuffled[start + i] = rotatedChunk[i]
+        }
+      }
+
+      return shuffled
+    }
+
+    const superShuffled = superShuffleArray(allQuestions)
+
+    let selectedQuestions = []
+
+    if (superShuffled.length >= 20) {
+      const step = Math.floor(superShuffled.length / 10)
+      const usedIndices = new Set()
+
+      while (selectedQuestions.length < 5 && usedIndices.size < superShuffled.length) {
+        const sectionStart = (selectedQuestions.length * step) % (superShuffled.length - step)
+        const randomInSection = Math.floor(Math.random() * step)
+        const candidateIndex = sectionStart + randomInSection
+
+        if (!usedIndices.has(candidateIndex) && candidateIndex < superShuffled.length) {
+          selectedQuestions.push(superShuffled[candidateIndex])
+          usedIndices.add(candidateIndex)
+        }
+      }
+
+      while (selectedQuestions.length < 5) {
+        const randomIndex = Math.floor(Math.random() * superShuffled.length)
+        if (!usedIndices.has(randomIndex)) {
+          selectedQuestions.push(superShuffled[randomIndex])
+          usedIndices.add(randomIndex)
+        }
+      }
+    } else if (superShuffled.length >= 10) {
+      const indices = []
+      const spacing = Math.floor(superShuffled.length / 5)
+
+      for (let i = 0; i < 5; i++) {
+        const baseIndex = i * spacing
+        const randomOffset = Math.floor(Math.random() * Math.min(spacing, superShuffled.length - baseIndex))
+        indices.push((baseIndex + randomOffset) % superShuffled.length)
+      }
+
+      const uniqueIndices = [...new Set(indices)]
+      selectedQuestions = uniqueIndices.slice(0, 5).map(index => superShuffled[index])
+
+      while (selectedQuestions.length < 5 && selectedQuestions.length < superShuffled.length) {
+        const randomIndex = Math.floor(Math.random() * superShuffled.length)
+        const candidate = superShuffled[randomIndex]
+        if (!selectedQuestions.some(q => q.id === candidate.id)) {
+          selectedQuestions.push(candidate)
+        }
+      }
+    } else {
+      selectedQuestions = superShuffled.slice(0, Math.min(5, superShuffled.length))
+    }
+
+    await formatQuestions(selectedQuestions)
+
+  } catch (error) {
+    console.error('Erreur lors du chargement des questions depuis API:', error)
+    console.warn('Fallback sur questions par défaut')
+    loadFallbackQuestions()
+  }
+}
+
 const startTimer = () => {
+  if (timerInterval) {
+    clearInterval(timerInterval)
+    timerInterval = null
+  }
+
   timerInterval = setInterval(() => {
     if (timeLeft.value > 0) {
       timeLeft.value--
     } else {
-      selectAnswer(null)
+      selectAnswer(null) // Temps écoulé
     }
   }, 1000)
 }
@@ -402,8 +594,26 @@ const stopTimer = () => {
 }
 
 const selectAnswer = (index) => {
-  if (hasAnswered.value) return
+  if (hasAnswered.value) {
+    return
+  }
 
+  // VÉRIFICATIONS DE BASE
+  if (!currentQuestion.value) {
+    console.error(' currentQuestion.value est null/undefined')
+    return
+  }
+
+  if (!currentQuestion.value.answers) {
+    console.error('currentQuestion.value.answers est null/undefined')
+    return
+  }
+
+  if (index !== null && index >= currentQuestion.value.answers.length) {
+    console.error(`Index ${index} invalide (max: ${currentQuestion.value.answers.length - 1})`)
+    return
+  }
+  
   selectedAnswer.value = index
   hasAnswered.value = true
   stopTimer()
@@ -411,66 +621,106 @@ const selectAnswer = (index) => {
   const timeTaken = 30 - timeLeft.value
   playerTime.value += timeTaken
 
-  const opponentTime = Math.floor(Math.random() * 25) + 3
-
-  let isCorrect = false
-  let selectedAnswerText = 'Pas de réponse'
   let pointsEarned = 0
+  let selectedAnswerText = 'Temps écoulé'
+  let isCorrect = false
+  let speedBonus = 0
 
-  if (index !== null && currentQuestion.value?.answers[index]) {
-    isCorrect = currentQuestion.value.answers[index].correct
-    selectedAnswerText = currentQuestion.value.answers[index].text
-
-    if (isCorrect) {
-      playerScore.value++
-
-      const basePoints = 100
-      let speedBonus = 0
-
-      if (timeTaken < opponentTime) {
-        const timeDifference = opponentTime - timeTaken
-
-        if (timeDifference >= 15) {
-          speedBonus = 75
-        } else if (timeDifference >= 10) {
-          speedBonus = 50
-        } else if (timeDifference >= 5) {
-          speedBonus = 30
-        } else {
-          speedBonus = 15
-        }
-      }
-
-      pointsEarned = basePoints + speedBonus
-
-      if (speedBonus > 0) {
-        pointsPopupText.value = `+${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité vs adversaire)`
-      } else {
-        pointsPopupText.value = `+${pointsEarned} PTS\n(Adversaire était plus rapide)`
-      }
-
-      showPointsPopup.value = true
-      setTimeout(() => (showPointsPopup.value = false), 2500)
-    } else {
-      pointsPopupText.value = `0 PTS\n(Mauvaise réponse)`
-      showPointsPopup.value = true
-      setTimeout(() => (showPointsPopup.value = false), 2000)
-    }
+  if (index !== null) {
+    const selectedAnswerObj = currentQuestion.value.answers[index]
+    isCorrect = selectedAnswerObj.correct === true
+    selectedAnswerText = selectedAnswerObj.text
   }
 
+  if (isCorrect) {
+    playerScore.value++
+
+    const basePoints = 100
+
+    // CALCUL DU BONUS DE RAPIDITÉ
+    if (timeTaken <= 5) {
+      speedBonus = 100
+    } else if (timeTaken <= 10) {
+      speedBonus = 75
+    } else if (timeTaken <= 15) {
+      speedBonus = 50
+    } else if (timeTaken <= 20) {
+      speedBonus = 25
+    } else {
+      speedBonus = 0
+    }
+
+    pointsEarned = basePoints + speedBonus
+
+    // MESSAGES DE BONUS
+    if (speedBonus >= 75) {
+      pointsPopupText.value = ` +${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité)`
+    } else if (speedBonus >= 25) {
+      pointsPopupText.value = ` +${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité)`
+    } else if (speedBonus > 0) {
+      pointsPopupText.value = `+${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité)`
+    } else {
+      pointsPopupText.value = ` +${pointsEarned} PTS\n(Bonne réponse !)`
+    }
+
+    showPointsPopup.value = true
+    setTimeout(() => showPointsPopup.value = false, 2500)
+  } else {
+    // speedBonus reste à 0 pour les mauvaises réponses
+    pointsEarned = 0
+
+    if (index === null) {
+      pointsPopupText.value = `0 PTS\n(Temps écoulé !)`
+    } else if (timeTaken <= 5) {
+      pointsPopupText.value = ` 0 PTS\n(Trop rapide, mauvaise réponse !)`
+    } else if (timeTaken >= 25) {
+      pointsPopupText.value = ` 0 PTS\n(Temps presque écoulé...)`
+    } else {
+      pointsPopupText.value = ` 0 PTS\n(Mauvaise réponse)`
+    }
+
+    showPointsPopup.value = true
+    setTimeout(() => (showPointsPopup.value = false), 2000)
+  }
+// Sauvegarder la réponse
   playerAnswers.value.push({
     questionId: currentQuestion.value?.id,
     questionText: currentQuestion.value?.text,
     selectedAnswer: selectedAnswerText,
     correct: isCorrect,
     time: timeTaken,
-    opponentTime: opponentTime,
     timeLeft: timeLeft.value,
     points: pointsEarned,
-    speedBonus: isCorrect ? (timeTaken < opponentTime ? true : false) : false
+    speedCategory: getSpeedCategory(timeTaken),
+    speedBonus: speedBonus
   })
+// Passage à la question suivante
+  setTimeout(() => {
+    try {
+      nextQuestion()
+    } catch (error) {
+      console.error(' Erreur dans nextQuestion():', error)
+      // Fallback en cas d'erreur
+      if (currentQuestionIndex.value < totalQuestions.value - 1) {
+        currentQuestionIndex.value++
+        timeLeft.value = 30
+        hasAnswered.value = false
+        selectedAnswer.value = null
+        startTimer()
+      } else {
+        finishBattle()
+      }
+    }
+  }, 2500)
+}
 
-  setTimeout(() => nextQuestion(), 2500)
+const getSpeedCategory = (timeTaken) => {
+  if (timeTaken <= 5) return 'lightning'
+  if (timeTaken <= 10) return 'fast'
+  if (timeTaken <= 15) return 'good'
+  if (timeTaken <= 20) return 'average'
+  if (timeTaken <= 25) return 'slow'
+  return 'very_slow'
 }
 
 const nextQuestion = () => {
@@ -479,7 +729,14 @@ const nextQuestion = () => {
     timeLeft.value = 30
     hasAnswered.value = false
     selectedAnswer.value = null
-    startTimer()
+
+    const nextQ = questions.value[currentQuestionIndex.value]
+    if (nextQ) {
+      startTimer()
+    } else {
+      console.error(` Question ${currentQuestionIndex.value} introuvable !`)
+      finishBattle()
+    }
   } else {
     finishBattle()
   }
@@ -490,121 +747,134 @@ const finishBattle = async () => {
 
   const playerTotalPoints = playerAnswers.value.reduce((total, answer) => total + answer.points, 0)
 
-  const opponentAnswers = playerAnswers.value.map((playerAnswer, index) => {
-    const question = questions.value[index]
-    const opponentTime = playerAnswer.opponentTime
+  const playerAverageTime = playerAnswers.value.length > 0
+    ? playerTime.value / playerAnswers.value.length
+    : 0
 
-    const isCorrect = Math.random() > 0.3
-    const randomAnswer = Math.floor(Math.random() * 4)
 
-    let points = 0
-    if (isCorrect) {
-      opponentScore.value++
+  const perfectAnswers = playerAnswers.value.filter(a => a.correct && a.time <= 10).length
 
-      const basePoints = 100
-      let speedBonus = 0
+      const goodAnswers = playerAnswers.value.filter(a => a.correct && a.time <= 20).length
+  try {
+    const existingBattleId = battleData.value?.id
 
-      if (opponentTime < playerAnswer.time) {
-        const timeDifference = playerAnswer.time - opponentTime
+    if (!existingBattleId) {
+      throw new Error('ID de bataille manquant')
+    }
 
-        if (timeDifference >= 15) {
-          speedBonus = 75
-        } else if (timeDifference >= 10) {
-          speedBonus = 50
-        } else if (timeDifference >= 5) {
-          speedBonus = 30
-        } else {
-          speedBonus = 15
+    await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+      credentials: 'include'
+    })
+
+    const iAmChallenger = battleData.value?.isFirstPlayer === false
+
+    let updateData = {}
+
+    if (iAmChallenger) {
+      updateData = {
+        has_challenger_won: null,
+        challenger_summary: {
+          score: playerScore.value,
+          totalPoints: playerTotalPoints,
+          totalTime: playerTime.value,
+          averageTime: playerAverageTime,
+          perfectAnswers: perfectAnswers,
+          goodAnswers: goodAnswers,
+          answers: playerAnswers.value.map(answer => ({
+            questionId: answer.questionId,
+            selectedAnswer: answer.selectedAnswer,
+            correct: answer.correct,
+            time: answer.time,
+            points: answer.points,
+            speedCategory: answer.speedCategory
+          })),
+          questionsData: questions.value.map(q => ({
+            id: q.id,
+            text: q.content_default,
+            correctAnswer: q.choices?.find(c => c.is_correct)?.text_answer || 'Réponse correcte'
+          }))
         }
       }
-
-      points = basePoints + speedBonus
+    } else {
+      updateData = {
+        has_challenger_won: null,
+        challenged_summary: {
+          score: playerScore.value,
+          totalPoints: playerTotalPoints,
+          totalTime: playerTime.value,
+          averageTime: playerAverageTime,
+          perfectAnswers: perfectAnswers,
+          goodAnswers: goodAnswers,
+          answers: playerAnswers.value.map(answer => ({
+            questionId: answer.questionId,
+            selectedAnswer: answer.selectedAnswer,
+            correct: answer.correct,
+            time: answer.time,
+            points: answer.points,
+            speedCategory: answer.speedCategory
+          })),
+          questionsData: questions.value.map(q => ({
+            id: q.id,
+            text: q.content_default,
+            correctAnswer: q.choices?.find(c => c.is_correct)?.text_answer || 'Réponse correcte'
+          }))
+        }
+      }
     }
 
-    opponentTime.value += opponentTime
+    const csrfToken = decodeURIComponent(
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1] ?? ''
+    )
 
-    return {
-      questionId: question.id,
-      questionText: question.content_default,
-      selectedAnswer:
-        question.choices?.[randomAnswer]?.text_answer ||
-        question.choices?.[randomAnswer]?.text ||
-        'Réponse mockée',
-      correct: isCorrect,
-      time: opponentTime,
-      timeLeft: Math.max(0, 30 - opponentTime),
-      points: points,
-      speedBonus: isCorrect ? (opponentTime < playerAnswer.time ? true : false) : false
-    }
-  })
+    const response = await fetch(`http://localhost:8000/api/v1/battles/${existingBattleId}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-XSRF-TOKEN': csrfToken
+      },
+      body: JSON.stringify(updateData)
+    })
 
-  const opponentTotalPoints = opponentAnswers.reduce((total, answer) => total + answer.points, 0)
-
-  try {
-    const matchData = {
-      player1_id: currentPlayer.value.id,
-      player2_id: opponent.value.id,
-      player1_score: playerScore.value,
-      player2_score: opponentScore.value,
-      player1_time: playerTime.value,
-      player2_time: opponentTime.value,
-      player1_points: playerTotalPoints,
-      player2_points: opponentTotalPoints,
-      winner_id:
-        playerTotalPoints > opponentTotalPoints ? currentPlayer.value.id : opponent.value.id,
-      questions_data: JSON.stringify(
-        questions.value.map((q) => ({
-          id: q.id,
-          text: q.content_default,
-          correctAnswer:
-            q.choices?.find((c) => c.is_correct)?.text_answer ||
-            q.choices?.find((c) => c.is_correct)?.text
-        }))
-      ),
-      player1_answers: JSON.stringify(playerAnswers.value),
-      player2_answers: JSON.stringify(opponentAnswers)
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`API Error: ${response.status} - ${errorText}`)
     }
 
-    console.log('💾 Sauvegarde du match dans la base...')
-    // const savedMatch = await battleService.saveMatch(matchData)
-    // console.log('✅ Match sauvegardé avec ID:', savedMatch.id)
+    const updatedBattle = await response.json()
+    const battle = updatedBattle.data || updatedBattle
 
-    const battleResults = {
-      battleId: Date.now(),
-      opponent: opponent.value,
-      playerScore: playerScore.value,
-      opponentScore: opponentScore.value,
-      playerTime: playerTime.value,
-      opponentTime: opponentTime.value,
-      playerTotalPoints: playerTotalPoints,
-      opponentTotalPoints: opponentTotalPoints,
-      questionsData: questions.value.map((q) => ({
-        id: q.id,
-        text: q.content_default || q.content_lf_tf || q.content_lf_blank,
-        correctAnswer:
-          q.choices?.find((c) => c.is_correct)?.text_answer ||
-          q.choices?.find((c) => c.is_correct)?.text ||
-          'Réponse correcte'
-      })),
-      playerAnswers: playerAnswers.value,
-      opponentAnswers: opponentAnswers
+    const bothPlayersFinished = battle.challenger_summary && battle.challenged_summary
+
+    if (bothPlayersFinished) {
+      await router.push(`/battle-details/${existingBattleId}`)
+    } else {
+      await router.push('/battle')
     }
-
-    localStorage.setItem('lastBattleResults', JSON.stringify(battleResults))
-    router.push(`/battle-details/${battleResults.battleId}`)
+    
   } catch (error) {
-    console.error('❌ Erreur sauvegarde match:', error)
+    console.error('Erreur lors de la sauvegarde:', error)
+    alert(`Erreur: ${error.message}`)
+    router.push('/battle')
   }
 }
 
 const getAnswerClass = (index) => {
   if (!hasAnswered.value) return ''
+  
+  const selectedAnswerObj = currentQuestion.value?.answers[index]
+  const isSelectedAnswer = selectedAnswer.value === index
+  const isCorrectAnswer = selectedAnswerObj?.correct === true
 
-  if (selectedAnswer.value === index) {
-    return currentQuestion.value?.answers[index]?.correct ? 'correct' : 'incorrect'
+  if (isSelectedAnswer) {
+    return isCorrectAnswer ? 'correct' : 'incorrect'
   }
-
-  if (currentQuestion.value?.answers[index]?.correct) {
+  
+  if (isCorrectAnswer) {
     return 'correct-answer'
   }
 
@@ -626,21 +896,16 @@ const getAvatarStyle = (player) => {
   }
 }
 
-// Lifecycle - ORDRE DE CHARGEMENT IMPORTANT
 onMounted(async () => {
-  console.log('🚀 BattleQuizView mounted')
-
-  // 1. Charger les données du joueur actuel EN PREMIER
   await loadCurrentUserData()
+  
+  await loadBattleData()
 
-  // 2. Ensuite charger les données de bataille
-  loadBattleData()
-
-  // 3. Démarrer le timer après un délai
   setTimeout(() => {
     if (questions.value.length > 0) {
-      console.log('⏰ Starting timer...')
       startTimer()
+    } else {
+      console.error(' Aucune question disponible pour démarrer le timer')
     }
   }, 1000)
 })
@@ -666,11 +931,9 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 2rem 1rem;
-  margin-bottom: 2rem;
 }
 
-/* UTILISATEUR AUTHENTIFIÉ (GAUCHE) */
+/* UTILISATEUR AUTHENTIFIÉ  */
 .player-info {
   display: flex;
   align-items: center;
@@ -683,7 +946,7 @@ onUnmounted(() => {
   text-align: left;
 }
 
-/* ADVERSAIRE (DROITE) */
+/* ADVERSAIRE  */
 .opponent-info {
   display: flex;
   align-items: center;
@@ -694,7 +957,7 @@ onUnmounted(() => {
 
 .opponent-details {
   text-align: right;
-  order: -1; /* Place le texte avant l'avatar */
+  order: -1;
 }
 
 .avatar {
@@ -1090,11 +1353,11 @@ onUnmounted(() => {
   }
 
   .opponent-info {
-    flex-direction: row-reverse; /* Avatar à droite, texte à gauche */
+    flex-direction: row-reverse;
   }
 
   .opponent-details {
-    text-align: left; /* Réajuster l'alignement sur mobile */
+    text-align: left;
     order: 0;
   }
 

@@ -1,13 +1,11 @@
 <template>
   <div class="battle-page">
     <div class="main-content">
-      <!-- Header avec meilleur spacing -->
       <div class="battle-header">
         <h1 class="battle-title">BATTLES</h1>
-        <h2 class="section-title">THEY CHALLENGED YOU</h2>
+        <p class="section-title">THEY CHALLENGED YOU</p>
       </div>
 
-      <!-- They Challenged You Section -->
       <div class="section">
         <div class="battle-grid">
           <div 
@@ -52,12 +50,11 @@
         </div>
       </div>
 
-      <!-- You Challenged Them Section -->
       <div class="section">
         <div class="section-header">
-          <h2 class="section-title">YOU CHALLENGED THEM</h2>
+          <p class="section-title">YOU CHALLENGED THEM</p>
           <div class="slots-info">
-            <span class="slots-counter">{{ outgoingChallenges.length }}/5 slots used</span>
+            <span class="slots-counter text-mini">{{ outgoingChallenges.length }}/5 slots used</span>
             <div class="slots-bar">
               <div 
                 class="slots-fill" 
@@ -67,9 +64,7 @@
           </div>
         </div>
 
-        <!-- EXACTEMENT 5 CARTES : battle-cards + invite-cards -->
         <div class="battle-grid">
-          <!-- Battle cards pour les slots occupés -->
           <div 
             v-for="challenge in outgoingChallenges" 
             :key="challenge.id"
@@ -104,7 +99,6 @@
             </div>
           </div>
 
-          <!-- Invite cards pour les slots libres (5 - nombre de battles) -->
           <div 
             v-for="n in (5 - outgoingChallenges.length)" 
             :key="'invite-' + n"
@@ -118,10 +112,16 @@
         </div>
       </div>
 
-      <!-- Finished Battles Section -->
       <div class="section">
         <h2 class="section-title">FINISHED BATTLES</h2>
-        <div class="battle-grid">
+        
+        <div v-if="finishedBattles.length === 0" class="empty-battles">
+          <div class="empty-icon">🎯</div>
+          <h3>Aucune bataille terminée</h3>
+          <p>Jouez votre première bataille pour voir l'historique ici !</p>
+        </div>
+        
+        <div v-else class="battle-grid">
           <div 
             v-for="battle in finishedBattles" 
             :key="battle.id"
@@ -156,7 +156,6 @@
       </div>
     </div>
 
-    <!-- Invitation Sent Pop-up -->
     <div class="modal-overlay" v-if="showInvitationModal" @click="closeInvitationModal">
       <div class="invitation-modal" @click.stop>
         <button class="close-btn" @click="closeInvitationModal">✕</button>
@@ -191,39 +190,65 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { battleService } from '@/services/api'
 
 const router = useRouter()
 
-// Modal state
 const showInvitationModal = ref(false)
 const invitedPlayerName = ref('')
 
-// Loading state
 const isLoading = ref(true)
 const error = ref('')
 const currentUserId = ref(null)
 
-// Données des battles
 const incomingChallenges = ref([])
-const outgoingChallenges = ref([]) // CORRIGER ICI - il manquait la parenthèse fermante
+const outgoingChallenges = ref([])
 const finishedBattles = ref([])
 const allUsers = ref([])
 
-// Avatar logic
 const getAvatarUrl = (user) => {
   if (!user || !user.avatar) return null
   return `http://localhost:8000/${user.avatar}`
 }
 
-// Charger les vraies données depuis la base
+const getBattleStatus = (battle, currentUserId) => {
+  const hasChallenger = battle.challenger_summary && 
+                       battle.challenger_summary.answers && 
+                       battle.challenger_summary.answers.length > 0
+  
+  const hasChallenged = battle.challenged_summary && 
+                       battle.challenged_summary.answers && 
+                       battle.challenged_summary.answers.length > 0
+  
+  if (hasChallenger && hasChallenged) {
+    return 'view'
+  }
+  
+  if (currentUserId === battle.challenged_id) {
+    if (!hasChallenged) {
+      return 'play'
+    } else if (!hasChallenger) {
+      return 'waiting'
+    }
+  }
+  
+  if (currentUserId === battle.challenger_id) {
+    if (!hasChallenged) {
+      return 'waiting'
+    } else if (!hasChallenger) {
+      return 'play'
+    }
+  }
+  
+  return 'waiting'
+}
+
 const loadBattlesFromDB = async () => {
   try {
     isLoading.value = true
     
-    // Récupérer l'utilisateur connecté
     const userResponse = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
       headers: { 'Accept': 'application/json' }
@@ -234,298 +259,198 @@ const loadBattlesFromDB = async () => {
       currentUserId.value = userData.id
     }
 
-    // Charger tous les utilisateurs disponibles
     const usersData = await battleService.getAvailableUsers()
     const loadedUsers = usersData.data || usersData || []
     allUsers.value = loadedUsers
     
-    // INCOMING CHALLENGES - pas de limite
-    incomingChallenges.value = loadedUsers
-      .filter(user => user.id !== currentUserId.value)
-      .slice(0, 4)
-      .map((user, index) => ({
-        id: user.id,
-        name: user.username,
-        country: getCountryCode(user),
-        timeLeft: '24h left',
-        status: index < 2 ? 'invitation' : (index === 2 ? 'play' : 'waiting'),
-        user: user
-      }))
+    const incomingBattlesFromDB = await fetch('http://localhost:8000/api/v1/battles', {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
 
-    // OUTGOING CHALLENGES - MAXIMUM 5 (représentent les slots occupés)
-    // Simuler quelques battles en cours (par exemple 2 sur 5 slots)
-    outgoingChallenges.value = loadedUsers
-      .filter(user => user.id !== currentUserId.value)
-      .slice(4, 6) // Prendre seulement 2 utilisateurs pour simuler 2 slots occupés
-      .map((user, index) => ({
-        id: user.id + 100,
-        name: user.username,
-        country: getCountryCode(user),
-        timeLeft: `${Math.floor(Math.random() * 20) + 1}h left`,
-        status: index === 0 ? 'play' : 'waiting',
-        user: user
-      }))
+    const allBattles = await incomingBattlesFromDB.json()
 
-    // FINISHED BATTLES
-    finishedBattles.value = loadedUsers
-      .filter(user => user.id !== currentUserId.value)
-      .slice(6, 8)
-      .map((user, index) => ({
-        id: user.id + 200,
-        name: user.username,
-        country: getCountryCode(user),
-        points: index === 0 ? 300 : -100,
-        user: user
-      }))
+    incomingChallenges.value = (allBattles.data || [])
+      .filter(battle => {
+        const iAmChallenged = battle.challenged_id === currentUserId.value
+        const battleStatus = getBattleStatus(battle, currentUserId.value)
+        const notFinished = battleStatus !== 'view'
+        
+        return iAmChallenged && notFinished
+      })
+      .map(battle => {
+        const battleStatus = getBattleStatus(battle, currentUserId.value)
+        
+        let displayStatus = 'invitation'
+        if (battle.has_challenged_accepted) {
+          displayStatus = battleStatus
+        }
+        
+        return {
+          id: battle.id,
+          name: battle.challenger.username,
+          country: battle.challenger.pos?.country_flag || '🇨🇭',
+          timeLeft: '24h left',
+          status: displayStatus,
+          user: battle.challenger
+        }
+      })
 
-    console.log('✅ Slots occupés:', outgoingChallenges.value.length, '/5')
-    console.log('✅ Slots libres:', 5 - outgoingChallenges.value.length, '/5')
+    outgoingChallenges.value = (allBattles.data || [])
+      .filter(battle => {
+        const iAmChallenger = battle.challenger_id === currentUserId.value
+        const battleStatus = getBattleStatus(battle, currentUserId.value)
+        const notFinished = battleStatus !== 'view'
+        
+        return iAmChallenger && notFinished
+      })
+      .map(battle => {
+        const battleStatus = getBattleStatus(battle, currentUserId.value)
+        
+        let displayStatus = 'waiting'
+        if (battle.has_challenged_accepted) {
+          displayStatus = battleStatus
+        }
+        
+        return {
+          id: battle.id,
+          name: battle.challenged.username,
+          country: battle.challenged.pos?.country_flag || '🇨🇭',
+          timeLeft: '24h left',
+          status: displayStatus,
+          user: battle.challenged
+        }
+      })
+
+    await loadFinishedBattles(allBattles.data || [])
 
   } catch (err) {
     error.value = err.message
-    console.error('❌ Erreur lors du chargement depuis la base:', err)
-    loadMockData()
+    
+    incomingChallenges.value = []
+    outgoingChallenges.value = []
+    finishedBattles.value = []
   } finally {
     isLoading.value = false
   }
 }
 
-// Fonction pour convertir pos_id en code pays
-const getCountryCode = (user) => {
-  // 1. Essayer d'abord depuis user.pos.country_flag
-  if (user.pos && user.pos.country_flag) {
-    return user.pos.country_flag
-  }
-  
-  // 2. Fallback sur le mapping pos_id
-  const countryMapping = {
-    1: '🇨🇭', 2: '🇫🇷', 3: '🇩🇪', 4: '🇮🇹', 5: '🇪🇸', 
-    6: '🇵🇹', 7: '🇷🇴', 8: '🇺🇸', 9: '🇬🇧', 10: '🇧🇪'
-  }
-  return countryMapping[user.pos_id] || '🇫🇷'
-}
-
-// Fonction fallback
-const loadMockData = () => {
-  // Simuler 2 slots occupés sur 5
-  outgoingChallenges.value = [
-    {
-      id: 5,
-      name: 'H.OVSANNA',
-      country: 'RO',
-      timeLeft: '6h left',
-      status: 'play'
-    },
-    {
-      id: 6,
-      name: 'S.DACOSTA',
-      country: 'PT',
-      timeLeft: '8h left',
-      status: 'waiting'
+const loadFinishedBattles = async (battles) => {
+  try {
+    const isBattleFinished = (battle) => {
+      const hasChallenger = battle.challenger_summary && 
+                           battle.challenger_summary.answers && 
+                           battle.challenger_summary.answers.length > 0
+      
+      const hasChallenged = battle.challenged_summary && 
+                           battle.challenged_summary.answers && 
+                           battle.challenged_summary.answers.length > 0
+      
+      return hasChallenger && hasChallenged
     }
-  ]
-  // Donc 3 invite-cards seront affichées automatiquement (5 - 2 = 3)
-
-  incomingChallenges.value = [
-    {
-      id: 1,
-      name: 'R.FREUENFELD',
-      country: 'DE',
-      timeLeft: '24h left',
-      status: 'play'
-    },
-    {
-      id: 2,
-      name: 'C.NDIAYE',
-      country: 'FR',
-      timeLeft: '24h left',
-      status: 'waiting'
-    },
-    {
-      id: 3,
-      name: 'R.KELLER',
-      country: 'DE',
-      timeLeft: '24h left',
-      status: 'invitation'
-    },
-    {
-      id: 4,
-      name: 'L.ANEX',
-      country: 'FR',
-      timeLeft: '11h left',
-      status: 'invitation'
-    }
-  ]
-
-  finishedBattles.value = [
-    {
-      id: 7,
-      name: 'P.DUJARDIN',
-      country: 'FR',
-      points: 300
-    },
-    {
-      id: 8,
-      name: 'L.ANEX',
-      country: 'FR',
-      points: -100
-    }
-  ]
-}
-
-// Méthodes existantes
-const acceptChallenge = (id) => {
-  const challenge = incomingChallenges.value.find(c => c.id === id)
-  if (challenge) {
-    challenge.status = 'play'
-  }
-}
-
-const declineChallenge = (id) => {
-  incomingChallenges.value = incomingChallenges.value.filter(c => c.id !== id)
-}
-
-const handleAction = async (challenge) => {
-  if (challenge.status === 'play') {
-    try {
-      console.log('🎮 Starting battle with', challenge.name)
-      
-      // 1. Récupérer TOUTES les questions depuis ta vraie API
-      console.log('📡 Récupération des questions...')
-      const questionsData = await battleService.getQuestions()
-      const allQuestions = questionsData.data || questionsData || []
-      
-      console.log('📋 Questions récupérées:', allQuestions.length)
-      
-      // 2. Récupérer TOUS les choix depuis ta vraie API  
-      console.log('📡 Récupération des choix...')
-      const choicesData = await battleService.getChoices()
-      const allChoices = choicesData.data || choicesData || []
-      
-      console.log('📋 Choix récupérés:', allChoices.length)
-      
-      // 3. Prendre 5 questions aléatoires
-      const shuffled = allQuestions.sort(() => 0.5 - Math.random())
-      const selectedQuestions = shuffled.slice(0, 5)
-      
-      console.log('🎯 5 questions sélectionnées:', selectedQuestions.map(q => `ID: ${q.id}`))
-      
-      // 4. Pour chaque question, associer ses choix et identifier la bonne réponse
-      selectedQuestions.forEach(question => {
-        // Filtrer les choix pour cette question
-        const questionChoices = allChoices.filter(choice => choice.question_id === question.id)
+    
+    const finishedBattlesList = battles
+      .filter(battle => {
+        const isFinished = isBattleFinished(battle)
+        const userParticipated = battle.challenger_id === currentUserId.value || battle.challenged_id === currentUserId.value
         
-        console.log(`📋 Question ${question.id}: ${questionChoices.length} choix trouvés`)
-        
-        // IMPORTANT : correct_answer_text est au format JSON !
-        let correctAnswerText = question.correct_answer_text
-        
-        // Si c'est une string JSON, la parser
-        if (typeof correctAnswerText === 'string') {
-          try {
-            correctAnswerText = JSON.parse(correctAnswerText)
-          } catch (e) {
-            console.warn('Could not parse correct_answer_text as JSON:', correctAnswerText)
-          }
-        }
-        
-        console.log(`✅ Bonne réponse pour question ${question.id}:`, correctAnswerText)
-        
-        // CORRIGER : Adapter la structure pour BattleQuizView
-        question.choices = questionChoices.map(choice => {
-          // COMPARER text_answer avec correct_answer_text (en tenant compte du format JSON)
-          let isCorrect = false
-          
-          // Plusieurs façons de comparer selon le format de correct_answer_text
-          if (Array.isArray(correctAnswerText)) {
-            // Si c'est un array, vérifier si text_answer est dedans
-            isCorrect = correctAnswerText.includes(choice.text_answer)
-          } else if (typeof correctAnswerText === 'string') {
-            // Si c'est une string, comparer directement
-            isCorrect = choice.text_answer === correctAnswerText
-          } else if (typeof correctAnswerText === 'boolean') {
-            // Si c'est un boolean, comparer avec "true"/"false"
-            isCorrect = choice.text_answer === String(correctAnswerText)
-          } else {
-            // Essayer de convertir en string et comparer
-            isCorrect = choice.text_answer === String(correctAnswerText)
-          }
-          
-          console.log(`🔍 Choix "${choice.text_answer}" ${isCorrect ? '✅ CORRECT' : '❌ incorrect'}`)
-          
-          return {
-            id: choice.id,
-            text_answer: choice.text_answer,
-            is_correct: isCorrect // CALCULER is_correct en comparant avec correct_answer_text
-          }
-        })
-        
-        // Si aucune réponse n'est marquée comme correcte, marquer la première par défaut
-        const correctAnswers = question.choices.filter(c => c.is_correct)
-        if (correctAnswers.length === 0 && question.choices.length > 0) {
-          console.warn(`⚠️ Aucune réponse correcte trouvée pour question ${question.id}, marquage de la première par défaut`)
-          question.choices[0].is_correct = true
-        }
-        
-        console.log(`✅ Question ${question.id}: ${question.choices.length} choix avec ${question.choices.filter(c => c.is_correct).length} bonne(s) réponse(s)`)
+        return isFinished && userParticipated
       })
-      
-      // 5. Vérifier qu'on a bien des choix
-      const questionsWithChoices = selectedQuestions.filter(q => q.choices && q.choices.length > 0)
-      console.log(`✅ ${questionsWithChoices.length}/5 questions ont des choix`)
-      
-      // 6. Si certaines questions n'ont pas de choix, les compléter
-      selectedQuestions.forEach(question => {
-        if (!question.choices || question.choices.length === 0) {
-          console.warn(`⚠️ Pas de choix pour question ${question.id}, ajout de choix par défaut`)
-          question.choices = [
-            { text_answer: 'Réponse A', is_correct: true },
-            { text_answer: 'Réponse B', is_correct: false },
-            { text_answer: 'Réponse C', is_correct: false },
-            { text_answer: 'Réponse D', is_correct: false }
-          ]
+      .map(battle => {
+        let opponentUser, playerWon
+        
+        if (battle.challenger_id === currentUserId.value) {
+          opponentUser = battle.challenged || {}
+          playerWon = battle.has_challenger_won
+        } else {
+          opponentUser = battle.challenger || {}
+          playerWon = !battle.has_challenger_won
+        }
+        
+        const opponentPos = opponentUser.pos || {}
+        
+        const battleDate = battle.updated_at || battle.created_at
+        const timestamp = new Date(battleDate).getTime()
+        
+        return {
+          id: battle.id,
+          name: opponentUser.username || opponentUser.name || `User #${opponentUser.id}`,
+          country: opponentPos.country_flag || getCountryCode(opponentUser) || '🇨🇭',
+          points: playerWon === true ? +300 : (playerWon === false ? -70 : +100),
+          user: opponentUser,
+          timestamp: timestamp,
+          playerWon: playerWon,
+          isDefault: false,
+          battleDate: battleDate
         }
       })
-      
-      // 7. Sauvegarder pour BattleQuizView
-      localStorage.setItem('currentBattle', JSON.stringify({
-        battleId: challenge.id,
-        opponent: {
-          id: challenge.user?.id || challenge.id,
-          name: challenge.name,
-          avatar: challenge.user?.avatar, // PASSER L'AVATAR COMPLET
-          flag: challenge.country
-        },
-        questions: selectedQuestions
-      }))
-      
-      console.log('💾 Battle data saved with opponent avatar:', challenge.user?.avatar)
-      console.log('💾 Battle data saved with opponent flag:', challenge.country)
-      
-      router.push('/battle-quiz')
-      
-    } catch (error) {
-      console.error('❌ Erreur chargement depuis la base:', error)
-      alert(`Erreur API: ${error.message}`)
-      router.push('/battle-quiz')
-    }
+      .sort((a, b) => {
+        const timestampA = a.timestamp || 0
+        const timestampB = b.timestamp || 0
+        
+        return timestampB - timestampA
+      })
+      .slice(0, 10)
+    
+    finishedBattles.value = finishedBattlesList
+    
+  } catch (error) {
+    finishedBattles.value = []
   }
 }
 
-const viewBattle = (id) => {
-  console.log('Viewing battle', id)
-  router.push(`/battle-details/${id}`)
+const acceptChallenge = async (battleId) => {
+  try {
+    const response = await fetch(`http://localhost:8000/api/v1/battles/${battleId}/status`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'accept',
+        user_id: currentUserId.value
+      })
+    })
+    
+    if (response.ok) {
+      await loadBattlesFromDB()
+    }
+  } catch (error) {
+    console.error('❌ Erreur lors de l\'acceptation:', error)
+  }
 }
 
-// FONCTION MISE À JOUR : Ajouter une battle = remplir un slot
-const invitePlayer = () => {
-  // 1. VÉRIFIER LES SLOTS (maximum 5)
+const declineChallenge = async (battleId) => {
+  try {
+    const response = await fetch(`http://localhost:8000/api/v1/battles/${battleId}/status`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'decline',
+        user_id: currentUserId.value
+      })
+    })
+    
+    if (response.ok) {
+      await loadBattlesFromDB()
+    }
+  } catch (error) {
+    console.error('❌ Erreur lors du refus:', error)
+  }
+}
+
+const invitePlayer = async () => {
   if (outgoingChallenges.value.length >= 5) {
     alert('🚫 All slots are full!')
     return
   }
   
-  // 2. TROUVER LES UTILISATEURS DISPONIBLES
   const availableUsers = allUsers.value.filter(user => 
     user.id !== currentUserId.value &&
     !incomingChallenges.value.some(c => c.user?.id === user.id) &&
@@ -534,77 +459,150 @@ const invitePlayer = () => {
   
   let selectedUser = null
   
-  // 3. CHOISIR UN UTILISATEUR AU HASARD
   if (availableUsers.length > 0) {
     selectedUser = availableUsers[Math.floor(Math.random() * availableUsers.length)]
     invitedPlayerName.value = selectedUser.username
-    console.log('🎲 Random user selected:', selectedUser.username)
   } else {
     const randomPlayers = ['M.GARCIA', 'T.SMITH', 'A.MILLER', 'S.JONES', 'C.WILSON']
     invitedPlayerName.value = randomPlayers[Math.floor(Math.random() * randomPlayers.length)]
-    console.log('🎲 Fallback to mock user:', invitedPlayerName.value)
   }
   
-  // 4. CRÉER LA NOUVELLE BATTLE (remplit un slot)
-  const newChallenge = {
-    id: Date.now(),
-    name: invitedPlayerName.value,
-    country: selectedUser ? getCountryCode(selectedUser) : 'US',
-    timeLeft: '24h left',
-    status: 'waiting',
-    user: selectedUser
-  }
-  
-  // 5. AJOUTER IMMÉDIATEMENT = TRANSFORMER UNE INVITE-CARD EN BATTLE-CARD
-  outgoingChallenges.value.push(newChallenge)
-  console.log('✅ Slot filled! Slots used:', outgoingChallenges.value.length, '/5')
-  console.log('✅ Free slots remaining:', 5 - outgoingChallenges.value.length)
-  
-  // 6. AFFICHER LE MODAL
-  showInvitationModal.value = true
-  
-  // 7. FERMER LE MODAL APRÈS 2 SECONDES
-  setTimeout(() => {
-    if (showInvitationModal.value) {
-      showInvitationModal.value = false
+  try {
+    const questionsData = await battleService.getQuestions()
+    const allQuestions = questionsData.data || questionsData || []
+    
+    if (allQuestions.length === 0) {
+      throw new Error('Aucune question disponible')
     }
-  }, 2000)
+    
+    const shuffled = allQuestions.sort(() => 0.5 - Math.random())
+    const selectedQuestions = shuffled.slice(0, 5)
+    const questionIds = selectedQuestions.map(q => q.id)
+    
+    const response = await fetch('http://localhost:8000/api/v1/battles', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        challenger_id: currentUserId.value,
+        challenged_id: selectedUser ? selectedUser.id : Math.floor(Math.random() * 10) + 1,
+        has_challenger_accepted: true,
+        has_challenged_accepted: false,
+        questions_id: questionIds
+      })
+    })
+    
+    if (response.ok) {
+      const result = await response.json()
+      showInvitationModal.value = true
+    } else {
+      const errorText = await response.text()
+      alert('Erreur lors de l\'envoi de l\'invitation')
+    }
+  } catch (error) {
+    alert('Erreur lors de l\'envoi de l\'invitation')
+  }
 }
 
 const closeInvitationModal = () => {
   showInvitationModal.value = false
+  
+  setTimeout(() => {
+    loadBattlesFromDB()
+  }, 500)
 }
 
-// Lifecycle
-onMounted(() => {
-  loadBattlesFromDB()
-})
-
-console.log('BattleView component loaded')
-
-// Dans le computed currentQuestion, remplace par :
-
-const currentQuestion = computed(() => {
-  if (questions.value.length === 0) return null
-  
-  const question = questions.value[currentQuestionIndex.value]
-  
-  console.log('🔍 Current question data:', question)
-  console.log('🔍 Question choices:', question.choices)
-  
-  // UTILISER LA VRAIE STRUCTURE DE TA BASE (text_answer)
-  return {
-    id: question.id,
-    text: question.content_default || question.content_lf_tf || question.content_lf_blank || 'Question sans contenu',
-    answers: question.choices?.map(choice => {
-      console.log('🔍 Processing choice:', choice)
-      return {
-        text: choice.text_answer || choice.content || choice.text, // CORRIGER : utiliser text_answer
-        correct: choice.is_correct || choice.correct || false
+const handleAction = async (challenge) => {
+  if (challenge.status === 'play') {
+    try {
+      const response = await fetch(`http://localhost:8000/api/v1/battles/${challenge.id}`, {
+        credentials: 'include',
+        headers: { 'Accept': 'application/json' }
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Erreur lors du chargement: ${response.status}`)
       }
-    }) || []
+      
+      const battleDetail = await response.json()
+      const battle = battleDetail.data || battleDetail
+      
+      const battleData = {
+        id: battle.id,
+        opponent: {
+          id: challenge.user.id,
+          name: challenge.user.username || challenge.name,
+          avatar: challenge.user.avatar || null,
+          flag: challenge.country || '🇨🇭'
+        },
+        questions: battle.questions_id || null,
+        isFirstPlayer: !battle.challenged_summary,
+        existingQuestions: battle.challenged_summary?.questionsData || null
+      }
+      
+      localStorage.setItem('currentBattle', JSON.stringify(battleData))
+      
+      await router.push('/battle-quiz')
+      
+    } catch (error) {
+      console.error('❌ Erreur:', error)
+      alert(`Erreur: ${error.message}`)
+    }
+    
+  } else if (challenge.status === 'waiting') {
+    alert('En attente que votre adversaire joue son tour')
+    
+  } else if (challenge.status === 'view') {
+    await router.push(`/battle-details/${challenge.id}`)
   }
+}
+
+const getCountryCode = (user) => {
+  if (!user) return '🇨🇭'
+  
+  if (user.pos && user.pos.country_flag) {
+    return user.pos.country_flag
+  }
+  
+  if (user.pos_id) {
+    const countryMapping = {
+      1: '🇨🇭', 2: '🇫🇷', 3: '🇩🇪', 4: '🇮🇹', 5: '🇪🇸', 
+      6: '🇵🇹', 7: '🇷🇴', 8: '🇺🇸', 9: '🇬🇧', 10: '🇧🇪'
+    }
+    return countryMapping[user.pos_id] || '🇨🇭'
+  }
+  
+  return '🇨🇭'
+}
+
+const viewBattle = (battleId) => {
+  router.push(`/battle-details/${battleId}`)
+}
+
+onMounted(async () => {
+  await loadBattlesFromDB()
+  
+  window.addEventListener('focus', refreshAfterBattle)
+  
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'battleCompleted') {
+      setTimeout(() => {
+        loadBattlesFromDB()
+      }, 1000)
+    }
+  })
 })
+
+onUnmounted(() => {
+  window.removeEventListener('focus', refreshAfterBattle)
+})
+
+const refreshAfterBattle = () => {
+  loadBattlesFromDB()
+}
 </script>
 
 <style scoped>
@@ -620,51 +618,35 @@ const currentQuestion = computed(() => {
   box-sizing: border-box;
 }
 
-/* MAIN CONTENT */
 .main-content {
   width: 100%;
-  max-width: 800px; /* Plus étroit pour une liste */
+  max-width: 800px;
   margin: 0 auto;
   padding: 0;
 }
 
-/* HEADER */
-.battle-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
 .battle-title {
-  font-size: 2.5rem;
-  font-weight: 700;
   color: #F7C72C;
-  margin: 0;
+  margin-top: 1.8rem;
+  margin-bottom: 1rem;
   text-transform: uppercase;
+  text-align: center;
   letter-spacing: 2px;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* SECTIONS */
 .section {
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
 }
 
 .section-title {
-  font-size: 1.3rem;
   color: white;
-  margin-bottom: 1.5rem;
-  text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-align: center;
+  text-align: left;
 }
 
-/* HEADER SECTION - NOUVEAU */
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
   flex-wrap: wrap;
   gap: 1rem;
 }
@@ -697,7 +679,6 @@ const currentQuestion = computed(() => {
   border-radius: 3px;
 }
 
-/* LISTES - TOUJOURS VERTICALES */
 .battle-grid,
 .invite-grid {
   display: flex;
@@ -710,7 +691,6 @@ const currentQuestion = computed(() => {
   margin-top: 1.5rem;
 }
 
-/* BATTLE CARDS */
 .battle-card {
   display: flex;
   align-items: center;
@@ -748,7 +728,6 @@ const currentQuestion = computed(() => {
   background: rgba(247, 199, 44, 0.1);
 }
 
-/* PLAYER INFO */
 .player-info {
   display: flex;
   align-items: center;
@@ -811,7 +790,6 @@ const currentQuestion = computed(() => {
   font-weight: 500;
 }
 
-/* TIME AND POINTS */
 .time-left,
 .points {
   font-size: 0.9rem;
@@ -827,7 +805,6 @@ const currentQuestion = computed(() => {
   font-size: 1rem;
 }
 
-/* ACTION BUTTONS */
 .action-buttons {
   display: flex;
   align-items: center;
@@ -906,12 +883,10 @@ const currentQuestion = computed(() => {
 .invitation-label {
   font-size: 0.7rem;
   color: #F7C72C;
-  font-weight: 600;
   margin-left: 0.5rem;
   white-space: nowrap;
 }
 
-/* INVITE CARDS */
 .invite-card {
   display: flex;
   align-items: center;
@@ -924,7 +899,7 @@ const currentQuestion = computed(() => {
   cursor: pointer;
   width: 100%;
   box-sizing: border-box;
-  min-height: 80px; /* Même hauteur que battle-card */
+  min-height: 80px;
   gap: 1rem;
 }
 
@@ -939,7 +914,6 @@ const currentQuestion = computed(() => {
   color: #F7C72C;
 }
 
-/* MODAL - Reste identique */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -970,7 +944,6 @@ const currentQuestion = computed(() => {
   box-sizing: border-box;
 }
 
-/* Styles modal - identiques */
 @keyframes modalSlideIn {
   from { opacity: 0; transform: translateY(-50px) scale(0.9); }
   to { opacity: 1; transform: translateY(0) scale(1); }
@@ -1076,414 +1049,20 @@ const currentQuestion = computed(() => {
   transform: translateY(-2px);
 }
 
-/* RESPONSIVE - CORRECTION POUR 768px */
-
-/* MOBILE (767px et moins) */
-@media (max-width: 768px) {
-  .battle-page {
-    margin-left: 0;
-    width: 100%;
-    padding: 1rem;
-    padding-bottom: 80px;
-  }
-  
-  .main-content {
-    max-width: 100%;
-  }
-  
-  .battle-title {
-    font-size: 2rem;
-    letter-spacing: 1px;
-  }
-  
-  .section-title {
-    font-size: 1.1rem;
-  }
-  
-  .battle-card {
-    padding: 1rem;
-    min-height: 70px;
-    gap: 0.8rem;
-  }
-  
-  .avatar {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
-  }
-  
-  .player-name {
-    font-size: 0.9rem;
-  }
-  
-  .flag {
-    font-size: 0.7rem;
-  }
-  
-  .time-left,
-  .points {
-    font-size: 0.8rem;
-    margin: 0 0.5rem;
-  }
-  
-  .btn-action,
-  .btn-view,
-  .btn-new {
-    padding: 0.5rem 1rem;
-    font-size: 0.7rem;
-  }
-  
-  .btn-accept,
-  .btn-decline {
-    width: 28px;
-    height: 28px;
-    font-size: 0.8rem;
-  }
-  
-  .invitation-label {
-    font-size: 0.6rem;
-  }
+.empty-battles {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  margin-top: 1rem;
 }
 
-/* PETIT TABLET (768px à 1023px) - NOUVEAU BREAKPOINT */
-@media (min-width: 769px) and (max-width: 1023px) {
-  .battle-page {
-    margin-left: 280px;
-    width: calc(100% - 280px);
-    padding: 1.5rem;
-    padding-bottom: 2rem;
-  }
-  
-  .main-content {
-    max-width: 700px;
-    padding: 0 0.5rem;
-  }
-  
-  .battle-title {
-    font-size: 2.8rem;
-    letter-spacing: 2px;
-  }
-  
-  .section {
-    margin-bottom: 2.5rem;
-  }
-  
-  .section-title {
-    font-size: 1.4rem;
-    text-align: left;
-  }
-  
-  .battle-card {
-    padding: 1.3rem;
-    min-height: 75px;
-  }
-  
-  .avatar {
-    width: 45px;
-    height: 45px;
-    font-size: 1.1rem;
-  }
-  
-  .player-name {
-    font-size: 0.95rem;
-  }
-  
-  .flag {
-    font-size: 0.75rem;
-  }
-  
-  .time-left,
-  .points {
-    font-size: 0.85rem;
-    margin: 0 0.8rem;
-  }
-  
-  .btn-action,
-  .btn-view,
-  .btn-new {
-    padding: 0.6rem 1.1rem;
-    font-size: 0.75rem;
-  }
-  
-  .btn-accept,
-  .btn-decline {
-    width: 30px;
-    height: 30px;
-    font-size: 0.85rem;
-  }
-  
-  .invitation-label {
-    font-size: 0.65rem;
-  }
-}
-
-/* DESKTOP (1024px et plus) */
-@media (min-width: 1024px) {
-  .battle-page {
-    margin-left: 280px;
-    width: calc(100% - 280px);
-    padding: 2rem;
-    padding-bottom: 2rem;
-  }
-  
-  .main-content {
-    max-width: 900px;
-    padding: 0 1rem;
-  }
-  
-  .battle-title {
-    font-size: 3.5rem;
-    letter-spacing: 3px;
-  }
-  
-  .section {
-    margin-bottom: 3.5rem;
-  }
-  
-  .section-title {
-    font-size: 1.8rem;
-    text-align: left;
-  }
-  
-  .battle-card {
-    padding: 1.5rem;
-    min-height: 85px;
-  }
-  
-  .avatar {
-    width: 50px;
-    height: 50px;
-    font-size: 1.2rem;
-  }
-  
-  .player-name {
-    font-size: 1.1rem;
-  }
-  
-  .flag {
-    font-size: 0.8rem;
-  }
-  
-  .time-left,
-  .points {
-    font-size: 1rem;
-    margin: 0 1rem;
-  }
-  
-  .btn-action,
-  .btn-view,
-  .btn-new {
-    padding: 0.7rem 1.3rem;
-    font-size: 0.8rem;
-  }
-  
-  .btn-accept,
-  .btn-decline {
-    width: 32px;
-    height: 32px;
-    font-size: 0.9rem;
-  }
-  
-  .invitation-label {
-    font-size: 0.7rem;
-  }
-}
-
-/* TRÈS PETIT MOBILE (479px et moins) - AMÉLIORÉ */
-@media (max-width: 479px) {
-  .battle-page {
-    padding: 0.5rem;
-    padding-bottom: 80px;
-  }
-  
-  .battle-title {
-    font-size: 1.6rem;
-    letter-spacing: 1px;
-  }
-  
-  .section {
-    margin-bottom: 2rem;
-  }
-  
-  .section-title {
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-  }
-  
-  .battle-card {
-    padding: 0.8rem;
-    min-height: 60px;
-    gap: 0.6rem;
-    /* Garder le layout horizontal mais optimisé */
-    flex-direction: row;
-    align-items: center;
-  }
-  
-  .player-info {
-    gap: 0.5rem;
-    flex: 1;
-    min-width: 0;
-  }
-  
-  .avatar {
-    width: 30px;
-    height: 30px;
-    font-size: 0.8rem;
-    flex-shrink: 0;
-  }
-  
-  .player-details {
-    gap: 0.1rem;
-    flex: 1;
-    min-width: 0;
-  }
-  
-  .player-name {
-    font-size: 0.75rem;
-    line-height: 1.1;
-  }
-  
-  .flag {
-    font-size: 0.55rem;
-  }
-  
-  .time-left,
-  .points {
-    font-size: 0.65rem;
-    margin: 0;
-    flex-shrink: 0;
-    min-width: 40px;
-  }
-  
-  .action-buttons {
-    gap: 0.3rem;
-    flex-shrink: 0;
-  }
-  
-  .btn-action,
-  .btn-view,
-  .btn-new {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.6rem;
-    border-radius: 6px;
-  }
-  
-  .btn-accept,
-  .btn-decline {
-    width: 20px;
-    height: 20px;
-    font-size: 0.6rem;
-  }
-  
-  .invitation-label {
-    font-size: 0.4rem;
-    margin-left: 0.2rem;
-  }
-  
-  /* Cards d'invitation */
-  .invite-card {
-    padding: 0.8rem;
-    gap: 0.5rem;
-  }
-  
-  .invite-icon {
-    font-size: 1rem;
-  }
-  
-  /* Modal responsive */
-  .invitation-modal {
-    padding: 1.5rem;
-    margin: 0.5rem;
-  }
-  
-  .modal-title {
-    font-size: 1.2rem;
-  }
-  
-  .modal-message {
-    font-size: 0.8rem;
-  }
-  
-  .player-avatar {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
-  }
-  
-  .invited-player .player-name {
-    font-size: 0.9rem;
-  }
-  
-  .btn-ok {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.8rem;
-  }
-}
-
-/* ULTRA PETIT MOBILE (380px et moins) - NOUVEAU */
-@media (max-width: 380px) {
-  .battle-page {
-    padding: 0.4rem;
-  }
-  
-  .battle-title {
-    font-size: 1.4rem;
-  }
-  
-  .section-title {
-    font-size: 0.8rem;
-  }
-  
-  .battle-card {
-    padding: 0.6rem;
-    min-height: 55px;
-    gap: 0.4rem;
-  }
-  
-  .avatar {
-    width: 28px;
-    height: 28px;
-    font-size: 0.7rem;
-  }
-  
-  .player-name {
-    font-size: 0.7rem;
-  }
-  
-  .flag {
-    font-size: 0.5rem;
-  }
-  
-  .time-left,
-  .points {
-    font-size: 0.6rem;
-    min-width: 35px;
-  }
-  
-  .btn-action,
-  .btn-view,
-  .btn-new {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.55rem;
-  }
-  
-  .btn-accept,
-  .btn-decline {
-    width: 18px;
-    height: 18px;
-    font-size: 0.55rem;
-  }
-  
-  .invitation-label {
-    font-size: 0.35rem;
-  }
-  
-  .invite-card {
-    padding: 0.6rem;
-  }
-  
-  .invite-icon {
-    font-size: 0.9rem;
-  }
+.empty-icon {
+  font-size: 3rem;
+  color: #F7C72C;
+  margin-bottom: 1rem;
 }
 </style>

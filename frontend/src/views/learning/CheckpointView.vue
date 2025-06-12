@@ -55,7 +55,6 @@ const checkpointData = ref({
 
 // Methods
 const closeModal = () => {
-  // Retourner à la formation view
   router.push('/')
 }
 
@@ -63,7 +62,6 @@ const beginTest = () => {
   router.push('/checkpoint-quiz')
 }
 
-console.log('CheckpointView component loaded')
 </script>
 
 <style scoped>

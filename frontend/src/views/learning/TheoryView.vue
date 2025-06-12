@@ -12,8 +12,7 @@
       <div class="theory-container">
         <!-- Theory Header -->
         <div class="theory-header">
-          <h1 class="theory-title">THÉORIE</h1>
-          <h2 class="theory-subtitle">{{ currentTheory.title }}</h2>
+          <h1 class="theory-title">THEORY</h1>
         </div>
 
         <!-- Theory Text -->
@@ -35,12 +34,11 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-// Props pour recevoir les données de la théorie
+
 const props = defineProps({
   theoryData: {
     type: Object,
     default: () => ({
-      title: "L'AVENGER",
       content: [
         "Robuste et audacieuse, l'Avenger est inspirée de l'héritage aéronautique de Breitling.",
         "Relancée en 2019, elle est ultralegible même avec des gants, et depuis 2022, elle embarque le calibre Breitling 01."
@@ -67,10 +65,8 @@ const emit = defineEmits(['next-step'])
 // Methods
 const nextStep = () => {
   emit('next-step')
-  console.log('Going to next step')
 }
 
-console.log('TheoryView component loaded')
 </script>
 
 <style scoped>

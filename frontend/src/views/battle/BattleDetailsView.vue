@@ -2,7 +2,6 @@
   <div class="battle-details-page">
     <!-- Header -->
     <div class="details-header">
-      <button class="close-btn" @click="closeBattleDetails">✕</button>
       <h1 class="details-title">BATTLE DETAILS</h1>
     </div>
 
@@ -11,7 +10,13 @@
       <div class="player-section" :class="{ 'winner': isPlayerWinner }">
         <div class="player-info">
           <div class="avatar" :style="getAvatarStyle(currentPlayer)">
-            {{ currentPlayer.avatar }}
+            <img 
+              v-if="currentPlayer.avatar && currentPlayer.avatar !== currentPlayer.name?.charAt(0)" 
+              :src="getAvatarUrl(currentPlayer)" 
+              :alt="currentPlayer.name"
+              class="avatar-image"
+            />
+            <span v-else class="avatar-initial">{{ currentPlayer.name?.charAt(0) || 'Y' }}</span>
           </div>
           <h3 class="player-name">{{ currentPlayer.name }}</h3>
           <span class="flag">{{ currentPlayer.flag }}</span>
@@ -64,7 +69,6 @@
         </div>
       </div>
 
-      <!-- VS Divider -->
       <div class="vs-divider">
         <span class="vs-text">VS</span>
       </div>
@@ -72,7 +76,13 @@
       <div class="player-section" :class="{ 'winner': !isPlayerWinner && !isTie }">
         <div class="player-info">
           <div class="avatar" :style="getAvatarStyle(opponent)">
-            {{ opponent.avatar }}
+            <img 
+              v-if="opponent.avatar && opponent.avatar !== opponent.name?.charAt(0)" 
+              :src="getAvatarUrl(opponent)" 
+              :alt="opponent.name"
+              class="avatar-image"
+            />
+            <span v-else class="avatar-initial">{{ opponent.name?.charAt(0) || 'O' }}</span>
           </div>
           <h3 class="player-name">{{ opponent.name }}</h3>
           <span class="flag">{{ opponent.flag }}</span>
@@ -100,7 +110,6 @@
           </div>
         </div>
 
-        <!-- Opponent Answers -->
         <div class="answers-list">
           <div 
             v-for="(answer, index) in opponentAnswers" 
@@ -265,42 +274,221 @@ const questionsData = ref([
   }
 ])
 
-// Charger les données depuis localStorage si disponibles
-onMounted(() => {
-  const savedResults = localStorage.getItem('lastBattleResults')
-  if (savedResults) {
-    const results = JSON.parse(savedResults)
-    
-    // Mettre à jour avec les vraies données si elles existent
-    if (results.battleId === parseInt(battleId)) {
-      opponent.value = results.opponent
-      if (results.playerAnswers?.length) {
-        playerAnswers.value = results.playerAnswers
-      }
-      if (results.opponentAnswers?.length) {
-        opponentAnswers.value = results.opponentAnswers
-      }
-      if (results.questionsData?.length) {
-        questionsData.value = results.questionsData
-      }
+const getAvatarUrl = (user) => {
+  if (!user || !user.avatar) {
+    return null
+  }
+  
+  if (typeof user.avatar === 'string' && user.avatar.length === 1) {
+    return null
+  }
+  
+  const avatarUrl = user.avatar.startsWith('http') ? user.avatar : `http://localhost:8000/${user.avatar}`
+  
+  return avatarUrl
+}
+
+const getCountryFlag = (posIdOrCountry) => {
+  if (typeof posIdOrCountry === 'string') {
+    const flagsByCode = {
+      'DE': '🇩🇪',
+      'FR': '🇫🇷',
+      'RO': '🇷🇴',
+      'PT': '🇵🇹',
+      'US': '🇺🇸',
+      'CH': '🇨🇭',
+      'IT': '🇮🇹',
+      'ES': '🇪🇸',
+      'GB': '🇬🇧',
+      'BE': '🇧🇪'
     }
+    return flagsByCode[posIdOrCountry] || '🌍'
+  }
+  
+  const flagMapping = {
+    1: '🇨🇭', // Suisse
+    2: '🇫🇷', // France
+    3: '🇩🇪', // Allemagne
+    4: '🇮🇹', // Italie
+    5: '🇪🇸', // Espagne
+    6: '🇵🇹', // Portugal
+    7: '🇷🇴', // Roumanie
+    8: '🇺🇸', // États-Unis
+    9: '🇬🇧', // Royaume-Uni
+    10: '🇧🇪' // Belgique
+  }
+  
+  return flagMapping[posIdOrCountry] || '🇨🇭'
+}
+
+const getUserFlag = (userData) => {
+  if (userData.pos && userData.pos.country_flag) {
+    return userData.pos.country_flag
+  }
+  
+  if (userData.pos_id) {
+    const flagFromPosId = getCountryFlag(userData.pos_id)
+    return flagFromPosId
+  }
+  
+  return '🇨🇭'
+}
+
+const loadCurrentUserData = async () => {
+  try {
+    // 1. Récupérer l'utilisateur authentifié
+    const userResponse = await fetch('http://localhost:8000/api/user', {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+    
+    if (!userResponse.ok) {
+      throw new Error('Failed to fetch authenticated user')
+    }
+    
+    const userData = await userResponse.json()
+    
+    const fullUserResponse = await fetch(`http://localhost:8000/api/v1/users/${userData.id}`, {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+    
+    let fullUserData = userData // Fallback sur les données de base
+    
+    if (fullUserResponse.ok) {
+      const fullUserResponseData = await fullUserResponse.json()
+      fullUserData = fullUserResponseData.data || fullUserResponseData || userData
+    }
+    
+    currentPlayer.value = {
+      id: fullUserData.id || userData.id,
+      name: fullUserData.username || userData.username || 'YOU',
+      avatar: fullUserData.avatar || userData.avatar || null,
+      flag: getUserFlag(fullUserData) || '🇨🇭'
+    }
+    
+  } catch (error) {
+    // Fallback en cas d'erreur
+    currentPlayer.value = {
+      id: 1,
+      name: 'YOU',
+      avatar: null,
+      flag: '🇨🇭'
+    }
+  }
+}
+
+onMounted(async () => {
+  await loadCurrentUserData()
+  
+  if (battleId) {
+    await loadBattleFromAPI(battleId)
+  } else {
+    console.error('❌ Aucun ID de bataille fourni')
+    router.push('/battle')
   }
 })
 
-// Fonction helper pour obtenir le drapeau du pays
-function getCountryFlag(country) {
-  const flags = {
-    'DE': '🇩🇪',
-    'FR': '🇫🇷',
-    'RO': '🇷🇴',
-    'PT': '🇵🇹',
-    'US': '🇺🇸',
-    'CH': '🇨🇭'
+const loadBattleFromAPI = async (battleId) => {
+  try {
+    const response = await fetch(`http://localhost:8000/api/v1/battles/${battleId}`, {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+    
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`)
+    }
+    
+    const battleDetail = await response.json()
+    const battle = battleDetail.data || battleDetail
+    
+    if (!battle.challenger_summary || !battle.challenged_summary) {
+      throw new Error('Données de bataille incomplètes')
+    }
+    
+    const isCurrentUserChallenger = battle.challenger_id === currentPlayer.value.id
+    
+    if (isCurrentUserChallenger) {
+      opponent.value = {
+        id: battle.challenged?.id || battle.challenged_id,
+        name: battle.challenged?.username || battle.challenged?.name || 'Adversaire',
+        avatar: battle.challenged?.avatar || null,
+        flag: battle.challenged?.pos?.country_flag || getCountryCodeSafe(battle.challenged) || '🇨🇭'
+      }
+      
+      playerAnswers.value = (battle.challenger_summary?.answers || []).map(answer => ({
+        correct: answer.correct || false,
+        text: answer.selectedAnswer || answer.text || 'Pas de réponse',
+        time: answer.time || 0
+      }))
+      
+      opponentAnswers.value = (battle.challenged_summary?.answers || []).map(answer => ({
+        correct: answer.correct || false,
+        text: answer.selectedAnswer || answer.text || 'Pas de réponse',
+        time: answer.time || 0
+      }))
+      
+    } else {
+      opponent.value = {
+        id: battle.challenger?.id || battle.challenger_id,
+        name: battle.challenger?.username || battle.challenger?.name || 'Adversaire',
+        avatar: battle.challenger?.avatar || null,
+        flag: battle.challenger?.pos?.country_flag || getCountryCodeSafe(battle.challenger) || '🇨🇭'
+      }
+      
+      // Mettre à jour les réponses du joueur (challenged)
+      playerAnswers.value = (battle.challenged_summary?.answers || []).map(answer => ({
+        correct: answer.correct || false,
+        text: answer.selectedAnswer || answer.text || 'Pas de réponse',
+        time: answer.time || 0
+      }))
+      
+      // Mettre à jour les réponses de l'adversaire (challenger)
+      opponentAnswers.value = (battle.challenger_summary?.answers || []).map(answer => ({
+        correct: answer.correct || false,
+        text: answer.selectedAnswer || answer.text || 'Pas de réponse',
+        time: answer.time || 0
+      }))
+    }
+    
+    if (battle.challenger_summary?.questionsData?.length) {
+      questionsData.value = battle.challenger_summary.questionsData
+    }
+    
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement de la bataille:', error)
+    alert(`Erreur lors du chargement de la bataille: ${error.message}`)
+    router.push('/battle')
   }
-  return flags[country] || '🌍'
 }
 
-// Computed Properties
+const getCountryCodeSafe = (user) => {
+  if (!user) return '🇨🇭'
+  
+  if (user.pos && user.pos.country_flag) {
+    return user.pos.country_flag
+  }
+  
+  if (user.pos_id) {
+    const countryMapping = {
+      1: '🇨🇭', 2: '🇫🇷', 3: '🇩🇪', 4: '🇮🇹', 5: '🇪🇸', 
+      6: '🇵🇹', 7: '🇷🇴', 8: '🇺🇸', 9: '🇬🇧', 10: '🇧🇪'
+    }
+    return countryMapping[user.pos_id] || '🇨🇭'
+  }
+  
+  return '🇨🇭'
+}
+
+const closeBattleDetails = () => {
+  router.push('/battle')
+}
+
+const returnToBattles = () => {
+  router.push('/battle')
+}
+
 const totalQuestions = computed(() => questionsData.value.length)
 
 const playerCorrectAnswers = computed(() => 
@@ -329,7 +517,7 @@ const opponentAverageTime = computed(() =>
 
 const playerFinalScore = computed(() => {
   const correctScore = playerCorrectAnswers.value * 100
-  const timeBonus = Math.max(0, (150 - playerTotalTime.value) * 2) // Bonus pour rapidité
+  const timeBonus = Math.max(0, (150 - playerTotalTime.value) * 2) 
   return Math.round(correctScore + timeBonus)
 })
 
@@ -378,17 +566,6 @@ const getAvatarStyle = (player) => {
   }
 }
 
-const closeBattleDetails = () => {
-  // Nettoyer localStorage
-  localStorage.removeItem('lastBattleResults')
-  router.push('/battle')
-}
-
-const returnToBattles = () => {
-  // Nettoyer localStorage
-  localStorage.removeItem('lastBattleResults')
-  router.push('/battle')
-}
 </script>
 
 <style scoped>
@@ -442,7 +619,6 @@ const returnToBattles = () => {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* PLAYERS COMPARISON */
@@ -526,6 +702,22 @@ const returnToBattles = () => {
   margin: 0 auto 0.6rem auto;
   border: 3px solid #F7C72C;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  overflow: hidden; /* IMPORTANT pour les images */
+}
+
+/* STYLES POUR LES IMAGES D'AVATAR */
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
+}
+
+.avatar-initial {
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
 }
 
 .player-name {

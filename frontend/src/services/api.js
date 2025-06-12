@@ -65,7 +65,6 @@ export const fetchAllUsers = async () => {
 }
 
 export const battleService = {
-  // Récupérer tous les utilisateurs disponibles pour un battle
   async getAvailableUsers() {
     // Token CSRF comme dans LoginView
     await fetch(`${SANCTUM_URL}`, {
@@ -91,7 +90,6 @@ export const battleService = {
     return await response.json()
   },
 
-  // Récupérer toutes les questions (utilise ta route existante)
   async getQuestions() {
     await fetch(`${SANCTUM_URL}`, {
       credentials: 'include'
@@ -105,7 +103,6 @@ export const battleService = {
     )
 
     const response = await fetch(`${API_BASE_URL}/questions`, {
-      // Utilise ta route existante
       credentials: 'include',
       headers: {
         Accept: 'application/json',
@@ -117,7 +114,6 @@ export const battleService = {
     return await response.json()
   },
 
-  // Récupérer tous les choix (utilise ta route existante)
   async getChoices() {
     await fetch(`${SANCTUM_URL}`, {
       credentials: 'include'
@@ -131,7 +127,6 @@ export const battleService = {
     )
 
     const response = await fetch(`${API_BASE_URL}/choices`, {
-      // Récupérer TOUS les choix
       credentials: 'include',
       headers: {
         Accept: 'application/json',
@@ -144,9 +139,6 @@ export const battleService = {
   }
 }
 
-export const fetchQuestions = () => {
-  return fetch(`${API_BASE_URL}/questions`, {})
-}
 
 export const fetchProgression = async (userid) => {
   const progression = await fetch(`${API_BASE_URL}/progression/${userid}`, {})
@@ -165,3 +157,22 @@ export const fetchModules = async () => {
   const data = await modules.json()
   return data.data
 }
+
+
+export const fetchLessons = async () => {
+  const lessons = await fetch(`${API_BASE_URL}/lessons`, {})
+  const data = await lessons.json()
+  return data.data
+}
+
+export const fetchLesson = async (lessonId) => {
+  const lesson = await fetch(`${API_BASE_URL}/lessons/${lessonId}`, {})
+  const data = await lesson.json()
+
+  }
+export const fetchQuestions = async () => {
+  const questions = await fetch(`${API_BASE_URL}/questions`, {})
+  const data = await questions.json()
+  return data.data
+}
+

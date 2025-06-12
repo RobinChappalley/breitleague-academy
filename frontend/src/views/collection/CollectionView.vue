@@ -7,7 +7,7 @@
     <div v-else>
       <div class="watch-details" v-if="selectedWatch.id">
         <div class="watch-info">
-          <h1 class="title">{{ selectedWatch.model }}</h1>
+          <h2 class="title">{{ selectedWatch.model }}</h2>
           <div class="specs">
             <p class="spec-item">Date: {{ selectedWatch.date }}</p>
             <p class="spec-item">Sizes: {{ selectedWatch.size }}</p>
@@ -203,20 +203,18 @@ onMounted(async () => {
   flex-direction: column;
   box-sizing: border-box;
   padding-left: 280px;
-  padding-top: 1rem; /* ajustement espace haut */
-  overflow-y: auto;
-  scroll-padding-top: 1rem;
+  overflow-y: hidden;
 }
 
 .watch-details {
   background-color: #072c54;
-  padding-left: 2rem;
-  padding-right: 2rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
   display: flex;
   justify-content: space-between;
-  flex: 0 0 60vh;
+  flex: 1;
   box-sizing: border-box;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .watch-info {
@@ -251,14 +249,14 @@ onMounted(async () => {
 }
 
 .watch-image img {
-  max-height: 100%;
-  max-width: 100%;
+  max-height: 350px;
+  max-width: 350px;
   object-fit: contain;
 }
 
 .watches-grid {
   background-color: #0d4f97;
-  flex: 1;
+  flex: 0 0 auto;
   padding: 2rem;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -268,7 +266,8 @@ onMounted(async () => {
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
   overflow-y: auto;
-  max-height: 40vh;
+  max-height: 50vh;
+  min-height: 200px;
 }
 
 .watch-item {
@@ -357,7 +356,7 @@ onMounted(async () => {
   }
   .watch-info {
     order: 2;
-    padding: 2rem;
+    padding: 1rem;
     text-align: center;
     align-items: center;
   }
