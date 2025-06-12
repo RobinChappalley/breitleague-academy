@@ -1,6 +1,6 @@
 <template>
   <div class="formation-image-container" :style="backgroundStyle">
-    <div class="progress-bar" v-if=!showStartModal>
+    <div class="progress-bar" v-if="!showStartModal&&!isCheckpointModalVisible">
       <ProgressBar/>
     </div>
     <div class="top-action-buttons">
@@ -28,6 +28,12 @@
         >
       </transition>
       <!-- Bouton spécial checkpoint -->
+      <button
+          class="checkpoint-button special-button"
+          @click="showCheckpointModal"
+      ></button>
+
+
       <transition name="fade">
         <div v-if="showLessonPoints">
           <div v-if="isCheckpointModalVisible" class="modal-overlay" @click="closeCheckpointModal">
