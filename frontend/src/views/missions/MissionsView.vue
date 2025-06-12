@@ -144,7 +144,6 @@ const getAllMissions = async () => {
     isLoading.value = true
     error.value = null
 
-    console.log("Chargement de l'utilisateur connecté...")
 
     //Récupérer l'utilisateur connecté
     const res = await fetch('http://localhost:8000/api/user', {

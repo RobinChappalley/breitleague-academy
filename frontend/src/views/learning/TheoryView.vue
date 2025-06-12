@@ -67,10 +67,8 @@ const emit = defineEmits(['next-step'])
 // Methods
 const nextStep = () => {
   emit('next-step')
-  console.log('Going to next step')
 }
 
-console.log('TheoryView component loaded')
 </script>
 
 <style scoped>

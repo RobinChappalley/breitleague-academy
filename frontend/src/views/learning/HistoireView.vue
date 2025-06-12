@@ -154,7 +154,6 @@ const router = useRouter()
 const goBack = () => {
   router.back()
 }
-console.log('HistoireView component loaded')
 </script>
 
 <style scoped>

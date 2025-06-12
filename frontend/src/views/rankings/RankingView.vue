@@ -260,7 +260,6 @@ const loadUsersRanking = async () => {
     if (!res.ok) throw new Error('Erreur lors du chargement des utilisateurs')
 
     const data = await res.json()
-    console.log('Utilisateurs chargés:', data)
 
     rankingPlayers.value = data.data
       .filter((user) => user.is_BS === true)
@@ -369,7 +368,6 @@ const loadCurrentUser = async () => {
         : []
     }
 
-    console.log('Utilisateur courant chargé :', currentUser.value)
   } catch (err) {
     console.error('Erreur lors du chargement du currentUser:', err.message)
   }
@@ -402,7 +400,6 @@ onMounted(() => {
   })
 })
 
-console.log('RankingView component loaded')
 </script>
 
 <style scoped>

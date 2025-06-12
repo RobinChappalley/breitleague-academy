@@ -104,11 +104,9 @@ const goBack = () => {
 }
 // Methods
 const openLesson = (lessonId) => {
-  console.log(`Opening lesson: ${lessonId}`)
   router.push(`/ressources/history`)
 }
 
-console.log('LessonsListView component loaded')
 </script>
 
 <style scoped>

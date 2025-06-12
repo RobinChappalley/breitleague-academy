@@ -62,7 +62,6 @@ const beginTest = () => {
   router.push('/checkpoint-quiz')
 }
 
-console.log('CheckpointView component loaded')
 </script>
 
 <style scoped>

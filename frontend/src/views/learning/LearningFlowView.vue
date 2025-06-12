@@ -187,12 +187,10 @@ const nextLesson = () => {
   } else {
     completedLessonNumber.value = lessonIndex.value + 1
     currentView.value = 'completed'
-    console.log('Toutes les leçons terminées!')
   }
 }
 
 const handleAnswer = (answerData) => {
-  console.log('Answer selected:', answerData)
   
   lessonAnswers.value.push({
     questionIndex: answerData.questionIndex || lessonIndex.value,
@@ -221,7 +219,6 @@ const backToMenu = () => {
   console.log('Back to menu')
 }
 
-console.log('LearningFlowView component loaded')
 </script>
 
 <style scoped>

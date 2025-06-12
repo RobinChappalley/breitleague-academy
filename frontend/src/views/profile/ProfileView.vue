@@ -134,7 +134,6 @@ const loadUserProfile = async () => {
     isLoading.value = true
     error.value = null
 
-    console.log("Chargement de l'utilisateur connecté...")
 
     // Récupérer l'utilisateur connecté
     const res = await fetch('http://localhost:8000/api/user', {
@@ -147,14 +146,12 @@ const loadUserProfile = async () => {
     if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
 
     const connectedUser = await res.json()
-    console.log('Utilisateur connecté:', connectedUser)
+   
 
     // API pour charger les infos complètes du user
     const response = await userService.getUser(connectedUser.id)
-    console.log('Réponse API user:', response)
 
     user.value = response.data || response
-    console.log('User complet chargé:', user.value)
 
     // Charger les rewards
     await loadUserRewards(user.value.id)
@@ -174,7 +171,6 @@ const loadUserRewards = async (userId) => {
 
     userRewards.value = user.rewards || []
 
-    console.log('Utilisateur chargé:', user)
   } catch (err) {
     console.error('Erreur lors du chargement de l’utilisateur:', err.message)
     userRewards.value = []
@@ -199,7 +195,6 @@ const goToCollection = () => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('🚀 ProfileView mounted, loading ...')
   loadUserProfile()
 })
 const logout = async () => {
