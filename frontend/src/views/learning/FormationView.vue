@@ -6,11 +6,14 @@
     <div class="top-action-buttons">
 
       <!-- Bouton temporaire pour tester -->
-      <button class="action-btn" @click="changeModule('next')">Next Module (Test)</button>
-      <button class="action-btn" @click="changeModule('previous')">Previous Module (Test)</button>
 
       <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
       <RouterLink class="action-btn" to="/missions">Missions</RouterLink>
+    </div>
+    <div class="move-watch-button">
+      <button class="action-btn" @click="changeModule('next')">←</button>
+      <button class="action-btn" @click="changeModule('previous')">→</button>
+
     </div>
 
     <div ref="watchContainer" class="formation-watch-container">
