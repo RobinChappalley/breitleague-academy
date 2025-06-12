@@ -5,17 +5,11 @@
     </div>
     <div class="top-action-buttons">
 
-      <div class="ressources-buttons">
-        <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
-        <RouterLink class="action-btn" to="/missions">Missions</RouterLink>
-      </div>
+      <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
+      <RouterLink class="action-btn" to="/missions">Missions</RouterLink>
 
-
-      <div class="moving-buttons">
-        <button class="action-btn next-module-button" @click="changeModule('next')">←</button>
-        <button class="action-btn previous-module-button" @click="changeModule('previous')">→</button>
-      </div>
     </div>
+
     <div ref="watchContainer" class="formation-watch-container">
 
       <!-- Image de la montre avec transition -->
@@ -31,8 +25,6 @@
         >
       </transition>
       <!-- Bouton spécial checkpoint -->
-
-
       <transition name="fade">
         <div v-if="showLessonPoints">
           <button
@@ -131,12 +123,20 @@
               {{ lesson.title }}
             </p>
           </div>
-          <h2 class="module-title">{{ moduleTitle }}</h2>
         </div>
 
 
       </transition>
     </div>
+    <transition name="fader">
+      <div class="moving-buttons" v-if="showLessonPoints">
+        <button class="action-btn next-module-button" @click="changeModule('next')">←</button>
+        <h2 class="module-title">{{ moduleTitle }}</h2>
+        <button class="action-btn previous-module-button" @click="changeModule('previous')">→</button>
+      </div>
+
+    </transition>
+
   </div>
 </template>
 
@@ -687,8 +687,8 @@ export default {
   right: 30px;
   display: flex;
   justify-content: flex-end;
-  flex-direction: row;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: flex-end;
   @media screen and (width >= 768px) {
     gap: 18px;
   }
@@ -697,16 +697,24 @@ export default {
   }
 }
 
-.ressources-buttons, .moving-buttons {
+.moving-buttons {
+  position: absolute;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 16px;
-  align-items: flex-end;
+  transform: translateX(-50%);
+  align-items: center;
+  transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+  right: 30px;
+  bottom: 10%;
+  @media screen and (max-width: 767px) {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%)
+  }
+}
 
- button {
-   min-height: 48px;
-}
-}
+
 
 /* MODAL CHECKPOINT STYLES */
 .modal-overlay {
@@ -975,33 +983,26 @@ export default {
   }
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active, .fade-leave-active, .fader-enter-active, .fader-leave-active {
   transition: opacity 0.2s;
 }
 
-.fade-enter-from, .fade-leave-to {
+.fade-enter-from, .fade-leave-to, .fader-enter-from, .fader-leave-to {
   opacity: 0;
 }
 
-.fade-leave-from, .fade-enter-to {
+.fade-leave-from, .fade-enter-to, .fader-leave-from, .fader-enter-to {
   opacity: 1;
 }
 
 .module-title {
-  position: absolute;
-  right: -100px;
-  bottom: -50px;
   font-size: 2.5rem;
   color: whitesmoke
 }
 
 .next-module-button, .previous-module-button {
-
   z-index: 2;
 }
 
-.next-module-button {
 
-  top: 10%
-}
 </style>
