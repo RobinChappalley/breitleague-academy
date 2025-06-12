@@ -503,7 +503,7 @@ const logout = async () => {
 
 .watches-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 1rem;
 }
 
@@ -538,12 +538,11 @@ const logout = async () => {
 }
 .watch-placeholder img,
 .watch-item img {
-  max-width: 120px;
-  max-height: 120px;
-  width: 100%;
+  width: clamp(80px, 20vw, 120px);
   height: auto;
   object-fit: contain;
 }
+
 /* USER INFO SECTION */
 .user-info-section {
   background: rgba(255, 255, 255, 0.1);
