@@ -146,7 +146,6 @@ const pointsPopupText = ref('')
 
 // FONCTION AMÉLIORÉE : Récupérer l'URL de l'avatar
 const getAvatarUrl = (user) => {
-  console.log('🖼️ Getting avatar for user:', user)
   
   if (!user || !user.avatar) {
     console.log('❌ No avatar data for user:', user?.name)
@@ -161,7 +160,7 @@ const getAvatarUrl = (user) => {
   
   // Construire l'URL complète
   const avatarUrl = user.avatar.startsWith('http') ? user.avatar : `http://localhost:8000/${user.avatar}`
-  console.log('✅ Avatar URL for', user.name, ':', avatarUrl)
+ 
   
   return avatarUrl
 }
@@ -169,7 +168,7 @@ const getAvatarUrl = (user) => {
 // FONCTION CORRIGÉE : Récupérer les données utilisateur actuelles
 const loadCurrentUserData = async () => {
   try {
-    console.log('🔄 Loading current user data...')
+    
     
     // 1. Récupérer l'utilisateur authentifié
     const userResponse = await fetch('http://localhost:8000/api/user', {
@@ -182,7 +181,6 @@ const loadCurrentUserData = async () => {
     }
     
     const userData = await userResponse.json()
-    console.log('📋 Raw authenticated user data:', userData)
     
     // 2. Récupérer les données complètes via ton API (AVEC POS)
     const fullUserResponse = await fetch(`http://localhost:8000/api/v1/users/${userData.id}`, {
@@ -194,7 +192,6 @@ const loadCurrentUserData = async () => {
     if (fullUserResponse.ok) {
       const fullUserResponseData = await fullUserResponse.json()
       fullUserData = fullUserResponseData.data || fullUserResponseData || userData
-      console.log('📋 Full user data from API:', fullUserData)
     } else {
       console.warn('⚠️ Could not fetch full user data, using basic auth data')
     }
@@ -206,9 +203,7 @@ const loadCurrentUserData = async () => {
       flag: getUserFlag(fullUserData) || '🇨🇭' 
     }
     
-    console.log('✅ Current player loaded:', currentPlayer.value)
-    console.log('🖼️ Avatar path:', currentPlayer.value.avatar)
-    console.log('🚩 Flag from pos:', fullUserData.pos?.country_flag)
+ 
     
   } catch (error) {
     console.warn('⚠️ Error loading current user data:', error)
@@ -227,18 +222,15 @@ const loadCurrentUserData = async () => {
 const getUserFlag = (userData) => {
 
   if (userData.pos && userData.pos.country_flag) {
-    console.log('✅ Flag from pos.country_flag:', userData.pos.country_flag)
     return userData.pos.country_flag
   }
   
 
   if (userData.pos_id) {
     const flagFromPosId = getCountryFlag(userData.pos_id)
-    console.log('⚠️ Fallback flag from pos_id mapping:', flagFromPosId)
     return flagFromPosId
   }
   
-  console.log('❌ No flag found, using default')
   return '🇨🇭'
 }
 
@@ -257,51 +249,42 @@ const getCountryFlag = (posId) => {
     10: '🇧🇪' // Belgique
   }
   
-  console.log('🚩 Converting pos_id to flag:', posId, '->', flagMapping[posId])
   return flagMapping[posId] || '🇨🇭'
 }
 
 
 const currentQuestion = computed(() => {
   if (questions.value.length === 0) {
-    console.log('❌ Aucune question disponible')
     return null
   }
   
   const question = questions.value[currentQuestionIndex.value]
-  console.log('🎯 Question actuelle BRUTE:', question)
   
+  // ❌ ERREUR : formattedAnswers n'est pas défini !
+  const formattedAnswers = question.choices?.map((choice, index) => ({
+    text: choice.text_answer,
+    correct: choice.is_correct
+  })) || []
 
   const result = {
     id: question.id,
     text: question.content_default || question.content_if_TF || question.content_if_blank || 'Question sans contenu',
-    answers: formattedAnswers
+    answers: formattedAnswers // ✅ MAINTENANT DÉFINI
   }
   
   console.log('✅ Question FINALE pour affichage:', result)
-  console.log('🔍 === RÉSUMÉ DES RÉPONSES ===')
-  result.answers.forEach((answer, index) => {
-    console.log(`   ${index}: "${answer.text}" = ${answer.correct ? '✅ CORRECT' : '❌ incorrect'}`)
-  })
-  
   return result
 })
 
 // CORRIGER formatQuestions() - UTILISER correct_answer_text au lieu de correct_choice_id
 const formatQuestions = async (questionsList) => {
   try {
-    console.log('🔧 === FORMATAGE QUESTIONS AVEC correct_answer_text ===')
-    console.log('📋 Questions reçues:', questionsList)
+   
     
     questions.value = questionsList.map((q, index) => {
-      console.log(`\n📝 === QUESTION ${index + 1} ===`)
-      console.log(`🆔 ID: ${q.id}`)
-      console.log(`📝 Contenu: ${q.content_default}`)
-      console.log(`🎯 correct_answer_text: ${q.correct_answer_text}`)
-      console.log(`🎯 correct_choice_id: ${q.correct_choice_id}`)
+     
       
       const choices = q.choices || []
-      console.log(`📋 Choix reçus (${choices.length}):`, choices)
       
       if (choices.length === 0) {
         console.warn(`⚠️ Aucun choix pour question ${q.id}`)
@@ -341,17 +324,12 @@ const formatQuestions = async (questionsList) => {
         }
       }
       
-      console.log(`✅ Réponses correctes identifiées:`, correctAnswerTexts)
       
       const formattedChoices = choices.map((choice, choiceIndex) => {
         // COMPARAISON avec correct_answer_text
         const isCorrect = correctAnswerTexts.includes(choice.text_answer)
         
-        console.log(`\n📝 Choix ${choiceIndex}:`)
-        console.log(`   - ID: ${choice.id}`)
-        console.log(`   - Texte: "${choice.text_answer}"`)
-        console.log(`   - Comparaison avec correct_answer_text: ${isCorrect}`)
-        console.log(`   - Résultat: ${isCorrect ? '✅ CORRECT' : '❌ incorrect'}`)
+       
         
         return {
           id: choice.id,
@@ -362,8 +340,7 @@ const formatQuestions = async (questionsList) => {
       
       // VÉRIFICATION : une seule réponse correcte
       const correctChoices = formattedChoices.filter(c => c.is_correct)
-      console.log(`\n🔍 Vérification question ${index + 1}:`)
-      console.log(`   - Choix corrects trouvés: ${correctChoices.length}`)
+  
       
       if (correctChoices.length === 0) {
         console.error(`❌ AUCUNE réponse correcte pour question ${q.id} !`)
@@ -394,13 +371,11 @@ const formatQuestions = async (questionsList) => {
     })
     
     totalQuestions.value = questions.value.length
-    console.log(`\n✅ === FORMATAGE TERMINÉ ===`)
-    console.log(`📊 Total questions formatées: ${questions.value.length}`)
+ 
     
     // VÉRIFICATION FINALE
     questions.value.forEach((q, index) => {
       const correctChoices = q.choices.filter(c => c.is_correct)
-      console.log(`🔍 Question ${index + 1}: ${correctChoices.length} réponse(s) correcte(s)`)
       if (correctChoices.length === 1) {
         console.log(`✅ Bonne réponse: "${correctChoices[0].text_answer}"`)
       }
@@ -433,8 +408,7 @@ const loadBattleData = async () => {
           flag: battleData.value.opponent.flag || '🇩🇪'
         }
         
-        console.log('✅ Opponent data loaded:', opponent.value)
-        console.log('🖼️ Opponent avatar:', battleData.value.opponent.avatar)
+      
       }
     }
     
@@ -449,7 +423,6 @@ const loadBattleData = async () => {
 
 // AJOUTER la fonction loadFallbackQuestions qui manque
 const loadFallbackQuestions = () => {
-  console.log('🔄 Chargement des questions de fallback...')
   
   questions.value = [
     {
@@ -505,7 +478,6 @@ const loadFallbackQuestions = () => {
   ]
   
   totalQuestions.value = questions.value.length
-  console.log('✅ Questions de fallback chargées:', questions.value.length)
 }
 
 // AJOUTER la fonction loadSpecificQuestions qui manque aussi
@@ -531,11 +503,9 @@ const loadSpecificQuestions = async (questionIds) => {
     // Filtrer les questions par leurs IDs dans l'ordre donné
     const specificQuestions = questionIds.map(id => {
       const found = allQuestions.find(q => q.id === id)
-      console.log(`🔍 Recherche question ID ${id}:`, found ? 'TROUVÉE' : 'NON TROUVÉE')
       return found
     }).filter(Boolean) // Enlever les undefined
     
-    console.log(`🎯 Questions spécifiques trouvées: ${specificQuestions.length}/${questionIds.length}`)
     
     if (specificQuestions.length === 0) {
       throw new Error('Aucune question spécifique trouvée')
@@ -570,44 +540,12 @@ const loadSpecificQuestions = async (questionIds) => {
 // CORRIGER loadQuestionsFromAPI() avec une gestion d'erreur plus robuste
 const loadQuestionsFromAPI = async () => {
   try {
-    console.log('🔄 Chargement des questions pour cette bataille...')
-    console.log('🎯 battleData:', battleData.value)
-    
-    // Vérifier si on a des questions fixes pour cette bataille (IDs)
-    if (battleData.value?.questions && Array.isArray(battleData.value.questions) && battleData.value.questions.length > 0) {
-      console.log('🎯 Utilisation des questions fixes de la bataille:', battleData.value.questions)
-      await loadSpecificQuestions(battleData.value.questions)
-      return
-    }
-    
-    // Vérifier si l'autre joueur a déjà joué (questions complètes dans son summary)
-    if (battleData.value?.existingQuestions && Array.isArray(battleData.value.existingQuestions) && battleData.value.existingQuestions.length > 0) {
-      console.log('🔄 Utilisation des questions déjà jouées par l\'adversaire')
-      
-      // CORRIGER : Reformater les questions existantes avec la même structure
-      questions.value = battleData.value.existingQuestions.map((q, index) => ({
-        id: q.id || index + 1,
-        content_default: q.text || `Question ${index + 1}`,
-        choices: [
-          { text_answer: q.correctAnswer, is_correct: true },
-          { text_answer: 'Réponse B', is_correct: false },
-          { text_answer: 'Réponse C', is_correct: false },
-          { text_answer: 'Réponse D', is_correct: false }
-        ]
-      }))
-      
-      totalQuestions.value = questions.value.length
-      console.log('✅ Questions formatées depuis l\'adversaire:', questions.value.length)
-      return
-    }
-    
-    // Fallback : charger 5 questions aléatoirement depuis l'API
-    console.log('🎲 Chargement de 5 questions aléatoirement depuis l\'API...')
+    console.log('🎲 Chargement avec SUPER mélange depuis TOUTE la DB...')
     const questionsData = await battleService.getQuestions()
     console.log('📋 Réponse API questions:', questionsData)
     
     const allQuestions = questionsData.data || questionsData || []
-    console.log('📊 Questions disponibles:', allQuestions.length)
+    console.log('📊 Questions disponibles (tous modules/leçons):', allQuestions.length)
     
     if (allQuestions.length === 0) {
       console.warn('⚠️ Aucune question API, utilisation du fallback')
@@ -615,11 +553,119 @@ const loadQuestionsFromAPI = async () => {
       return
     }
     
-    // Sélectionner 5 questions aléatoirement
-    const shuffled = allQuestions.sort(() => 0.5 - Math.random())
-    const selectedQuestions = shuffled.slice(0, 5)
+    // NOUVEAU : SUPER MÉLANGE MULTIPLE avec vraie randomisation
+    const superShuffleArray = (array) => {
+      const shuffled = [...array]
+      
+      // 1. PREMIER MÉLANGE : Fisher-Yates classique
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+      }
+      
+      // 2. DEUXIÈME MÉLANGE : Basé sur timestamp + random
+      const seed = Date.now() % 1000
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const randomFactor1 = Math.random()
+        const randomFactor2 = Math.sin(seed + i) // Fonction trigonométrique pour plus de chaos
+        const randomFactor3 = (new Date().getMilliseconds()) / 1000
+        const combinedRandom = Math.abs(randomFactor1 + randomFactor2 + randomFactor3) % 1
+        const j = Math.floor(combinedRandom * (i + 1))
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+      }
+      
+      // 3. TROISIÈME MÉLANGE : Méthode "chunk and rotate"
+      const chunkSize = Math.max(1, Math.floor(shuffled.length / 10))
+      for (let start = 0; start < shuffled.length; start += chunkSize) {
+        const end = Math.min(start + chunkSize, shuffled.length)
+        const chunk = shuffled.slice(start, end)
+        
+        // Rotation aléatoire du chunk
+        const rotateBy = Math.floor(Math.random() * chunk.length)
+        const rotatedChunk = [...chunk.slice(rotateBy), ...chunk.slice(0, rotateBy)]
+        
+        // Remettre le chunk mélangé
+        for (let i = 0; i < rotatedChunk.length; i++) {
+          shuffled[start + i] = rotatedChunk[i]
+        }
+      }
+      
+      return shuffled
+    }
     
-    console.log('🎯 Questions sélectionnées:', selectedQuestions.length)
+    // Appliquer le SUPER mélange
+    const superShuffled = superShuffleArray(allQuestions)
+    
+    // NOUVEAU : Sélection vraiment aléatoire (pas forcément du début)
+    let selectedQuestions = []
+    
+    if (superShuffled.length >= 20) {
+      // Si on a beaucoup de questions, prendre 5 questions à différents endroits
+      const step = Math.floor(superShuffled.length / 10) // Diviser en 10 sections
+      const usedIndices = new Set()
+      
+      while (selectedQuestions.length < 5 && usedIndices.size < superShuffled.length) {
+        // Choisir un index aléatoire dans une section différente
+        const sectionStart = (selectedQuestions.length * step) % (superShuffled.length - step)
+        const randomInSection = Math.floor(Math.random() * step)
+        const candidateIndex = sectionStart + randomInSection
+        
+        if (!usedIndices.has(candidateIndex) && candidateIndex < superShuffled.length) {
+          selectedQuestions.push(superShuffled[candidateIndex])
+          usedIndices.add(candidateIndex)
+        }
+      }
+      
+      // Si on n'a pas assez de questions, compléter aléatoirement
+      while (selectedQuestions.length < 5) {
+        const randomIndex = Math.floor(Math.random() * superShuffled.length)
+        if (!usedIndices.has(randomIndex)) {
+          selectedQuestions.push(superShuffled[randomIndex])
+          usedIndices.add(randomIndex)
+        }
+      }
+    } else if (superShuffled.length >= 10) {
+      // Méthode intermédiaire : prendre des questions espacées
+      const indices = []
+      const spacing = Math.floor(superShuffled.length / 5)
+      
+      for (let i = 0; i < 5; i++) {
+        const baseIndex = i * spacing
+        const randomOffset = Math.floor(Math.random() * Math.min(spacing, superShuffled.length - baseIndex))
+        indices.push((baseIndex + randomOffset) % superShuffled.length)
+      }
+      
+      // Supprimer les doublons et prendre les questions
+      const uniqueIndices = [...new Set(indices)]
+      selectedQuestions = uniqueIndices.slice(0, 5).map(index => superShuffled[index])
+      
+      // Compléter si besoin
+      while (selectedQuestions.length < 5 && selectedQuestions.length < superShuffled.length) {
+        const randomIndex = Math.floor(Math.random() * superShuffled.length)
+        const candidate = superShuffled[randomIndex]
+        if (!selectedQuestions.some(q => q.id === candidate.id)) {
+          selectedQuestions.push(candidate)
+        }
+      }
+    } else {
+      // Peu de questions : prendre les 5 premières du mélange
+      selectedQuestions = superShuffled.slice(0, Math.min(5, superShuffled.length))
+    }
+    
+    console.log('🎯 Questions sélectionnées (avec indices originaux):')
+    selectedQuestions.forEach((q, index) => {
+      const originalIndex = allQuestions.findIndex(orig => orig.id === q.id)
+      console.log(`  ${index + 1}. Q${q.id} (index original: ${originalIndex}/${allQuestions.length - 1}) - M${q.module_id}/L${q.lesson_id}`)
+    })
+    
+    // Vérifier qu'on a une bonne distribution
+    const moduleDistribution = {}
+    selectedQuestions.forEach(q => {
+      const moduleId = q.module_id || 'unknown'
+      moduleDistribution[moduleId] = (moduleDistribution[moduleId] || 0) + 1
+    })
+    console.log('📚 Distribution par module:', moduleDistribution)
+    
     await formatQuestions(selectedQuestions)
     
   } catch (error) {
@@ -631,7 +677,6 @@ const loadQuestionsFromAPI = async () => {
 
 // Methods (le reste des méthodes reste identique...)
 const startTimer = () => {
-  console.log('⏰ Démarrage du timer...')
   
   // Nettoyer l'ancien timer si il existe
   if (timerInterval) {
@@ -1044,7 +1089,6 @@ onMounted(async () => {
   // 3. Démarrer le timer après un délai
   setTimeout(() => {
     if (questions.value.length > 0) {
-      console.log('⏰ Starting timer...')
       startTimer()
     } else {
       console.error('❌ Aucune question disponible pour démarrer le timer')
