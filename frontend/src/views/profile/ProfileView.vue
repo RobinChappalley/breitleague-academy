@@ -108,7 +108,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { userService, getCurrentUser } from '@/services/api'
+import { userService, getCurrentUser, BACKEND_URL } from '@/services/api'
 
 const router = useRouter()
 
@@ -177,13 +177,13 @@ const loadUserRewards = async (userId) => {
 }
 
 const getUserInitial = () => {
-  if (user.value.avatar) return `http://localhost:8000/${user.value.avatar}`
+  if (user.value.avatar) return `${BACKEND_URL}/${user.value.avatar}`
   if (user.value.username) return user.value.username[0].toUpperCase()
   return 'U'
 }
 
 const getRewardImage = (reward) => {
-  if (reward.photo_name) return `http://localhost:8000/${reward.photo_name}`
+  if (reward.photo_name) return `${BACKEND_URL}/${reward.photo_name}`
   if (reward.model) return reward.model[0].toUpperCase()
   return 'U'
 }
