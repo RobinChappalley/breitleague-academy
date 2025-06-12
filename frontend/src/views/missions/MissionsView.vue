@@ -46,7 +46,7 @@
               <div class="reward-watch">
                 <img
                   v-if="mission.reward"
-                  :src="`http://localhost:8000/${mission.reward.photo_name}`"
+                  :src="`${BACKEND_URL}/${mission.reward.photo_name}`"
                   :alt="mission.reward.model"
                   class="watch-image"
                 />
@@ -64,7 +64,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { userService } from '@/services/api'
+import { userService, getCurrentUser, BACKEND_URL } from '@/services/api'
 const router = useRouter()
 
 const goBack = () => {
@@ -84,12 +84,12 @@ const visibleMissions = computed(() => {
   })
 })
 
-const successMessage = ref('') 
+const successMessage = ref('')
 
 const claimReward = async (mission) => {
   if (mission.progress === 100 && !mission.completed) {
     try {
-      const resAddReward = await fetch('http://localhost:8000/api/v1/user-rewards', {
+      const resAddReward = await fetch(`${BACKEND_URL}/api/v1/user-rewards`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -110,7 +110,7 @@ const claimReward = async (mission) => {
 
       // DELETE la user-mission
       const resDeleteMission = await fetch(
-        `http://localhost:8000/api/v1/user-missions/${mission.user_mission_id}`,
+        `${BACKEND_URL}/api/v1/user-missions/${mission.user_mission_id}`,
         {
           method: 'DELETE',
           credentials: 'include',
@@ -145,38 +145,27 @@ const getAllMissions = async () => {
     error.value = null
 
 
-    //Récupérer l'utilisateur connecté
-    const res = await fetch('http://localhost:8000/api/user', {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
-    })
+    // Récupérer l'utilisateur connecté via getCurrentUserId
+    const connectedUser = await getCurrentUser.getCurrentUserId()
+    console.log('Utilisateur connecté:', connectedUser)
 
-    if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
-
-    const connectedUser = await res.json()
-
-    //Charger infos complètes du user
+    // Charger infos complètes du user
     const response = await userService.getUser(connectedUser.id)
-
     user.value = response.data || response
 
-    //Charger les missions
+    // Charger les missions
     const userMissions = user.value.missions || []
 
+    // 4️⃣ Pour chaque mission, aller chercher le reward lié + ajouter user_mission_id
     const missionsWithRewards = await Promise.all(
       userMissions.map(async (mission) => {
         try {
-          const rewardRes = await fetch(
-            `http://localhost:8000/api/v1/rewards/${mission.reward_id}`,
-            {
-              credentials: 'include',
-              headers: {
-                Accept: 'application/json'
-              }
+          const rewardRes = await fetch(`${BACKEND_URL}/api/v1/rewards/${mission.reward_id}`, {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json'
             }
-          )
+          })
 
           if (!rewardRes.ok) {
             console.warn(`Reward ${mission.reward_id} non trouvé.`)
@@ -184,7 +173,7 @@ const getAllMissions = async () => {
               ...mission,
               reward: null,
               progress: mission.pivot.is_completed === 1 ? 100 : 0,
-              completed: false, // NE PAS le mettre égal à is_completed !
+              completed: false,
               user_mission_id: mission.pivot.id
             }
           }
@@ -195,7 +184,7 @@ const getAllMissions = async () => {
             ...mission,
             reward: rewardData.data,
             progress: mission.pivot.is_completed === 1 ? 100 : 0,
-            completed: false, // pareil
+            completed: false,
             user_mission_id: mission.pivot.id
           }
         } catch (err) {
@@ -215,6 +204,7 @@ const getAllMissions = async () => {
     missions.value = missionsWithRewards
   } catch (err) {
     error.value = err
+    console.error('Erreur dans getAllMissions:', err)
   } finally {
     isLoading.value = false
   }
@@ -232,7 +222,7 @@ onMounted(async () => {
   background: linear-gradient(135deg, #072c54 0%, #1e3a8a 100%);
   color: white;
   padding: 1rem;
-  padding-bottom: 100px; 
+  padding-bottom: 100px;
   box-sizing: border-box;
 }
 

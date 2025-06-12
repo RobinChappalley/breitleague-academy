@@ -21,6 +21,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { getCurrentUser, BACKEND_URL, SANCTUM_URL } from '@/services/api'
 
 const username = ref('')
 const password = ref('')
@@ -33,7 +34,7 @@ const login = async () => {
 
   try {
     // Récupérer le token CSRF
-    await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+    await fetch(`${SANCTUM_URL}`, {
       credentials: 'include'
     })
 
@@ -46,7 +47,7 @@ const login = async () => {
     )
 
     // Envoyer le login avec le token CSRF
-    const res = await fetch('http://localhost:8000/login', {
+    const res = await fetch(`${BACKEND_URL}/login`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -70,33 +71,23 @@ const login = async () => {
 
 const fetchUser = async () => {
   try {
-    const res = await fetch('http://localhost:8000/api/user', {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
-    })
+    const connectedUser = await getCurrentUser.getCurrentUserId()
+    console.log('Utilisateur connecté:', connectedUser)
 
-    if (!res.ok) {
-      currentUser.value = null
-      localStorage.removeItem('isLoggedIn')
-      return
-    }
-
-    const data = await res.json()
-    currentUser.value = data
+    currentUser.value = connectedUser
     localStorage.setItem('isLoggedIn', 'true')
 
-    // Si l'utilisateur est connecté → rediriger vers "/"
     router.push('/')
-  } catch {
+  } catch (err) {
+    // Si erreur (fetch échoué ou 401), on déconnecte
+    console.error('Error fetching user:', err)
     currentUser.value = null
     localStorage.removeItem('isLoggedIn')
   }
 }
 
 const logout = async () => {
-  await fetch('http://localhost:8000/logout', {
+  await fetch(`${BACKEND_URL}logout`, {
     method: 'POST',
     credentials: 'include'
   })

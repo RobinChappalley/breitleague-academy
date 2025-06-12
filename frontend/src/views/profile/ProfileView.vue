@@ -103,7 +103,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { userService } from '@/services/api'
+import { userService, getCurrentUser, BACKEND_URL } from '@/services/api'
 
 const router = useRouter()
 
@@ -134,18 +134,9 @@ const loadUserProfile = async () => {
     error.value = null
 
 
-    // Récupérer l'utilisateur connecté
-    const res = await fetch('http://localhost:8000/api/user', {
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json'
-      }
-    })
-
-    if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
-
-    const connectedUser = await res.json()
-   
+    // 1️⃣ Récupérer l'utilisateur connecté
+    const connectedUser = await getCurrentUser.getCurrentUserId()
+    console.log('Utilisateur connecté:', connectedUser)
 
     // API pour charger les infos complètes du user
     const response = await userService.getUser(connectedUser.id)
@@ -177,13 +168,13 @@ const loadUserRewards = async (userId) => {
 }
 
 const getUserInitial = () => {
-  if (user.value.avatar) return `http://localhost:8000/${user.value.avatar}`
+  if (user.value.avatar) return `${BACKEND_URL}/${user.value.avatar}`
   if (user.value.username) return user.value.username[0].toUpperCase()
   return 'U'
 }
 
 const getRewardImage = (reward) => {
-  if (reward.photo_name) return `http://localhost:8000/${reward.photo_name}`
+  if (reward.photo_name) return `${BACKEND_URL}/${reward.photo_name}`
   if (reward.model) return reward.model[0].toUpperCase()
   return 'U'
 }
@@ -206,7 +197,7 @@ const logout = async () => {
         ?.split('=')[1] ?? ''
     )
 
-    await fetch('http://localhost:8000/logout', {
+    await fetch(`${BACKEND_URL}/logout`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -230,7 +221,7 @@ const logout = async () => {
   min-height: 100vh;
   width: 100%;
   background: linear-gradient(135deg, #072c54 0%, #1e3a8a 100%);
-  
+
   padding: 1rem;
   padding-bottom: 100px;
   box-sizing: border-box;

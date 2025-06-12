@@ -1,5 +1,23 @@
+// frontend/src/services/api.js
+export const BACKEND_URL = 'http://localhost:8000'
+const API_BASE_URL = `${BACKEND_URL}/api/v1`
+export const SANCTUM_URL = `${BACKEND_URL}/sanctum/csrf-cookie`
 
-const API_BASE_URL = 'http://localhost:8000/api/v1'
+export const getCurrentUser = {
+  async getCurrentUserId() {
+    const res = await fetch(`${BACKEND_URL}/api/user`, {
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`)
+    }
+
+    return res.json()
+  }
+}
 
 export const userService = {
   async getUser(id) {
@@ -33,9 +51,23 @@ export const userService = {
   }
 }
 
+export const fetchAllUsers = async () => {
+  const res = await fetch(`${API_BASE_URL}/users`, {
+    credentials: 'include',
+    headers: {
+      Accept: 'application/json'
+    }
+  })
+  if (!res.ok) throw new Error('Erreur lors du chargement des utilisateurs')
+
+  const data = await res.json()
+  return data
+}
+
 export const battleService = {
   async getAvailableUsers() {
-    await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+    // Token CSRF comme dans LoginView
+    await fetch(`${SANCTUM_URL}`, {
       credentials: 'include'
     })
 
@@ -59,7 +91,7 @@ export const battleService = {
   },
 
   async getQuestions() {
-    await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+    await fetch(`${SANCTUM_URL}`, {
       credentials: 'include'
     })
 
@@ -83,7 +115,7 @@ export const battleService = {
   },
 
   async getChoices() {
-    await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+    await fetch(`${SANCTUM_URL}`, {
       credentials: 'include'
     })
 
@@ -115,11 +147,10 @@ export const fetchProgression = async (userid) => {
 }
 
 export const fetchModule = async (moduleId) => {
-const module = await fetch(`${API_BASE_URL}/modules/${moduleId}`, {})
-const data = await module.json()
-return data.data
+  const module = await fetch(`${API_BASE_URL}/modules/${moduleId}`, {})
+  const data = await module.json()
+  return data.data
 }
-
 
 export const fetchModules = async () => {
   const modules = await fetch(`${API_BASE_URL}/modules`, {})
