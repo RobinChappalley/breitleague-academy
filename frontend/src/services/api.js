@@ -50,6 +50,19 @@ export const userService = {
   }
 }
 
+export const fetchAllUsers = async () => {
+  const res = await fetch(`${API_BASE_URL}/users`, {
+    credentials: 'include',
+    headers: {
+      Accept: 'application/json'
+    }
+  })
+  if (!res.ok) throw new Error('Erreur lors du chargement des utilisateurs')
+
+  const data = await res.json()
+  return data
+}
+
 export const battleService = {
   // Récupérer tous les utilisateurs disponibles pour un battle
   async getAvailableUsers() {
