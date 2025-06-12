@@ -1,6 +1,6 @@
 // frontend/src/services/api.js
 const API_BASE_URL = 'http://localhost:8000/api/v1'
-const BACKEND_URL = 'http://localhost:8000'
+export const BACKEND_URL = 'http://localhost:8000'
 
 export const getCurrentUser = {
   async getCurrentUserId() {

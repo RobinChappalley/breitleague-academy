@@ -27,7 +27,7 @@
         <div class="watch-image">
           <img
             v-if="selectedWatch.photo_name"
-            :src="`${backendUrl.replace(/\/$/, '')}/${selectedWatch.photo_name.replace(
+            :src="`${BACKEND_URL.replace(/\/$/, '')}/${selectedWatch.photo_name.replace(
               /^\/\//,
               ''
             )}`"
@@ -45,7 +45,7 @@
           @click="selectWatch(watch)"
         >
           <img
-            :src="`${backendUrl}/${watch.photo_name}`.replace(/([^:]\/)(\/)+/g, '$1')"
+            :src="`${BACKEND_URL}/${watch.photo_name}`.replace(/([^:]\/)(\/)+/g, '$1')"
             :alt="watch.model"
           />
           <span
@@ -66,10 +66,10 @@
 </template>
 
 <script setup>
-import { userService, getCurrentUser } from '@/services/api'
+import { BACKEND_URL, userService, getCurrentUser } from '@/services/api'
+
 import { ref, onMounted } from 'vue'
 
-const backendUrl = 'http://localhost:8000'
 const watches = ref([])
 const selectedWatch = ref({})
 const favoriteIds = ref([])
@@ -114,7 +114,7 @@ const fetchFavorites = async () => {
     const user = await getCurrentUser.getCurrentUserId()
     console.log('Utilisateur connecté:', user)
 
-    const res = await userService.getUser(user.id) // <- correction ici
+    const res = await userService.getUser(user.id)
     const dataUser = res.data
 
     favoriteIds.value = Array.isArray(dataUser.rewards)
@@ -151,7 +151,7 @@ const toggleFavorite = async (watch) => {
     }
 
     //On utilise bodyData dans le fetch
-    const response = await fetch(`${backendUrl}/api/v1/user-rewards/${watch.userRewardId}`, {
+    const response = await fetch(`${BACKEND_URL}/api/v1/user-rewards/${watch.userRewardId}`, {
       method: 'PUT',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },

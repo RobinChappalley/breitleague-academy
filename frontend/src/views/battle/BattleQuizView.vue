@@ -5,9 +5,9 @@
       <!-- UTILISATEUR AUTHENTIFIÉ À GAUCHE -->
       <div class="player-info">
         <div class="avatar" :style="getAvatarStyle(currentPlayer)">
-          <img 
-            v-if="currentPlayer.avatar && currentPlayer.avatar !== currentPlayer.name?.charAt(0)" 
-            :src="getAvatarUrl(currentPlayer)" 
+          <img
+            v-if="currentPlayer.avatar && currentPlayer.avatar !== currentPlayer.name?.charAt(0)"
+            :src="getAvatarUrl(currentPlayer)"
             :alt="currentPlayer.name"
             class="avatar-image"
           />
@@ -18,9 +18,9 @@
           <span class="flag">{{ currentPlayer.flag }}</span>
         </div>
       </div>
-      
+
       <div class="vs-indicator">VS</div>
-      
+
       <!-- ADVERSAIRE À DROITE -->
       <div class="opponent-info">
         <div class="opponent-details">
@@ -28,9 +28,9 @@
           <span class="flag">{{ opponent.flag }}</span>
         </div>
         <div class="avatar" :style="getAvatarStyle(opponent)">
-          <img 
-            v-if="opponent.avatar && opponent.avatar !== opponent.name?.charAt(0)" 
-            :src="getAvatarUrl(opponent)" 
+          <img
+            v-if="opponent.avatar && opponent.avatar !== opponent.name?.charAt(0)"
+            :src="getAvatarUrl(opponent)"
             :alt="opponent.name"
             class="avatar-image"
           />
@@ -42,27 +42,20 @@
     <!-- Progress Bar -->
     <div class="progress-container">
       <div class="progress-bar">
-        <div 
-          class="progress-fill"
-          :style="{ width: progressPercentage + '%' }"
-        ></div>
+        <div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
       </div>
-      <div class="question-counter">
-        {{ currentQuestionIndex + 1 }} / {{ totalQuestions }}
-      </div>
+      <div class="question-counter">{{ currentQuestionIndex + 1 }} / {{ totalQuestions }}</div>
     </div>
 
     <!-- Timer -->
     <div class="timer-container">
-      <div class="timer" :class="{ 'warning': timeLeft <= 5 }">
-        {{ timeLeft }}s
-      </div>
+      <div class="timer" :class="{ warning: timeLeft <= 5 }">{{ timeLeft }}s</div>
     </div>
 
     <!-- Question -->
     <div class="question-container" v-if="currentQuestion">
       <h2 class="question-text">{{ currentQuestion.text }}</h2>
-      
+
       <!-- Answer Options -->
       <div class="answers-grid">
         <button
@@ -85,8 +78,8 @@
     </div>
 
     <!-- Popup des points gagnés -->
-    <div 
-      v-if="showPointsPopup" 
+    <div
+      v-if="showPointsPopup"
       class="points-popup"
       :class="{ 'speed-bonus': pointsPopupText.includes('bonus') }"
     >
@@ -146,22 +139,24 @@ const pointsPopupText = ref('')
 // FONCTION AMÉLIORÉE : Récupérer l'URL de l'avatar
 const getAvatarUrl = (user) => {
   console.log('🖼️ Getting avatar for user:', user)
-  
+
   if (!user || !user.avatar) {
     console.log('❌ No avatar data for user:', user?.name)
     return null
   }
-  
+
   // Si c'est juste une lettre (fallback), ne pas afficher d'image
   if (typeof user.avatar === 'string' && user.avatar.length === 1) {
     console.log('❌ Avatar is just initial:', user.avatar)
     return null
   }
-  
+
   // Construire l'URL complète
-  const avatarUrl = user.avatar.startsWith('http') ? user.avatar : `http://localhost:8000/${user.avatar}`
+  const avatarUrl = user.avatar.startsWith('http')
+    ? user.avatar
+    : `http://localhost:8000/${user.avatar}`
   console.log('✅ Avatar URL for', user.name, ':', avatarUrl)
-  
+
   return avatarUrl
 }
 
@@ -169,28 +164,28 @@ const getAvatarUrl = (user) => {
 const loadCurrentUserData = async () => {
   try {
     console.log('🔄 Loading current user data...')
-    
+
     // 1. Récupérer l'utilisateur authentifié
     const userResponse = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
-      headers: { 'Accept': 'application/json' }
+      headers: { Accept: 'application/json' }
     })
-    
+
     if (!userResponse.ok) {
       throw new Error('Failed to fetch authenticated user')
     }
-    
+
     const userData = await userResponse.json()
     console.log('📋 Raw authenticated user data:', userData)
-    
+
     // 2. Récupérer les données complètes via ton API (AVEC POS)
     const fullUserResponse = await fetch(`http://localhost:8000/api/v1/users/${userData.id}`, {
       credentials: 'include',
-      headers: { 'Accept': 'application/json' }
+      headers: { Accept: 'application/json' }
     })
-    
+
     let fullUserData = userData // Fallback sur les données de base
-    
+
     if (fullUserResponse.ok) {
       const fullUserResponseData = await fullUserResponse.json()
       fullUserData = fullUserResponseData.data || fullUserResponseData || userData
@@ -198,7 +193,7 @@ const loadCurrentUserData = async () => {
     } else {
       console.warn('⚠️ Could not fetch full user data, using basic auth data')
     }
-    
+
     // 3. METTRE À JOUR currentPlayer avec les VRAIES données
     currentPlayer.value = {
       id: fullUserData.id || userData.id,
@@ -206,14 +201,13 @@ const loadCurrentUserData = async () => {
       avatar: fullUserData.avatar || userData.avatar || null,
       flag: getUserFlag(fullUserData) || '🇨🇭' // UTILISER LA NOUVELLE FONCTION
     }
-    
+
     console.log('✅ Current player loaded:', currentPlayer.value)
     console.log('🖼️ Avatar path:', currentPlayer.value.avatar)
     console.log('🚩 Flag from pos:', fullUserData.pos?.country_flag)
-    
   } catch (error) {
     console.warn('⚠️ Error loading current user data:', error)
-    
+
     // Fallback en cas d'erreur
     currentPlayer.value = {
       id: 1,
@@ -231,14 +225,14 @@ const getUserFlag = (userData) => {
     console.log('✅ Flag from pos.country_flag:', userData.pos.country_flag)
     return userData.pos.country_flag
   }
-  
+
   // 2. Fallback sur le mapping pos_id si pas de country_flag
   if (userData.pos_id) {
     const flagFromPosId = getCountryFlag(userData.pos_id)
     console.log('⚠️ Fallback flag from pos_id mapping:', flagFromPosId)
     return flagFromPosId
   }
-  
+
   // 3. Fallback final
   console.log('❌ No flag found, using default')
   return '🇨🇭'
@@ -258,7 +252,7 @@ const getCountryFlag = (posId) => {
     9: '🇬🇧', // Royaume-Uni
     10: '🇧🇪' // Belgique
   }
-  
+
   console.log('🚩 Converting pos_id to flag:', posId, '->', flagMapping[posId])
   return flagMapping[posId] || '🇨🇭'
 }
@@ -266,17 +260,22 @@ const getCountryFlag = (posId) => {
 // Computed
 const currentQuestion = computed(() => {
   if (questions.value.length === 0) return null
-  
+
   const question = questions.value[currentQuestionIndex.value]
-  
+
   // UTILISER LA VRAIE STRUCTURE DE TA BASE (text_answer)
   return {
     id: question.id,
-    text: question.content_default || question.content_lf_tf || question.content_lf_blank || 'Question sans contenu',
-    answers: question.choices?.map(choice => ({
-      text: choice.text_answer || choice.content || choice.text,
-      correct: choice.is_correct || choice.correct || false
-    })) || []
+    text:
+      question.content_default ||
+      question.content_lf_tf ||
+      question.content_lf_blank ||
+      'Question sans contenu',
+    answers:
+      question.choices?.map((choice) => ({
+        text: choice.text_answer || choice.content || choice.text,
+        correct: choice.is_correct || choice.correct || false
+      })) || []
   }
 })
 
@@ -291,7 +290,7 @@ const loadBattleData = () => {
     const savedBattle = localStorage.getItem('currentBattle')
     if (savedBattle) {
       battleData.value = JSON.parse(savedBattle)
-      
+
       // Mettre à jour les données de l'adversaire
       if (battleData.value.opponent) {
         opponent.value = {
@@ -300,16 +299,16 @@ const loadBattleData = () => {
           avatar: battleData.value.opponent.avatar,
           flag: battleData.value.opponent.flag || '🇩🇪'
         }
-        
+
         console.log('✅ Opponent data loaded:', opponent.value)
         console.log('🖼️ Opponent avatar:', battleData.value.opponent.avatar)
       }
-      
+
       // Charger les questions depuis la base de données
       if (battleData.value.questions && battleData.value.questions.length > 0) {
         questions.value = battleData.value.questions
         totalQuestions.value = questions.value.length
-        
+
         console.log('✅ Questions loaded from database:', questions.value.length, 'questions')
       } else {
         console.warn('⚠️ No questions found in battle data, using fallback')
@@ -379,7 +378,7 @@ const loadFallbackQuestions = () => {
       ]
     }
   ]
-  
+
   totalQuestions.value = questions.value.length
   console.log('🔄 Using fallback questions:', questions.value.length)
 }
@@ -404,7 +403,7 @@ const stopTimer = () => {
 
 const selectAnswer = (index) => {
   if (hasAnswered.value) return
-  
+
   selectedAnswer.value = index
   hasAnswered.value = true
   stopTimer()
@@ -413,24 +412,24 @@ const selectAnswer = (index) => {
   playerTime.value += timeTaken
 
   const opponentTime = Math.floor(Math.random() * 25) + 3
-  
+
   let isCorrect = false
   let selectedAnswerText = 'Pas de réponse'
   let pointsEarned = 0
-  
+
   if (index !== null && currentQuestion.value?.answers[index]) {
     isCorrect = currentQuestion.value.answers[index].correct
     selectedAnswerText = currentQuestion.value.answers[index].text
-    
+
     if (isCorrect) {
       playerScore.value++
-      
+
       const basePoints = 100
       let speedBonus = 0
-      
+
       if (timeTaken < opponentTime) {
         const timeDifference = opponentTime - timeTaken
-        
+
         if (timeDifference >= 15) {
           speedBonus = 75
         } else if (timeDifference >= 10) {
@@ -441,24 +440,24 @@ const selectAnswer = (index) => {
           speedBonus = 15
         }
       }
-      
+
       pointsEarned = basePoints + speedBonus
-      
+
       if (speedBonus > 0) {
         pointsPopupText.value = `+${pointsEarned} PTS!\n(+${speedBonus} bonus rapidité vs adversaire)`
       } else {
         pointsPopupText.value = `+${pointsEarned} PTS\n(Adversaire était plus rapide)`
       }
-      
+
       showPointsPopup.value = true
-      setTimeout(() => showPointsPopup.value = false, 2500)
+      setTimeout(() => (showPointsPopup.value = false), 2500)
     } else {
       pointsPopupText.value = `0 PTS\n(Mauvaise réponse)`
       showPointsPopup.value = true
-      setTimeout(() => showPointsPopup.value = false, 2000)
+      setTimeout(() => (showPointsPopup.value = false), 2000)
     }
   }
-  
+
   playerAnswers.value.push({
     questionId: currentQuestion.value?.id,
     questionText: currentQuestion.value?.text,
@@ -470,7 +469,7 @@ const selectAnswer = (index) => {
     points: pointsEarned,
     speedBonus: isCorrect ? (timeTaken < opponentTime ? true : false) : false
   })
-  
+
   setTimeout(() => nextQuestion(), 2500)
 }
 
@@ -488,26 +487,26 @@ const nextQuestion = () => {
 
 const finishBattle = async () => {
   stopTimer()
-  
+
   const playerTotalPoints = playerAnswers.value.reduce((total, answer) => total + answer.points, 0)
-  
+
   const opponentAnswers = playerAnswers.value.map((playerAnswer, index) => {
     const question = questions.value[index]
     const opponentTime = playerAnswer.opponentTime
-    
+
     const isCorrect = Math.random() > 0.3
     const randomAnswer = Math.floor(Math.random() * 4)
-    
+
     let points = 0
     if (isCorrect) {
       opponentScore.value++
-      
+
       const basePoints = 100
       let speedBonus = 0
-      
+
       if (opponentTime < playerAnswer.time) {
         const timeDifference = playerAnswer.time - opponentTime
-        
+
         if (timeDifference >= 15) {
           speedBonus = 75
         } else if (timeDifference >= 10) {
@@ -518,16 +517,19 @@ const finishBattle = async () => {
           speedBonus = 15
         }
       }
-      
+
       points = basePoints + speedBonus
     }
-    
+
     opponentTime.value += opponentTime
-    
+
     return {
       questionId: question.id,
       questionText: question.content_default,
-      selectedAnswer: question.choices?.[randomAnswer]?.text_answer || question.choices?.[randomAnswer]?.text || 'Réponse mockée',
+      selectedAnswer:
+        question.choices?.[randomAnswer]?.text_answer ||
+        question.choices?.[randomAnswer]?.text ||
+        'Réponse mockée',
       correct: isCorrect,
       time: opponentTime,
       timeLeft: Math.max(0, 30 - opponentTime),
@@ -535,9 +537,9 @@ const finishBattle = async () => {
       speedBonus: isCorrect ? (opponentTime < playerAnswer.time ? true : false) : false
     }
   })
-  
+
   const opponentTotalPoints = opponentAnswers.reduce((total, answer) => total + answer.points, 0)
-  
+
   try {
     const matchData = {
       player1_id: currentPlayer.value.id,
@@ -548,20 +550,25 @@ const finishBattle = async () => {
       player2_time: opponentTime.value,
       player1_points: playerTotalPoints,
       player2_points: opponentTotalPoints,
-      winner_id: playerTotalPoints > opponentTotalPoints ? currentPlayer.value.id : opponent.value.id,
-      questions_data: JSON.stringify(questions.value.map(q => ({
-        id: q.id,
-        text: q.content_default,
-        correctAnswer: q.choices?.find(c => c.is_correct)?.text_answer || q.choices?.find(c => c.is_correct)?.text
-      }))),
+      winner_id:
+        playerTotalPoints > opponentTotalPoints ? currentPlayer.value.id : opponent.value.id,
+      questions_data: JSON.stringify(
+        questions.value.map((q) => ({
+          id: q.id,
+          text: q.content_default,
+          correctAnswer:
+            q.choices?.find((c) => c.is_correct)?.text_answer ||
+            q.choices?.find((c) => c.is_correct)?.text
+        }))
+      ),
       player1_answers: JSON.stringify(playerAnswers.value),
       player2_answers: JSON.stringify(opponentAnswers)
     }
-    
+
     console.log('💾 Sauvegarde du match dans la base...')
     // const savedMatch = await battleService.saveMatch(matchData)
     // console.log('✅ Match sauvegardé avec ID:', savedMatch.id)
-    
+
     const battleResults = {
       battleId: Date.now(),
       opponent: opponent.value,
@@ -571,18 +578,20 @@ const finishBattle = async () => {
       opponentTime: opponentTime.value,
       playerTotalPoints: playerTotalPoints,
       opponentTotalPoints: opponentTotalPoints,
-      questionsData: questions.value.map(q => ({
+      questionsData: questions.value.map((q) => ({
         id: q.id,
         text: q.content_default || q.content_lf_tf || q.content_lf_blank,
-        correctAnswer: q.choices?.find(c => c.is_correct)?.text_answer || q.choices?.find(c => c.is_correct)?.text || 'Réponse correcte'
+        correctAnswer:
+          q.choices?.find((c) => c.is_correct)?.text_answer ||
+          q.choices?.find((c) => c.is_correct)?.text ||
+          'Réponse correcte'
       })),
       playerAnswers: playerAnswers.value,
       opponentAnswers: opponentAnswers
     }
-    
+
     localStorage.setItem('lastBattleResults', JSON.stringify(battleResults))
     router.push(`/battle-details/${battleResults.battleId}`)
-    
   } catch (error) {
     console.error('❌ Erreur sauvegarde match:', error)
   }
@@ -590,15 +599,15 @@ const finishBattle = async () => {
 
 const getAnswerClass = (index) => {
   if (!hasAnswered.value) return ''
-  
+
   if (selectedAnswer.value === index) {
     return currentQuestion.value?.answers[index]?.correct ? 'correct' : 'incorrect'
   }
-  
+
   if (currentQuestion.value?.answers[index]?.correct) {
     return 'correct-answer'
   }
-  
+
   return 'disabled'
 }
 
@@ -610,7 +619,7 @@ const getAvatarStyle = (player) => {
     'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
     'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
   ]
-  
+
   const index = (player.id || 0) % gradients.length
   return {
     background: gradients[index]
@@ -620,13 +629,13 @@ const getAvatarStyle = (player) => {
 // Lifecycle - ORDRE DE CHARGEMENT IMPORTANT
 onMounted(async () => {
   console.log('🚀 BattleQuizView mounted')
-  
+
   // 1. Charger les données du joueur actuel EN PREMIER
   await loadCurrentUserData()
-  
+
   // 2. Ensuite charger les données de bataille
   loadBattleData()
-  
+
   // 3. Démarrer le timer après un délai
   setTimeout(() => {
     if (questions.value.length > 0) {
@@ -645,7 +654,7 @@ onUnmounted(() => {
 .battle-quiz-page {
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, #072C54 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #072c54 0%, #1e3a8a 100%);
   color: white;
   padding: 1rem;
   padding-bottom: 100px;
@@ -698,7 +707,7 @@ onUnmounted(() => {
   justify-content: center;
   font-weight: bold;
   font-size: 1.5rem;
-  border: 3px solid #F7C72C;
+  border: 3px solid #f7c72c;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   flex-shrink: 0;
@@ -732,7 +741,7 @@ onUnmounted(() => {
 .vs-indicator {
   font-size: 2rem;
   font-weight: 700;
-  color: #F7C72C;
+  color: #f7c72c;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
 }
@@ -754,7 +763,7 @@ onUnmounted(() => {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #F7C72C 0%, #E6B625 100%);
+  background: linear-gradient(90deg, #f7c72c 0%, #e6b625 100%);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -762,7 +771,7 @@ onUnmounted(() => {
 .question-counter {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #F7C72C;
+  color: #f7c72c;
 }
 
 /* TIMER */
@@ -775,7 +784,7 @@ onUnmounted(() => {
   display: inline-block;
   font-size: 3rem;
   font-weight: 700;
-  color: #F7C72C;
+  color: #f7c72c;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
   width: 100px;
@@ -788,13 +797,17 @@ onUnmounted(() => {
 }
 
 .timer.warning {
-  color: #FF4444;
+  color: #ff4444;
   animation: pulse 0.5s ease-in-out infinite alternate;
 }
 
 @keyframes pulse {
-  from { transform: scale(1); }
-  to { transform: scale(1.1); }
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
 }
 
 /* QUESTION */
@@ -833,7 +846,7 @@ onUnmounted(() => {
 
 .answer-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.2);
-  border-color: #F7C72C;
+  border-color: #f7c72c;
   transform: translateY(-2px);
 }
 
@@ -844,7 +857,7 @@ onUnmounted(() => {
 /* COULEURS DES RÉPONSES AMÉLIORÉES */
 .answer-btn.correct {
   background: rgba(76, 175, 80, 0.4) !important;
-  border-color: #4CAF50 !important;
+  border-color: #4caf50 !important;
   color: white !important;
   box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
   animation: correctPulse 0.6s ease-out;
@@ -852,7 +865,7 @@ onUnmounted(() => {
 
 .answer-btn.incorrect {
   background: rgba(244, 67, 54, 0.4) !important;
-  border-color: #F44336 !important;
+  border-color: #f44336 !important;
   color: white !important;
   box-shadow: 0 0 15px rgba(244, 67, 54, 0.5);
   animation: incorrectShake 0.6s ease-out;
@@ -860,8 +873,8 @@ onUnmounted(() => {
 
 .answer-btn.correct-answer {
   background: rgba(76, 175, 80, 0.2) !important;
-  border-color: #4CAF50 !important;
-  color: #4CAF50 !important;
+  border-color: #4caf50 !important;
+  color: #4caf50 !important;
   animation: correctGlow 0.6s ease-out;
 }
 
@@ -873,21 +886,43 @@ onUnmounted(() => {
 
 /* ANIMATIONS */
 @keyframes correctPulse {
-  0% { transform: scale(1); box-shadow: 0 0 0 rgba(76, 175, 80, 0.5); }
-  50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(76, 175, 80, 0.8); }
-  100% { transform: scale(1); box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); }
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(76, 175, 80, 0.5);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+  }
 }
 
 @keyframes incorrectShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  75% { transform: translateX(10px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  75% {
+    transform: translateX(10px);
+  }
 }
 
 @keyframes correctGlow {
-  0% { box-shadow: 0 0 0 rgba(76, 175, 80, 0); }
-  50% { box-shadow: 0 0 15px rgba(76, 175, 80, 0.6); }
-  100% { box-shadow: 0 0 10px rgba(76, 175, 80, 0.3); }
+  0% {
+    box-shadow: 0 0 0 rgba(76, 175, 80, 0);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+  }
 }
 
 /* AFFICHAGE DES POINTS GAGNÉS */
@@ -897,7 +932,7 @@ onUnmounted(() => {
   left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(247, 199, 44, 0.95);
-  color: #072C54;
+  color: #072c54;
   padding: 1.5rem 2rem;
   border-radius: 15px;
   font-size: 1.3rem;
@@ -908,46 +943,58 @@ onUnmounted(() => {
   text-align: center;
   white-space: pre-line;
   line-height: 1.3;
-  border: 3px solid #072C54;
+  border: 3px solid #072c54;
 }
 
 .points-popup.speed-bonus {
-  background: linear-gradient(135deg, #4CAF50 0%, #F7C72C 100%);
+  background: linear-gradient(135deg, #4caf50 0%, #f7c72c 100%);
   color: white;
-  border-color: #4CAF50;
+  border-color: #4caf50;
   animation: speedBonusShow 2.5s ease-out forwards;
 }
 
 @keyframes speedBonusShow {
-  0% { 
-    opacity: 0; 
-    transform: translate(-50%, -50%) scale(0.5) rotate(-10deg); 
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5) rotate(-10deg);
   }
-  20% { 
-    opacity: 1; 
-    transform: translate(-50%, -50%) scale(1.2) rotate(2deg); 
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2) rotate(2deg);
   }
-  40% { 
-    transform: translate(-50%, -50%) scale(1.1) rotate(-1deg); 
+  40% {
+    transform: translate(-50%, -50%) scale(1.1) rotate(-1deg);
   }
-  60% { 
-    transform: translate(-50%, -50%) scale(1.05) rotate(0.5deg); 
+  60% {
+    transform: translate(-50%, -50%) scale(1.05) rotate(0.5deg);
   }
-  80% { 
-    opacity: 1; 
-    transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
   }
-  100% { 
-    opacity: 0; 
-    transform: translate(-50%, -50%) scale(0.9) rotate(0deg); 
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9) rotate(0deg);
   }
 }
 
 @keyframes pointsShow {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-  80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
 }
 
 /* LOADING STATE */
@@ -960,15 +1007,19 @@ onUnmounted(() => {
   width: 50px;
   height: 50px;
   border: 4px solid rgba(247, 199, 44, 0.3);
-  border-top: 4px solid #F7C72C;
+  border-top: 4px solid #f7c72c;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem auto;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* RESPONSIVE */
@@ -979,36 +1030,36 @@ onUnmounted(() => {
     padding: 2rem;
     padding-bottom: 2rem;
   }
-  
+
   .battle-header {
     padding: 3rem 2rem;
   }
-  
+
   .avatar {
     width: 80px;
     height: 80px;
     font-size: 2rem;
   }
-  
+
   .vs-indicator {
     font-size: 3rem;
   }
-  
+
   .question-text {
     font-size: 2rem;
     margin-bottom: 4rem;
   }
-  
+
   .answers-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
-  
+
   .answer-btn {
     padding: 2rem;
     font-size: 1.2rem;
   }
-  
+
   .timer {
     width: 120px;
     height: 120px;
@@ -1023,13 +1074,13 @@ onUnmounted(() => {
     padding: 1rem;
     padding-bottom: 80px;
   }
-  
+
   .battle-header {
     padding: 1rem;
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   /* Mobile : garder la même logique mais en vertical */
   .player-info,
   .opponent-info {
@@ -1037,37 +1088,37 @@ onUnmounted(() => {
     justify-content: center;
     width: 100%;
   }
-  
+
   .opponent-info {
     flex-direction: row-reverse; /* Avatar à droite, texte à gauche */
   }
-  
+
   .opponent-details {
     text-align: left; /* Réajuster l'alignement sur mobile */
     order: 0;
   }
-  
+
   .vs-indicator {
     font-size: 1.5rem;
     order: 1;
   }
-  
+
   .avatar {
     width: 50px;
     height: 50px;
     font-size: 1.2rem;
   }
-  
+
   .question-text {
     font-size: 1.2rem;
     margin-bottom: 2rem;
   }
-  
+
   .answer-btn {
     padding: 1rem;
     font-size: 1rem;
   }
-  
+
   .timer {
     width: 80px;
     height: 80px;
