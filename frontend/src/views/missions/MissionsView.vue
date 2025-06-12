@@ -47,7 +47,7 @@
               <div class="reward-watch">
                 <img
                   v-if="mission.reward"
-                  :src="`http://localhost:8000/${mission.reward.photo_name}`"
+                  :src="`${BACKEND_URL}/${mission.reward.photo_name}`"
                   :alt="mission.reward.model"
                   class="watch-image"
                 />
@@ -65,7 +65,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { userService, getCurrentUser } from '@/services/api'
+import { userService, getCurrentUser, BACKEND_URL } from '@/services/api'
 const router = useRouter()
 
 const goBack = () => {
@@ -93,7 +93,7 @@ const successMessage = ref('') // on ajoute un message
 const claimReward = async (mission) => {
   if (mission.progress === 100 && !mission.completed) {
     try {
-      const resAddReward = await fetch('http://localhost:8000/api/v1/user-rewards', {
+      const resAddReward = await fetch(`${BACKEND_URL}/api/v1/user-rewards`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -114,7 +114,7 @@ const claimReward = async (mission) => {
 
       // DELETE la user-mission
       const resDeleteMission = await fetch(
-        `http://localhost:8000/api/v1/user-missions/${mission.user_mission_id}`,
+        `${BACKEND_URL}/api/v1/user-missions/${mission.user_mission_id}`,
         {
           method: 'DELETE',
           credentials: 'include',
@@ -165,15 +165,12 @@ const getAllMissions = async () => {
     const missionsWithRewards = await Promise.all(
       userMissions.map(async (mission) => {
         try {
-          const rewardRes = await fetch(
-            `http://localhost:8000/api/v1/rewards/${mission.reward_id}`,
-            {
-              credentials: 'include',
-              headers: {
-                Accept: 'application/json'
-              }
+          const rewardRes = await fetch(`${BACKEND_URL}/api/v1/rewards/${mission.reward_id}`, {
+            credentials: 'include',
+            headers: {
+              Accept: 'application/json'
             }
-          )
+          })
 
           if (!rewardRes.ok) {
             console.warn(`Reward ${mission.reward_id} non trouvé.`)
