@@ -113,9 +113,6 @@ export const battleService = {
   }
 }
 
-export const fetchQuestions = () => {
-  return fetch(`${API_BASE_URL}/questions`, {})
-}
 
 export const fetchProgression = async (userid) => {
   const progression = await fetch(`${API_BASE_URL}/progression/${userid}`, {})
