@@ -2,7 +2,6 @@
   <div class="battle-details-page">
     <!-- Header -->
     <div class="details-header">
-      <button class="close-btn" @click="closeBattleDetails">✕</button>
       <h1 class="details-title">BATTLE DETAILS</h1>
     </div>
 
