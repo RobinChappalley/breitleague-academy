@@ -46,7 +46,7 @@
         <div class="button-section">
           <!-- Cancel/Close Button -->
           <button 
-            v-if="showResult && selectedAnswer !== currentQuestion.correctAnswer" 
+           
             class="cancel-btn"
             @click="resetQuestion"
           >
@@ -55,7 +55,7 @@
           
           <!-- Next Button -->
           <button 
-            class="next-btn"
+            class="next-btn primary-btn"
             :class="{ 'disabled': selectedAnswer === null && !showResult }"
             @click="handleNext"
             :disabled="selectedAnswer === null && !showResult"
@@ -77,7 +77,7 @@ const props = defineProps({
     type: Object,
     default: () => ({
       question: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
-      correctAnswer: "true" // "true" ou "false"
+      correctAnswer: "true" 
     })
   },
   currentStep: {
@@ -245,36 +245,31 @@ const resetQuestion = () => {
 }
 
 .cancel-btn {
-  background: rgba(239, 68, 68, 0.8);
-  color: white;
+  background: #F7C72C;
+  color: #072C54;
   border: none;
   width: 50px;
   height: 50px;
-  border-radius: 50%;
-  font-size: 1.2rem;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
 }
 
-.cancel-btn:hover {
-  background: rgba(239, 68, 68, 1);
-  transform: translateY(-2px);
-}
+
 
 .next-btn {
   background: #F7C72C;
   color: #072C54;
+  height: 50px;
   border: none;
   padding: 1rem 3rem;
   border-radius: 8px;
-  font-weight: 700;
-  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  text-transform: uppercase;
   letter-spacing: 1px;
   flex: 1;
   max-width: 300px;

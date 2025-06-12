@@ -214,3 +214,21 @@ export const learningService = {
   }
 }
 
+
+export const fetchLessons = async () => {
+  const lessons = await fetch(`${API_BASE_URL}/lessons`, {})
+  const data = await lessons.json()
+  return data.data
+}
+
+export const fetchLesson = async (lessonId) => {
+  const lesson = await fetch(`${API_BASE_URL}/lessons/${lessonId}`, {})
+  const data = await lesson.json()
+
+  }
+export const fetchQuestions = async () => {
+  const questions = await fetch(`${API_BASE_URL}/questions`, {})
+  const data = await questions.json()
+  return data.data
+}
+

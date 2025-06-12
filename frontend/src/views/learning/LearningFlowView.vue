@@ -95,7 +95,7 @@ const isLoading = ref(true)
 const lessons = ref([])
 
 // Tracking pour la progression
-const lessonAnswers = ref([])
+const lessonAnswers = ref([]) // CORRIGÉ: Fermeture de parenthèse manquante
 const completedLessonNumber = ref(1)
 
 // Computed
@@ -131,10 +131,10 @@ const transformDBDataToLessonFormat = (theoriesData) => {
 
     // Prendre la première question de cette théorie
     const firstQuestion = theoryItem.questions[0]
-    
+
     // ⚠️ NOUVEAU : Déterminer le type selon l'index plutôt que selon les données DB
     const questionType = getQuestionTypeForIndex(theoryIndex)
-    
+
     let question = {}
 
     if (firstQuestion) {
@@ -144,7 +144,7 @@ const transformDBDataToLessonFormat = (theoriesData) => {
           question = {
             type: 'multiple-choice',
             question: firstQuestion.content_default || generateDefaultQuestion(theoryItem, 'multiple-choice'),
-            answers: firstQuestion.choices?.length > 0 
+            answers: firstQuestion.choices?.length > 0
               ? firstQuestion.choices.map(choice => ({
                   text: choice.text_answer,
                   correct: choice.id === firstQuestion.correct_answer_text?.correct_choice_id
@@ -165,7 +165,7 @@ const transformDBDataToLessonFormat = (theoriesData) => {
           question = {
             type: 'matching',
             instruction: firstQuestion.content_default || generateDefaultQuestion(theoryItem, 'matching'),
-            pairs: firstQuestion.choices?.length >= 4 
+            pairs: firstQuestion.choices?.length >= 4
               ? transformChoicesToPairs(firstQuestion.choices)
               : generateDefaultMatchingPairs(theoryItem)
           }
@@ -189,7 +189,7 @@ const transformDBDataToLessonFormat = (theoriesData) => {
 // ⚠️ NOUVEAU : Fonctions pour générer du contenu par défaut
 const generateDefaultQuestion = (theoryItem, questionType) => {
   const baseContent = theoryItem.content.substring(0, 100) + "..."
-  
+
   switch (questionType) {
     case 'multiple-choice':
       return `Concernant cette théorie, quelle affirmation est correcte ?`
@@ -250,14 +250,14 @@ const generateWatchOptions = () => {
 const loadLessonData = async () => {
   try {
     isLoading.value = true
-    
+
     // Récupérer les théories de la leçon
     const response = await learningService.getLessonTheories(props.lessonId)
     const theoriesData = response.data || []
-    
+
     // Transformer les données en format attendu avec alternance
     lessons.value = transformDBDataToLessonFormat(theoriesData)
-    
+
     console.log('Données chargées avec alternance:', lessons.value)
     console.log('Types de questions:', lessons.value.map(lesson => lesson.question.type))
   } catch (error) {
@@ -277,7 +277,7 @@ const getFallbackLessons = () => {
       content: "Robuste et audacieuse, l'Avenger est inspirée de l'héritage aéronautique de Breitling. Relancée en 2019, elle est ultralegible même avec des gants."
     },
     {
-      id: 2, 
+      id: 2,
       content: "Le Navitimer est l'une des montres d'aviation les plus emblématiques. Créé en 1952, il dispose d'une règle à calcul circulaire."
     },
     {
@@ -307,18 +307,20 @@ const nextLesson = () => {
   } else {
     completedLessonNumber.value = lessonIndex.value + 1
     currentView.value = 'completed'
-    console.log('Toutes les leçons terminées!')
   }
 }
 
 const handleAnswer = (answerData) => {
-  console.log('Answer selected:', answerData)
-  
+
+
   lessonAnswers.value.push({
+    lessonId:lessonID,
     questionIndex: answerData.questionIndex || lessonIndex.value,
     correct: answerData.correct || answerData.allCorrect || false,
     data: answerData
   })
+  saveAnswersToLocalStorage(lessonAnswers.value)
+
 }
 
 const handleLessonFinish = () => {
@@ -346,7 +348,6 @@ onMounted(() => {
   loadLessonData()
 })
 
-console.log('LearningFlowView component loaded')
 </script>
 
 <style scoped>

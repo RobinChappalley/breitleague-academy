@@ -17,12 +17,9 @@
           <div class="profile-avatar">
             <div class="avatar-placeholder">
               <img :src="getUserInitial()" alt="User's Avatar" class="avatar-image" />
-
-              <!--<span>{{ getUserInitial() }}</span>-->
-              <!-- L'initiale au centre -->
             </div>
           </div>
-          <!-- Badge Breitling SVG sur le bord -->
+          <!-- Badge Breitling SVG -->
           <div v-if="user.is_BS" class="breitling-badge-avatar" title="Breitling Specialist">
             <img
               src="/images/icones/breitlingspecialist_badge.svg"
@@ -38,43 +35,41 @@
 
         <div class="profile-info">
           <div class="country-info">
-            <span class="flag">{{ user.pos?.country_flag || '🌍' }}</span>
-            <span class="country">{{ user.pos?.country || 'Non renseigné' }}</span>
+            <h2 class="flag">{{ user.pos?.country_flag || '🌍' }}</h2>
           </div>
-          <div class="store-info">Store : {{ user.pos?.address || 'Non renseigné' }}</div>
-          <div class="reseller-since">Reseller since {{ user.signup_year || '2020' }}</div>
+          <p class="store-info text-secondary">Store : {{ user.pos?.address || 'Non renseigné' }}</p>
+          <p class="reseller-since text-secondary">Reseller since {{ user.signup_year || '2020' }}</p>
         </div>
       </div>
 
-      <!-- Rest of the template remains the same -->
       <div class="content-container">
         <!-- Score Section -->
         <div class="score-section">
-          <div class="score-label">SCORE</div>
-          <div class="score-value">
+          <p class="score-label">SCORE</p>
+          <h1 class="score-value">
             {{ (user.elo_score || 0).toLocaleString('fr-CH').replace(/\u202F/g, "'") }} PTS
-          </div>
+          </h1>
         </div>
 
         <!-- Stats Section -->
         <div class="stats-section">
           <div class="stat-item">
-            <div class="stat-value">{{ user.battle_won || 0 }}</div>
+            <h2 class="stat-value">{{ user.battle_won || 0 }}</h2>
             <div class="stat-label">Victories</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value">{{ user.battle_lost || 0 }}</div>
+            <h2 class="stat-value">{{ user.battle_lost || 0 }}</h2>
             <div class="stat-label">Defeats</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value">{{ winRate }}%</div>
+            <h2 class="stat-value">{{ winRate }}%</h2>
             <div class="stat-label">Win Rate</div>
           </div>
         </div>
 
         <!-- Top 3 Watches Section -->
         <div>
-          <h3>FAVORITE WATCHES</h3>
+          <h3 class="fav">FAVORITE WATCHES</h3>
         </div>
         <div class="watches-grid">
           <div
@@ -138,9 +133,8 @@ const loadUserProfile = async () => {
     isLoading.value = true
     error.value = null
 
-    console.log("Chargement de l'utilisateur connecté...")
 
-    // 1️⃣ Récupérer l'utilisateur connecté
+    // Récupérer l'utilisateur connecté
     const res = await fetch('http://localhost:8000/api/user', {
       credentials: 'include',
       headers: {
@@ -151,14 +145,12 @@ const loadUserProfile = async () => {
     if (!res.ok) throw new Error('Utilisateur non authentifié (401)')
 
     const connectedUser = await res.json()
-    console.log('Utilisateur connecté:', connectedUser)
+   
 
-    // 2️⃣ Appeler ton API pour charger les infos complètes du user
+    // API pour charger les infos complètes du user
     const response = await userService.getUser(connectedUser.id)
-    console.log('Réponse API user:', response)
 
     user.value = response.data || response
-    console.log('User complet chargé:', user.value)
 
     // Charger les rewards
     await loadUserRewards(user.value.id)
@@ -178,7 +170,6 @@ const loadUserRewards = async (userId) => {
 
     userRewards.value = user.rewards || []
 
-    console.log('Utilisateur chargé:', user)
   } catch (err) {
     console.error('Erreur lors du chargement de l’utilisateur:', err.message)
     userRewards.value = []
@@ -203,7 +194,6 @@ const goToCollection = () => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('🚀 ProfileView mounted, loading ...')
   loadUserProfile()
 })
 const logout = async () => {
@@ -225,7 +215,6 @@ const logout = async () => {
       }
     })
 
-    // Nettoyer le localStorage
     localStorage.removeItem('isLoggedIn')
 
     // Redirige vers la page de login
@@ -241,7 +230,7 @@ const logout = async () => {
   min-height: 100vh;
   width: 100%;
   background: linear-gradient(135deg, #072c54 0%, #1e3a8a 100%);
-  color: white;
+  
   padding: 1rem;
   padding-bottom: 100px;
   box-sizing: border-box;
@@ -302,6 +291,8 @@ const logout = async () => {
   position: relative;
   display: inline-block;
   margin-bottom: 1.5rem;
+
+  padding-top: 2.5rem;
 }
 
 .profile-avatar {
@@ -349,6 +340,10 @@ const logout = async () => {
   font-size: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   cursor: pointer;
+}
+
+.fav {
+  color: white;
 }
 
 .breitling-badge-avatar {
@@ -411,17 +406,7 @@ const logout = async () => {
   max-width: 400px;
 }
 
-.country-info {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
 
-.flag {
-  font-size: 1.2rem;
-}
 
 .country {
   font-weight: 600;
@@ -429,7 +414,6 @@ const logout = async () => {
 
 .store-info,
 .reseller-since {
-  font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 0.25rem;
 }
@@ -450,8 +434,6 @@ const logout = async () => {
 }
 
 .score-label {
-  font-size: 1rem;
-  font-weight: 600;
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 0.5rem;
 }
@@ -478,8 +460,6 @@ const logout = async () => {
 }
 
 .stat-value {
-  font-size: 1.8rem;
-  font-weight: 700;
   color: #f7c72c;
   margin-bottom: 0.5rem;
 }

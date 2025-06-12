@@ -15,10 +15,9 @@
       </button>
       <!-- Header -->
       <div class="missions-header">
-        <h1 class="missions-title">MISSIONS</h1>
+        <h2 class="missions-title">MISSIONS</h2>
       </div>
 
-      <!-- Message de succès -->
       <div v-if="successMessage" class="success-message">
         {{ successMessage }}
       </div>
@@ -77,18 +76,15 @@ const user = ref(null)
 const isLoading = ref(false)
 const error = ref(null)
 
-// Missions triées : missions complètes (100%) en haut, puis les autres
 const visibleMissions = computed(() => {
   return missions.value.sort((a, b) => {
-    // Missions à 100% en premier
     if (a.progress === 100 && b.progress !== 100) return -1
     if (a.progress !== 100 && b.progress === 100) return 1
-    // Sinon tri par progression décroissante
     return b.progress - a.progress
   })
 })
 
-const successMessage = ref('') // on ajoute un message
+const successMessage = ref('') 
 
 const claimReward = async (mission) => {
   if (mission.progress === 100 && !mission.completed) {
@@ -148,7 +144,6 @@ const getAllMissions = async () => {
     isLoading.value = true
     error.value = null
 
-    console.log("Chargement de l'utilisateur connecté...")
 
     //Récupérer l'utilisateur connecté
     const res = await fetch('http://localhost:8000/api/user', {
@@ -170,7 +165,6 @@ const getAllMissions = async () => {
     //Charger les missions
     const userMissions = user.value.missions || []
 
-    // 4️⃣ Pour chaque mission, aller chercher le reward lié + ajouter user_mission_id
     const missionsWithRewards = await Promise.all(
       userMissions.map(async (mission) => {
         try {
@@ -238,12 +232,13 @@ onMounted(async () => {
   background: linear-gradient(135deg, #072c54 0%, #1e3a8a 100%);
   color: white;
   padding: 1rem;
-  padding-bottom: 100px; /* Espace pour navbar mobile */
+  padding-bottom: 100px; 
   box-sizing: border-box;
 }
 
 /* MAIN CONTENT */
 .main-content {
+  padding-top: 2rem;
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
@@ -538,10 +533,6 @@ onMounted(async () => {
     padding-bottom: 80px; /* Espace pour navbar mobile (70px + marge) */
   }
 
-  .missions-title {
-    font-size: 2rem;
-    letter-spacing: 1px;
-  }
 
   .mission-card {
     padding: 1.2rem;
@@ -602,9 +593,6 @@ onMounted(async () => {
     padding-bottom: 100px;
   }
 
-  .missions-title {
-    font-size: 1.8rem;
-  }
 
   .mission-card {
     padding: 1rem;
@@ -616,6 +604,7 @@ onMounted(async () => {
 }
 
 .back-arrow {
+
   position: absolute;
   top: 1.5rem;
   left: 1.5rem;
@@ -623,7 +612,7 @@ onMounted(async () => {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.3rem;
+  padding-top: 2rem;
   border-radius: 50%;
   transition: background 0.18s, box-shadow 0.18s;
 }

@@ -271,24 +271,20 @@ const resetQuestion = () => {
 }
 
 .cancel-btn {
-  background: rgba(239, 68, 68, 0.8);
-  color: white;
+  background: #F7C72C;
+  color: #072C54;
   border: none;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  font-size: 1.2rem;
+  width: 75px;
+  height: 75px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
 }
 
-.cancel-btn:hover {
-  background: rgba(239, 68, 68, 1);
-  transform: translateY(-2px);
-}
 
 .next-btn {
   background: #F7C72C;
