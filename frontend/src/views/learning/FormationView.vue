@@ -5,17 +5,17 @@
     </div>
     <div class="top-action-buttons">
 
-      <!-- Bouton temporaire pour tester -->
+      <div class="ressources-buttons">
+        <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
+        <RouterLink class="action-btn" to="/missions">Missions</RouterLink>
+      </div>
 
-      <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
-      <RouterLink class="action-btn" to="/missions">Missions</RouterLink>
+
+      <div class="moving-buttons">
+        <button class="action-btn next-module-button" @click="changeModule('next')">←</button>
+        <button class="action-btn previous-module-button" @click="changeModule('previous')">→</button>
+      </div>
     </div>
-    <div class="move-watch-button">
-      <button class="action-btn" @click="changeModule('next')">←</button>
-      <button class="action-btn" @click="changeModule('previous')">→</button>
-
-    </div>
-
     <div ref="watchContainer" class="formation-watch-container">
 
       <!-- Image de la montre avec transition -->
@@ -131,7 +131,7 @@
               {{ lesson.title }}
             </p>
           </div>
-          <h2 class="module-title">{{moduleTitle}}</h2>
+          <h2 class="module-title">{{ moduleTitle }}</h2>
         </div>
 
 
@@ -194,10 +194,10 @@ export default {
         backgroundDesktop: 'backgrounds/aviators-horizontal.png'
       },
       showLessonPoints: true,
-      spinDirection:'right',
+      spinDirection: 'right',
       showStartModal: false,
       selectedModule: null,
-      selectedLesson:null
+      selectedLesson: null
     }
   },
 
@@ -461,12 +461,12 @@ export default {
 
     async loadModule() {
       const progression = await this.loadProgression()
-      let moduleToDisplayId =0
+      let moduleToDisplayId = 0
       if (progression.last_checkpoint_id == 3) {
-         moduleToDisplayId = 1
+        moduleToDisplayId = 1
 
       } else {
-       moduleToDisplayId = progression.last_checkpoint_id + 1
+        moduleToDisplayId = progression.last_checkpoint_id + 1
       }
       return await fetchModule(moduleToDisplayId)
     },
@@ -694,15 +694,26 @@ export default {
   top: 40px;
   right: 30px;
   display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: flex-end;
+  justify-content: flex-end;
+  flex-direction: row;
+  align-items: flex-start;
   @media screen and (width >= 768px) {
     gap: 18px;
   }
   @media screen and (max-width: 767px) {
     gap: 10px;
   }
+}
+
+.ressources-buttons, .moving-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-end;
+
+ button {
+   min-height: 48px;
+}
 }
 
 /* MODAL CHECKPOINT STYLES */
@@ -920,6 +931,7 @@ export default {
 .watch-slide-leave-active.spin-right {
   animation: watch-spin-out-right 0.7s forwards;
 }
+
 .watch-slide-leave-active.spin-left {
   animation: watch-spin-out-left 0.7s forwards;
 }
@@ -928,6 +940,7 @@ export default {
 .watch-slide-enter-active.spin-right {
   animation: watch-spin-in-right 0.7s forwards;
 }
+
 .watch-slide-enter-active.spin-left {
   animation: watch-spin-in-left 0.7s forwards;
 }
@@ -939,6 +952,7 @@ export default {
     transform: rotate(2turn) scale(0.7); /* tourne complet à droite */
   }
 }
+
 @keyframes watch-spin-in-right {
   from {
     opacity: 0;
@@ -949,6 +963,7 @@ export default {
     transform: translateY(0) rotate(0deg) scale(1);
   }
 }
+
 /* ...et idem pour la gauche : */
 @keyframes watch-spin-out-left {
   to {
@@ -956,6 +971,7 @@ export default {
     transform: rotate(-2turn) scale(0.7); /* tourne complet à gauche */
   }
 }
+
 @keyframes watch-spin-in-left {
   from {
     opacity: 0;
@@ -983,7 +999,17 @@ export default {
   position: absolute;
   right: -100px;
   bottom: -50px;
-font-size: 2.5rem;
-  color:whitesmoke
+  font-size: 2.5rem;
+  color: whitesmoke
+}
+
+.next-module-button, .previous-module-button {
+
+  z-index: 2;
+}
+
+.next-module-button {
+
+  top: 10%
 }
 </style>
