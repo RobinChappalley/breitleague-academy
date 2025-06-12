@@ -9,7 +9,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 })
-// 👇 Ajout du guard ici
+//  Ajout du guard ici
 const isAuthenticated = () => {
   return localStorage.getItem('isLoggedIn') === 'true'
 }

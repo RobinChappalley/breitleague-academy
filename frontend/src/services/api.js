@@ -1,4 +1,3 @@
-// frontend/src/services/api.js
 const API_BASE_URL = 'http://localhost:8000/api/v1'
 
 export const userService = {
@@ -34,9 +33,7 @@ export const userService = {
 }
 
 export const battleService = {
-  // Récupérer tous les utilisateurs disponibles pour un battle
   async getAvailableUsers() {
-    // Token CSRF comme dans LoginView
     await fetch('http://localhost:8000/sanctum/csrf-cookie', {
       credentials: 'include'
     })
@@ -60,7 +57,6 @@ export const battleService = {
     return await response.json()
   },
 
-  // Récupérer toutes les questions (utilise ta route existante)
   async getQuestions() {
     await fetch('http://localhost:8000/sanctum/csrf-cookie', {
       credentials: 'include'
@@ -74,7 +70,6 @@ export const battleService = {
     )
 
     const response = await fetch(`${API_BASE_URL}/questions`, {
-      // Utilise ta route existante
       credentials: 'include',
       headers: {
         Accept: 'application/json',
@@ -86,7 +81,6 @@ export const battleService = {
     return await response.json()
   },
 
-  // Récupérer tous les choix (utilise ta route existante)
   async getChoices() {
     await fetch('http://localhost:8000/sanctum/csrf-cookie', {
       credentials: 'include'
@@ -100,7 +94,6 @@ export const battleService = {
     )
 
     const response = await fetch(`${API_BASE_URL}/choices`, {
-      // Récupérer TOUS les choix
       credentials: 'include',
       headers: {
         Accept: 'application/json',
@@ -113,9 +106,6 @@ export const battleService = {
   }
 }
 
-export const fetchQuestions = () => {
-  return fetch(`${API_BASE_URL}/questions`, {})
-}
 
 export const fetchProgression = async (userid) => {
   const progression = await fetch(`${API_BASE_URL}/progression/${userid}`, {})
@@ -133,6 +123,23 @@ return data.data
 export const fetchModules = async () => {
   const modules = await fetch(`${API_BASE_URL}/modules`, {})
   const data = await modules.json()
+  return data.data
+}
+
+
+export const fetchLessons = async () => {
+  const lessons = await fetch(`${API_BASE_URL}/lessons`, {})
+  const data = await lessons.json()
+  return data.data
+}
+
+export const fetchLesson = async (lessonId) => {
+  const lesson = await fetch(`${API_BASE_URL}/lessons/${lessonId}`, {})
+  const data = await lesson.json()
+
+export const fetchQuestions = async () => {
+  const questions = await fetch(`${API_BASE_URL}/questions`, {})
+  const data = await questions.json()
   return data.data
 }
 

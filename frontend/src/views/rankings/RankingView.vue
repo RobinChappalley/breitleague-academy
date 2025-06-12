@@ -173,7 +173,6 @@ const showPlayerPopup = ref(false)
 const selectedPlayer = ref(null)
 
 const displayedPlayers = computed(() => {
-  // Filtrage par pays si ce n'est pas "world"
   let filteredPlayers = rankingPlayers.value
 
   if (selectedFilter.value !== 'world') {
@@ -182,13 +181,11 @@ const displayedPlayers = computed(() => {
     )
   }
 
-  // Recalcule le rank pour affichage (1, 2, 3...)
   const playersWithLocalRank = filteredPlayers.map((player, index) => ({
     ...player,
     displayRank: index + 1
   }))
 
-  // Limite à top 20 si pas "see all"
   if (!showingAll.value) {
     return playersWithLocalRank.slice(0, 20)
   }
@@ -229,7 +226,6 @@ const closePlayerPopup = () => {
   selectedPlayer.value = null
 }
 
-// Generate random gradient for each avatar
 const getAvatarStyle = (player) => {
   if (!player) return {}
 
@@ -264,14 +260,12 @@ const loadUsersRanking = async () => {
     if (!res.ok) throw new Error('Erreur lors du chargement des utilisateurs')
 
     const data = await res.json()
-    console.log('Utilisateurs chargés:', data)
 
-    // Mapper les users pour les adapter à ton format Ranking
     rankingPlayers.value = data.data
       .filter((user) => user.is_BS === true)
       .map((user, index) => ({
         id: user.id,
-        rank: index + 1, //on trie + on met le rang
+        rank: index + 1, 
         name: user.username.toUpperCase(),
         country: user.pos?.country || 'Unknown',
         score: user.elo_score || 0,
@@ -292,9 +286,8 @@ const loadUsersRanking = async () => {
               }))
           : []
       }))
-      // On trie par elo_score DESC
+      
       .sort((a, b) => b.score - a.score)
-      // On attribue le rang correct après tri
       .map((player, index) => ({
         ...player,
         rank: index + 1
@@ -336,7 +329,6 @@ const loadCurrentUser = async () => {
     const userData = await res1.json()
 
     const userId = userData.id
-    //console.log(userId)
 
     // Étape 2 : Charger les vraies infos utilisateur via /v1/users/{id}
     const res2 = await fetch(`http://localhost:8000/api/v1/users/${userId}`, {
@@ -347,7 +339,6 @@ const loadCurrentUser = async () => {
     })
     if (!res2.ok) throw new Error('Erreur chargement données utilisateur')
     const fullUser = await res2.json()
-    //console.log(fullUser)
     const userDataFull = fullUser.data
 
     // Étape 3 : Chercher le rank si présent dans le classement
@@ -376,9 +367,7 @@ const loadCurrentUser = async () => {
             }))
         : []
     }
-    //console.log(fullUser.data.id)
 
-    console.log('Utilisateur courant chargé :', currentUser.value)
   } catch (err) {
     console.error('Erreur lors du chargement du currentUser:', err.message)
   }
@@ -400,7 +389,7 @@ const getAvatarUrl = (avatarPath) => {
   if (avatarPath) {
     return `http://localhost:8000/${avatarPath}`
   }
-  return '/images/icones/default_avatar.png' // fallback si pas d'avatar
+  return '/images/icones/default_avatar.png' 
 }
 
 onMounted(() => {
@@ -411,7 +400,6 @@ onMounted(() => {
   })
 })
 
-console.log('RankingView component loaded')
 </script>
 
 <style scoped>
@@ -912,15 +900,15 @@ console.log('RankingView component loaded')
   .ranking-page {
     margin-left: 280px;
     width: calc(100% - 280px);
-    padding-bottom: 0; /* Pas de padding bottom sur desktop */
+    padding-bottom: 0; 
   }
 
   .main-content {
-    padding-bottom: 120px; /* Espace pour le footer utilisateur */
+    padding-bottom: 120px; 
   }
 
   .user-position-footer {
-    left: 280px; /* Aligné avec la navbar desktop */
+    left: 280px; 
     padding: 1.5rem 2rem;
   }
 
@@ -960,7 +948,7 @@ console.log('RankingView component loaded')
   }
 
   .main-content {
-    padding-bottom: 140px; /* Plus d'espace sur large desktop */
+    padding-bottom: 140px; 
   }
 
   .user-position-footer {
@@ -1003,17 +991,19 @@ console.log('RankingView component loaded')
   }
 
   .main-content {
-    padding-bottom: 180px; /* Plus d'espace : footer fixe (100px) + navbar mobile (70px) + marge (10px) */
+
+    padding-bottom: 180px;
+ 
   }
 
   .user-position-footer {
-    left: 0; /* Pleine largeur sur mobile */
+    left: 0; 
     padding: 0.8rem 1rem;
-    bottom: 70px; /* Au-dessus de la navbar mobile */
+    bottom: 70px; 
   }
 
   .see-all-btn {
-    margin: 2rem 0 3rem 0; /* Plus de marge en bas */
+    margin: 2rem 0 3rem 0; 
   }
 
   .user-ranking-item {
@@ -1069,7 +1059,9 @@ console.log('RankingView component loaded')
 /* TRÈS PETIT MOBILE (moins de 480px) */
 @media (max-width: 479px) {
   .main-content {
-    padding-bottom: 190px; /* Encore plus d'espace sur très petit mobile */
+    padding: 1rem;
+    padding-bottom: 190px; 
+
   }
 
   .user-position-footer {
