@@ -28,14 +28,15 @@
         >
       </transition>
       <!-- Bouton spécial checkpoint -->
-      <button
-          class="checkpoint-button special-button"
-          @click="showCheckpointModal"
-      ></button>
 
 
       <transition name="fade">
         <div v-if="showLessonPoints">
+          <button
+              class="checkpoint-button special-button"
+              @click="showCheckpointModal"
+          ></button>
+
           <div v-if="isCheckpointModalVisible" class="modal-overlay" @click="closeCheckpointModal">
             <div class="checkpoint-modal" @click.stop>
               <button class="close-btn" @click="closeCheckpointModal">✕</button>
@@ -199,6 +200,8 @@ export default {
   },
 
   computed: {
+
+
     currentModule() {
       if (!this.modules.length) return null;
       return this.modules[this.currentModuleIndex];
@@ -263,16 +266,31 @@ export default {
     }
 
     // 4. Mapper les lessons avec status/progress
-    this.lessons = loadedModule.lessons.map((lesson, idx) => ({
+    let mappedLessons = loadedModule.lessons.map((lesson, idx) => ({
       ...lesson,
       status: 'not-started',
       progress: 0,
       title: lesson.title || `Lesson ${idx + 1}`
     }));
+
+    if (this.progression && this.progression.last_checkpoint_id === 3) {
+      mappedLessons = this.markAllLessonsCompleted(mappedLessons);
+    }
+
+    this.lessons = mappedLessons;
   }
+
   ,
 
   methods: {
+
+    markAllLessonsCompleted(lessons) {
+      return lessons.map(lesson => ({
+        ...lesson,
+        status: 'completed',
+        progress: 100
+      }));
+    },
     updateContainerDimensions() {
       const container = this.$refs.watchContainer
       if (container) {
@@ -477,12 +495,18 @@ export default {
         this.currentModuleIndex = nextIndex;
 
         // Mettre à jour les lessons du nouveau module
-        this.lessons = newModule.lessons.map((lesson, idx) => ({
+        let mappedLessons = newModule.lessons.map((lesson, idx) => ({
           ...lesson,
           status: 'not-started',
           progress: 0,
           title: lesson.title || `Lesson ${idx + 1}`
         }));
+
+        if (this.progression && this.progression.last_checkpoint_id === 3) {
+          mappedLessons = this.markAllLessonsCompleted(mappedLessons);
+        }
+
+        this.lessons = mappedLessons;
 
         this.isWatchTransitioning = false;
         console.log('Module changed to:', newModule.title);
