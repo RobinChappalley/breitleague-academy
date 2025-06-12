@@ -15,7 +15,7 @@
       </button>
       <!-- Header -->
       <div class="missions-header">
-        <h1 class="missions-title">MISSIONS</h1>
+        <h2 class="missions-title">MISSIONS</h2>
       </div>
 
       <div v-if="successMessage" class="success-message">
@@ -238,6 +238,7 @@ onMounted(async () => {
 
 /* MAIN CONTENT */
 .main-content {
+  padding-top: 2rem;
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
@@ -532,10 +533,6 @@ onMounted(async () => {
     padding-bottom: 80px; /* Espace pour navbar mobile (70px + marge) */
   }
 
-  .missions-title {
-    font-size: 2rem;
-    letter-spacing: 1px;
-  }
 
   .mission-card {
     padding: 1.2rem;
@@ -596,9 +593,6 @@ onMounted(async () => {
     padding-bottom: 100px;
   }
 
-  .missions-title {
-    font-size: 1.8rem;
-  }
 
   .mission-card {
     padding: 1rem;
@@ -610,6 +604,7 @@ onMounted(async () => {
 }
 
 .back-arrow {
+
   position: absolute;
   top: 1.5rem;
   left: 1.5rem;
@@ -617,7 +612,7 @@ onMounted(async () => {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.3rem;
+  padding-top: 2rem;
   border-radius: 50%;
   transition: background 0.18s, box-shadow 0.18s;
 }

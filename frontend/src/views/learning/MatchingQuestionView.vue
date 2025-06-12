@@ -81,6 +81,13 @@
 
         <!-- Validation Button -->
         <div class="button-section">
+          <button
+            class="cancel-btn"
+            @click="resetQuestion"
+          >
+            ✕
+          </button>
+          <!-- Next Button - Toujours visible -->
           <button 
             class="next-btn"
             :class="{ 'disabled': !allCorrect }"
@@ -97,6 +104,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 // Props
 const props = defineProps({
@@ -129,7 +137,7 @@ const selectedLeftIndex = ref(null)
 const selectedRightIndex = ref(null)
 const matches = ref([]) 
 const matchingGrid = ref(null)
-
+const router = useRouter()
 const progress = computed(() => (props.currentStep / props.totalSteps) * 100)
 
 const leftItems = ref(
@@ -164,6 +172,11 @@ const allCorrect = computed(() =>
   matches.value.length === leftItems.value.length && 
   matches.value.every(match => match.correct)
 )
+const resetQuestion = () => {
+ if (confirm('Êtes-vous sûr de vouloir quitter le quiz ? Votre progression sera perdue.')) {
+    router.push('/')
+  }
+}
 
 const correctPairsCount = computed(() => 
   matches.value.filter(match => {
@@ -480,25 +493,38 @@ const handleNext = () => {
   gap: 1rem;
 }
 
+.cancel-btn {
+  background: #F7C72C;
+  color: #072C54;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+
 .check-btn,
 .next-btn {
+ background: #F7C72C;
+  color: #072C54;
+  border: none;
   padding: 1rem 3rem;
   border-radius: 8px;
-  font-weight: 700;
-  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 1px;
-  border: none;
-  min-width: 150px;
+  flex: 1;
+  max-width: 300px;
+  height: 50px;
 }
 
-.check-btn,
-.next-btn {
-  background: #F7C72C;
-  color: #072C54;
-}
 
 .next-btn:hover:not(.disabled) {
   background: #E6B625;

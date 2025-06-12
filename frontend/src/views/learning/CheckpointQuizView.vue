@@ -46,15 +46,15 @@
               @click="selectAnswer(index)"
             >
               <span class="answer-text">{{ answer.text }}</span>
-              <span v-if="showResult && answer.correct" class="check-icon">✓</span>
-              <span v-if="showResult && selectedAnswer === index && !answer.correct" class="cross-icon">✗</span>
+              <span v-if="showResult && answer.correct" class="check-icon"></span>
+              <span v-if="showResult && selectedAnswer === index && !answer.correct" class="cross-icon"></span>
             </div>
           </div>
 
           <!-- Navigation -->
           <div class="button-section">
             <button 
-              class="cancel-btn" 
+              class="cancel-btn btn-primary" 
               @click="exitQuiz"
               title="Exit Quiz"
             >
@@ -62,7 +62,7 @@
             </button>
             
             <button 
-              class="next-btn"
+              class="next-btn btn-primary"
               :class="{ 'disabled': selectedAnswer === null && !showResult }"
               @click="nextQuestion"
               :disabled="selectedAnswer === null && !showResult"
@@ -475,21 +475,7 @@ onUnmounted(() => {
   cursor: default;
 }
 
-/* Icônes de résultat */
-.check-icon, .cross-icon {
-  position: absolute;
-  right: 1rem;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
 
-.check-icon {
-  color: white;
-}
-
-.cross-icon {
-  color: white;
-}
 
 /* Animations */
 @keyframes correctPulse {
@@ -524,25 +510,22 @@ onUnmounted(() => {
   gap: 1rem;
 }
 
+
 .cancel-btn {
-  background: rgba(239, 68, 68, 0.8);
-  color: white;
+  background: #F7C72C;
+  color: #072C54;
   border: none;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  font-size: 1.2rem;
+  width: 75px;
+  height: 75px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
 }
 
-.cancel-btn:hover {
-  background: rgba(239, 68, 68, 1);
-  transform: translateY(-2px);
-}
 
 .next-btn {
   background: #F7C72C;
@@ -550,8 +533,7 @@ onUnmounted(() => {
   border: none;
   padding: 1rem 3rem;
   border-radius: 8px;
-  font-weight: 700;
-  font-size: 1rem;
+  
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
@@ -687,8 +669,8 @@ onUnmounted(() => {
   }
   
   .cancel-btn {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     font-size: 1rem;
   }
   
