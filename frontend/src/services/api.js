@@ -1,3 +1,4 @@
+
 const API_BASE_URL = 'http://localhost:8000/api/v1'
 
 export const userService = {
@@ -137,6 +138,7 @@ export const fetchLesson = async (lessonId) => {
   const lesson = await fetch(`${API_BASE_URL}/lessons/${lessonId}`, {})
   const data = await lesson.json()
 
+  }
 export const fetchQuestions = async () => {
   const questions = await fetch(`${API_BASE_URL}/questions`, {})
   const data = await questions.json()
