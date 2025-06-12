@@ -51,6 +51,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 // Props
 const props = defineProps({
@@ -110,7 +112,11 @@ const animateProgress = () => {
 
 const handleFinish = () => {
   emit('finish')
-  emit('next-lesson') 
+
+  emit('next-lesson')
+
+  router.push('/')// ou 'back-to-menu' selon le contexte
+
 }
 
 // Lifecycle

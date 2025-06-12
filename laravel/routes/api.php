@@ -53,6 +53,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('battles', BattleController::class)->parameters([
         'battles' => 'battle'
     ]);
+    Route::patch('battles/{battle}/status', [BattleController::class, 'updateStatus']);
     Route::apiResource('user-rewards', UserRewardController::class)->parameters([
         'user-rewards' => 'userReward'
     ]);

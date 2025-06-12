@@ -121,7 +121,16 @@
       <!-- Finished Battles Section -->
       <div class="section">
         <h2 class="section-title">FINISHED BATTLES</h2>
-        <div class="battle-grid">
+        
+        <!-- SI AUCUNE BATAILLE -->
+        <div v-if="finishedBattles.length === 0" class="empty-battles">
+          <div class="empty-icon">🎯</div>
+          <h3>Aucune bataille terminée</h3>
+          <p>Jouez votre première bataille pour voir l'historique ici !</p>
+        </div>
+        
+        <!-- SI DES BATAILLES EXISTENT -->
+        <div v-else class="battle-grid">
           <div 
             v-for="battle in finishedBattles" 
             :key="battle.id"
@@ -141,6 +150,8 @@
               <div class="player-details">
                 <h3 class="player-name">{{ battle.name }}</h3>
                 <div class="flag">{{ battle.country }}</div>
+                <!-- Badge pour indiquer que c'est une vraie bataille -->
+                <div class="real-battle-badge">Bataille jouée</div>
               </div>
             </div>
             
@@ -191,7 +202,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { battleService } from '@/services/api'
 
@@ -218,6 +229,56 @@ const getAvatarUrl = (user) => {
   return `http://localhost:8000/${user.avatar}`
 }
 
+// NOUVELLE FONCTION : Déterminer le statut d'une bataille selon les summaries
+const getBattleStatus = (battle, currentUserId) => {
+  const hasChallenger = battle.challenger_summary && 
+                       battle.challenger_summary.answers && 
+                       battle.challenger_summary.answers.length > 0
+  
+  const hasChallenged = battle.challenged_summary && 
+                       battle.challenged_summary.answers && 
+                       battle.challenged_summary.answers.length > 0
+  
+  console.log(`🎮 getBattleStatus(${battle.id}):`, {
+    currentUserId,
+    challenger_id: battle.challenger_id,
+    challenged_id: battle.challenged_id,
+    hasChallenger,
+    hasChallenged
+  })
+  
+  // Bataille terminée - les deux ont joué
+  if (hasChallenger && hasChallenged) {
+    console.log(`   → Status: VIEW (bataille terminée)`)
+    return 'view'
+  }
+  
+  // Je suis le challenged (celui qui a été invité)
+  if (currentUserId === battle.challenged_id) {
+    if (!hasChallenged) {
+      console.log(`   → Status: PLAY (challenged doit jouer en premier)`)
+      return 'play' // Mon tour - je n'ai pas encore joué
+    } else if (!hasChallenger) {
+      console.log(`   → Status: WAITING (challenged a joué, attente du challenger)`)
+      return 'waiting' // J'ai joué, attente du challenger
+    }
+  }
+  
+  // Je suis le challenger (celui qui a invité)
+  if (currentUserId === battle.challenger_id) {
+    if (!hasChallenged) {
+      console.log(`   → Status: WAITING (attente que le challenged joue en premier)`)
+      return 'waiting' // Attente que le challenged joue en premier
+    } else if (!hasChallenger) {
+      console.log(`   → Status: PLAY (challenged a joué, tour du challenger)`)
+      return 'play' // Le challenged a joué, c'est mon tour
+    }
+  }
+  
+  console.log(`   → Status: WAITING (défaut)`)
+  return 'waiting'
+}
+
 // Charger les vraies données depuis la base
 const loadBattlesFromDB = async () => {
   try {
@@ -232,6 +293,7 @@ const loadBattlesFromDB = async () => {
     if (userResponse.ok) {
       const userData = await userResponse.json()
       currentUserId.value = userData.id
+      console.log('👤 Current User ID:', currentUserId.value)
     }
 
     // Charger tous les utilisateurs disponibles
@@ -239,293 +301,271 @@ const loadBattlesFromDB = async () => {
     const loadedUsers = usersData.data || usersData || []
     allUsers.value = loadedUsers
     
-    // INCOMING CHALLENGES - pas de limite
-    incomingChallenges.value = loadedUsers
-      .filter(user => user.id !== currentUserId.value)
-      .slice(0, 4)
-      .map((user, index) => ({
-        id: user.id,
-        name: user.username,
-        country: getCountryCode(user),
-        timeLeft: '24h left',
-        status: index < 2 ? 'invitation' : (index === 2 ? 'play' : 'waiting'),
-        user: user
-      }))
+    // Récupérer toutes les batailles
+    const incomingBattlesFromDB = await fetch('http://localhost:8000/api/v1/battles', {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
 
-    // OUTGOING CHALLENGES - MAXIMUM 5 (représentent les slots occupés)
-    // Simuler quelques battles en cours (par exemple 2 sur 5 slots)
-    outgoingChallenges.value = loadedUsers
-      .filter(user => user.id !== currentUserId.value)
-      .slice(4, 6) // Prendre seulement 2 utilisateurs pour simuler 2 slots occupés
-      .map((user, index) => ({
-        id: user.id + 100,
-        name: user.username,
-        country: getCountryCode(user),
-        timeLeft: `${Math.floor(Math.random() * 20) + 1}h left`,
-        status: index === 0 ? 'play' : 'waiting',
-        user: user
-      }))
+    const allBattles = await incomingBattlesFromDB.json()
+    console.log('📋 TOUTES LES BATAILLES depuis API:', allBattles.data)
 
-    // FINISHED BATTLES
-    finishedBattles.value = loadedUsers
-      .filter(user => user.id !== currentUserId.value)
-      .slice(6, 8)
-      .map((user, index) => ({
-        id: user.id + 200,
-        name: user.username,
-        country: getCountryCode(user),
-        points: index === 0 ? 300 : -100,
-        user: user
-      }))
+    // INCOMING = Batailles où JE suis le "challenged" (invitations reçues + en cours de jeu)
+    incomingChallenges.value = (allBattles.data || [])
+      .filter(battle => {
+        const iAmChallenged = battle.challenged_id === currentUserId.value
+        const battleStatus = getBattleStatus(battle, currentUserId.value)
+        const notFinished = battleStatus !== 'view'
+        
+        console.log(`🔍 Incoming Bataille ${battle.id}:`, {
+          iAmChallenged,
+          battleStatus,
+          notFinished,
+          has_challenged_accepted: battle.has_challenged_accepted
+        })
+        
+        return iAmChallenged && notFinished
+      })
+      .map(battle => {
+        const battleStatus = getBattleStatus(battle, currentUserId.value)
+        
+        // Déterminer le statut d'affichage
+        let displayStatus = 'invitation'
+        if (battle.has_challenged_accepted) {
+          displayStatus = battleStatus // 'play' ou 'waiting'
+        }
+        
+        return {
+          id: battle.id,
+          name: battle.challenger.username,
+          country: battle.challenger.pos?.country_flag || '🇨🇭',
+          timeLeft: '24h left',
+          status: displayStatus,
+          user: battle.challenger
+        }
+      })
 
-    console.log('✅ Slots occupés:', outgoingChallenges.value.length, '/5')
-    console.log('✅ Slots libres:', 5 - outgoingChallenges.value.length, '/5')
+    console.log('📨 Incoming challenges (reçues):', incomingChallenges.value.length)
+
+    // OUTGOING = Batailles où JE suis le "challenger" (invitations envoyées + en cours de jeu)
+    outgoingChallenges.value = (allBattles.data || [])
+      .filter(battle => {
+        const iAmChallenger = battle.challenger_id === currentUserId.value
+        const battleStatus = getBattleStatus(battle, currentUserId.value)
+        const notFinished = battleStatus !== 'view'
+        
+        console.log(`🔍 Outgoing Bataille ${battle.id}:`, {
+          iAmChallenger,
+          battleStatus,
+          notFinished,
+          has_challenged_accepted: battle.has_challenged_accepted
+        })
+        
+        return iAmChallenger && notFinished
+      })
+      .map(battle => {
+        const battleStatus = getBattleStatus(battle, currentUserId.value)
+        
+        // Déterminer le statut d'affichage
+        let displayStatus = 'waiting'
+        if (battle.has_challenged_accepted) {
+          displayStatus = battleStatus // 'play' ou 'waiting'
+        }
+        
+        return {
+          id: battle.id,
+          name: battle.challenged.username,
+          country: battle.challenged.pos?.country_flag || '🇨🇭',
+          timeLeft: '24h left',
+          status: displayStatus,
+          user: battle.challenged
+        }
+      })
+
+    console.log('📤 Outgoing challenges (envoyées):', outgoingChallenges.value.length)
+
+    // FINISHED BATTLES = Batailles TERMINÉES
+    await loadFinishedBattles(allBattles.data || [])
+
+    console.log('✅ Données chargées avec logique corrigée:')
+    console.log(`  - Incoming: ${incomingChallenges.value.length}`)
+    console.log(`  - Outgoing: ${outgoingChallenges.value.length}`)
+    console.log(`  - Finished: ${finishedBattles.value.length}`)
 
   } catch (err) {
     error.value = err.message
-    console.error('❌ Erreur lors du chargement depuis la base:', err)
-    loadMockData()
+    console.error('❌ Erreur lors du chargement:', err)
+    
+    incomingChallenges.value = []
+    outgoingChallenges.value = []
+    finishedBattles.value = []
   } finally {
     isLoading.value = false
   }
 }
 
-// Fonction pour convertir pos_id en code pays
-const getCountryCode = (user) => {
-  // 1. Essayer d'abord depuis user.pos.country_flag
-  if (user.pos && user.pos.country_flag) {
-    return user.pos.country_flag
-  }
-  
-  // 2. Fallback sur le mapping pos_id
-  const countryMapping = {
-    1: '🇨🇭', 2: '🇫🇷', 3: '🇩🇪', 4: '🇮🇹', 5: '🇪🇸', 
-    6: '🇵🇹', 7: '🇷🇴', 8: '🇺🇸', 9: '🇬🇧', 10: '🇧🇪'
-  }
-  return countryMapping[user.pos_id] || '🇫🇷'
-}
-
-// Fonction fallback
-const loadMockData = () => {
-  // Simuler 2 slots occupés sur 5
-  outgoingChallenges.value = [
-    {
-      id: 5,
-      name: 'H.OVSANNA',
-      country: 'RO',
-      timeLeft: '6h left',
-      status: 'play'
-    },
-    {
-      id: 6,
-      name: 'S.DACOSTA',
-      country: 'PT',
-      timeLeft: '8h left',
-      status: 'waiting'
+// CORRIGER loadFinishedBattles() pour trier par date décroissante
+const loadFinishedBattles = async (battles) => {
+  try {
+    console.log('🔄 Filtrage des batailles terminées...')
+    
+    // HELPER FUNCTION : même logique que dans loadBattlesFromDB
+    const isBattleFinished = (battle) => {
+      const hasChallenger = battle.challenger_summary && 
+                           battle.challenger_summary.answers && 
+                           battle.challenger_summary.answers.length > 0
+      
+      const hasChallenged = battle.challenged_summary && 
+                           battle.challenged_summary.answers && 
+                           battle.challenged_summary.answers.length > 0
+      
+      return hasChallenger && hasChallenged
     }
-  ]
-  // Donc 3 invite-cards seront affichées automatiquement (5 - 2 = 3)
-
-  incomingChallenges.value = [
-    {
-      id: 1,
-      name: 'R.FREUENFELD',
-      country: 'DE',
-      timeLeft: '24h left',
-      status: 'play'
-    },
-    {
-      id: 2,
-      name: 'C.NDIAYE',
-      country: 'FR',
-      timeLeft: '24h left',
-      status: 'waiting'
-    },
-    {
-      id: 3,
-      name: 'R.KELLER',
-      country: 'DE',
-      timeLeft: '24h left',
-      status: 'invitation'
-    },
-    {
-      id: 4,
-      name: 'L.ANEX',
-      country: 'FR',
-      timeLeft: '11h left',
-      status: 'invitation'
-    }
-  ]
-
-  finishedBattles.value = [
-    {
-      id: 7,
-      name: 'P.DUJARDIN',
-      country: 'FR',
-      points: 300
-    },
-    {
-      id: 8,
-      name: 'L.ANEX',
-      country: 'FR',
-      points: -100
-    }
-  ]
-}
-
-// Méthodes existantes
-const acceptChallenge = (id) => {
-  const challenge = incomingChallenges.value.find(c => c.id === id)
-  if (challenge) {
-    challenge.status = 'play'
-  }
-}
-
-const declineChallenge = (id) => {
-  incomingChallenges.value = incomingChallenges.value.filter(c => c.id !== id)
-}
-
-const handleAction = async (challenge) => {
-  if (challenge.status === 'play') {
-    try {
-      console.log('🎮 Starting battle with', challenge.name)
-      
-      // 1. Récupérer TOUTES les questions depuis ta vraie API
-      console.log('📡 Récupération des questions...')
-      const questionsData = await battleService.getQuestions()
-      const allQuestions = questionsData.data || questionsData || []
-      
-      console.log('📋 Questions récupérées:', allQuestions.length)
-      
-      // 2. Récupérer TOUS les choix depuis ta vraie API  
-      console.log('📡 Récupération des choix...')
-      const choicesData = await battleService.getChoices()
-      const allChoices = choicesData.data || choicesData || []
-      
-      console.log('📋 Choix récupérés:', allChoices.length)
-      
-      // 3. Prendre 5 questions aléatoires
-      const shuffled = allQuestions.sort(() => 0.5 - Math.random())
-      const selectedQuestions = shuffled.slice(0, 5)
-      
-      console.log('🎯 5 questions sélectionnées:', selectedQuestions.map(q => `ID: ${q.id}`))
-      
-      // 4. Pour chaque question, associer ses choix et identifier la bonne réponse
-      selectedQuestions.forEach(question => {
-        // Filtrer les choix pour cette question
-        const questionChoices = allChoices.filter(choice => choice.question_id === question.id)
+    
+    // FILTRER : SEULEMENT les batailles VRAIMENT TERMINÉES
+    const finishedBattlesList = battles
+      .filter(battle => {
+        const isFinished = isBattleFinished(battle)
+        const userParticipated = battle.challenger_id === currentUserId.value || battle.challenged_id === currentUserId.value
         
-        console.log(`📋 Question ${question.id}: ${questionChoices.length} choix trouvés`)
+        console.log(`🔍 Finished Bataille ${battle.id}:`)
+        console.log(`   - isFinished: ${isFinished}`)
+        console.log(`   - userParticipated: ${userParticipated}`)
+        console.log(`   - created_at: ${battle.created_at}`)
+        console.log(`   - updated_at: ${battle.updated_at}`)
+        console.log(`   - RÉSULTAT: ${isFinished && userParticipated}`)
         
-        // IMPORTANT : correct_answer_text est au format JSON !
-        let correctAnswerText = question.correct_answer_text
-        
-        // Si c'est une string JSON, la parser
-        if (typeof correctAnswerText === 'string') {
-          try {
-            correctAnswerText = JSON.parse(correctAnswerText)
-          } catch (e) {
-            console.warn('Could not parse correct_answer_text as JSON:', correctAnswerText)
-          }
-        }
-        
-        console.log(`✅ Bonne réponse pour question ${question.id}:`, correctAnswerText)
-        
-        // CORRIGER : Adapter la structure pour BattleQuizView
-        question.choices = questionChoices.map(choice => {
-          // COMPARER text_answer avec correct_answer_text (en tenant compte du format JSON)
-          let isCorrect = false
-          
-          // Plusieurs façons de comparer selon le format de correct_answer_text
-          if (Array.isArray(correctAnswerText)) {
-            // Si c'est un array, vérifier si text_answer est dedans
-            isCorrect = correctAnswerText.includes(choice.text_answer)
-          } else if (typeof correctAnswerText === 'string') {
-            // Si c'est une string, comparer directement
-            isCorrect = choice.text_answer === correctAnswerText
-          } else if (typeof correctAnswerText === 'boolean') {
-            // Si c'est un boolean, comparer avec "true"/"false"
-            isCorrect = choice.text_answer === String(correctAnswerText)
-          } else {
-            // Essayer de convertir en string et comparer
-            isCorrect = choice.text_answer === String(correctAnswerText)
-          }
-          
-          console.log(`🔍 Choix "${choice.text_answer}" ${isCorrect ? '✅ CORRECT' : '❌ incorrect'}`)
-          
-          return {
-            id: choice.id,
-            text_answer: choice.text_answer,
-            is_correct: isCorrect // CALCULER is_correct en comparant avec correct_answer_text
-          }
-        })
-        
-        // Si aucune réponse n'est marquée comme correcte, marquer la première par défaut
-        const correctAnswers = question.choices.filter(c => c.is_correct)
-        if (correctAnswers.length === 0 && question.choices.length > 0) {
-          console.warn(`⚠️ Aucune réponse correcte trouvée pour question ${question.id}, marquage de la première par défaut`)
-          question.choices[0].is_correct = true
-        }
-        
-        console.log(`✅ Question ${question.id}: ${question.choices.length} choix avec ${question.choices.filter(c => c.is_correct).length} bonne(s) réponse(s)`)
+        return isFinished && userParticipated
       })
-      
-      // 5. Vérifier qu'on a bien des choix
-      const questionsWithChoices = selectedQuestions.filter(q => q.choices && q.choices.length > 0)
-      console.log(`✅ ${questionsWithChoices.length}/5 questions ont des choix`)
-      
-      // 6. Si certaines questions n'ont pas de choix, les compléter
-      selectedQuestions.forEach(question => {
-        if (!question.choices || question.choices.length === 0) {
-          console.warn(`⚠️ Pas de choix pour question ${question.id}, ajout de choix par défaut`)
-          question.choices = [
-            { text_answer: 'Réponse A', is_correct: true },
-            { text_answer: 'Réponse B', is_correct: false },
-            { text_answer: 'Réponse C', is_correct: false },
-            { text_answer: 'Réponse D', is_correct: false }
-          ]
+      .map(battle => {
+        // Déterminer l'adversaire selon le rôle de l'utilisateur
+        let opponentUser, playerWon
+        
+        if (battle.challenger_id === currentUserId.value) {
+          // L'utilisateur est le challenger
+          opponentUser = battle.challenged || {}
+          playerWon = battle.has_challenger_won
+          console.log(`   - JE suis challenger vs ${opponentUser.username}, j'ai ${playerWon ? 'gagné' : 'perdu'}`)
+        } else {
+          // L'utilisateur est le challenged
+          opponentUser = battle.challenger || {}
+          playerWon = !battle.has_challenger_won
+          console.log(`   - JE suis challenged par ${opponentUser.username}, j'ai ${playerWon ? 'gagné' : 'perdu'}`)
+        }
+        
+        const opponentPos = opponentUser.pos || {}
+        
+        // AMÉLIORATION : Utiliser updated_at (quand la bataille est terminée) plutôt que created_at
+        const battleDate = battle.updated_at || battle.created_at
+        const timestamp = new Date(battleDate).getTime()
+        
+        console.log(`   - Battle date: ${battleDate}, timestamp: ${timestamp}`)
+        
+        return {
+          id: battle.id,
+          name: opponentUser.username || opponentUser.name || `User #${opponentUser.id}`,
+          country: opponentPos.country_flag || getCountryCode(opponentUser) || '🇨🇭',
+          points: playerWon === true ? +300 : (playerWon === false ? -70 : +100),
+          user: opponentUser,
+          timestamp: timestamp,
+          playerWon: playerWon,
+          isDefault: false,
+          battleDate: battleDate // Garder la date pour debug
         }
       })
-      
-      // 7. Sauvegarder pour BattleQuizView
-      localStorage.setItem('currentBattle', JSON.stringify({
-        battleId: challenge.id,
-        opponent: {
-          id: challenge.user?.id || challenge.id,
-          name: challenge.name,
-          avatar: challenge.user?.avatar, // PASSER L'AVATAR COMPLET
-          flag: challenge.country
-        },
-        questions: selectedQuestions
-      }))
-      
-      console.log('💾 Battle data saved with opponent avatar:', challenge.user?.avatar)
-      console.log('💾 Battle data saved with opponent flag:', challenge.country)
-      
-      router.push('/battle-quiz')
-      
-    } catch (error) {
-      console.error('❌ Erreur chargement depuis la base:', error)
-      alert(`Erreur API: ${error.message}`)
-      router.push('/battle-quiz')
-    }
+      // CORRECTION : Tri par timestamp décroissant (plus récent en premier)
+      .sort((a, b) => {
+        const timestampA = a.timestamp || 0
+        const timestampB = b.timestamp || 0
+        
+        console.log(`🔄 Tri: Bataille ${a.id} (${timestampA}) vs Bataille ${b.id} (${timestampB})`)
+        
+        // Décroissant : b - a (plus récent en premier)
+        return timestampB - timestampA
+      })
+      .slice(0, 10) // Garder seulement les 10 plus récentes
+    
+    finishedBattles.value = finishedBattlesList
+    
+    console.log('✅ Batailles terminées chargées et triées:', finishedBattles.value.length)
+    console.log('📅 Ordre des batailles (plus récente en premier):')
+    finishedBattles.value.forEach((battle, index) => {
+      console.log(`   ${index + 1}. Bataille ${battle.id} - ${battle.name} - ${battle.battleDate}`)
+    })
+    
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement des batailles terminées:', error)
+    finishedBattles.value = []
   }
 }
 
-const viewBattle = (id) => {
-  console.log('Viewing battle', id)
-  router.push(`/battle-details/${id}`)
+// CORRIGER acceptChallenge() pour bien mettre à jour le statut
+const acceptChallenge = async (battleId) => {
+  try {
+    console.log('✅ Acceptation de la bataille:', battleId)
+    
+    const response = await fetch(`http://localhost:8000/api/v1/battles/${battleId}/status`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'accept',
+        user_id: currentUserId.value
+      })
+    })
+    
+    if (response.ok) {
+      console.log('✅ Bataille acceptée avec succès')
+      // Recharger les données pour mettre à jour les listes
+      await loadBattlesFromDB()
+    } else {
+      console.error('❌ Erreur lors de l\'acceptation:', response.status)
+    }
+  } catch (error) {
+    console.error('❌ Erreur lors de l\'acceptation:', error)
+  }
 }
 
-// FONCTION MISE À JOUR : Ajouter une battle = remplir un slot
-const invitePlayer = () => {
-  // 1. VÉRIFIER LES SLOTS (maximum 5)
+// CORRIGER declineChallenge() pour appeler l'API
+const declineChallenge = async (battleId) => {
+  try {
+    console.log('❌ Refus de la bataille:', battleId)
+    
+    const response = await fetch(`http://localhost:8000/api/v1/battles/${battleId}/status`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        action: 'decline',
+        user_id: currentUserId.value
+      })
+    })
+    
+    if (response.ok) {
+      console.log('✅ Bataille refusée avec succès')
+      // Recharger les données pour mettre à jour les listes
+      await loadBattlesFromDB()
+    } else {
+      console.error('❌ Erreur lors du refus:', response.status)
+    }
+  } catch (error) {
+    console.error('❌ Erreur lors du refus:', error)
+  }
+}
+
+// CORRIGER invitePlayer() pour ne PAS recharger immédiatement ET fermer le modal
+const invitePlayer = async () => {
   if (outgoingChallenges.value.length >= 5) {
     alert('🚫 All slots are full!')
     return
   }
   
-  // 2. TROUVER LES UTILISATEURS DISPONIBLES
   const availableUsers = allUsers.value.filter(user => 
     user.id !== currentUserId.value &&
     !incomingChallenges.value.some(c => c.user?.id === user.id) &&
@@ -534,7 +574,6 @@ const invitePlayer = () => {
   
   let selectedUser = null
   
-  // 3. CHOISIR UN UTILISATEUR AU HASARD
   if (availableUsers.length > 0) {
     selectedUser = availableUsers[Math.floor(Math.random() * availableUsers.length)]
     invitedPlayerName.value = selectedUser.username
@@ -545,66 +584,187 @@ const invitePlayer = () => {
     console.log('🎲 Fallback to mock user:', invitedPlayerName.value)
   }
   
-  // 4. CRÉER LA NOUVELLE BATTLE (remplit un slot)
-  const newChallenge = {
-    id: Date.now(),
-    name: invitedPlayerName.value,
-    country: selectedUser ? getCountryCode(selectedUser) : 'US',
-    timeLeft: '24h left',
-    status: 'waiting',
-    user: selectedUser
-  }
-  
-  // 5. AJOUTER IMMÉDIATEMENT = TRANSFORMER UNE INVITE-CARD EN BATTLE-CARD
-  outgoingChallenges.value.push(newChallenge)
-  console.log('✅ Slot filled! Slots used:', outgoingChallenges.value.length, '/5')
-  console.log('✅ Free slots remaining:', 5 - outgoingChallenges.value.length)
-  
-  // 6. AFFICHER LE MODAL
-  showInvitationModal.value = true
-  
-  // 7. FERMER LE MODAL APRÈS 2 SECONDES
-  setTimeout(() => {
-    if (showInvitationModal.value) {
-      showInvitationModal.value = false
+  try {
+    console.log('📤 Envoi de l\'invitation avec questions fixes...')
+    
+    // NOUVEAU : Récupérer 5 questions aléatoirement pour cette bataille
+    const questionsData = await battleService.getQuestions()
+    const allQuestions = questionsData.data || questionsData || []
+    
+    if (allQuestions.length === 0) {
+      throw new Error('Aucune question disponible')
     }
-  }, 2000)
-}
-
-const closeInvitationModal = () => {
-  showInvitationModal.value = false
-}
-
-// Lifecycle
-onMounted(() => {
-  loadBattlesFromDB()
-})
-
-console.log('BattleView component loaded')
-
-// Dans le computed currentQuestion, remplace par :
-
-const currentQuestion = computed(() => {
-  if (questions.value.length === 0) return null
-  
-  const question = questions.value[currentQuestionIndex.value]
-  
-  console.log('🔍 Current question data:', question)
-  console.log('🔍 Question choices:', question.choices)
-  
-  // UTILISER LA VRAIE STRUCTURE DE TA BASE (text_answer)
-  return {
-    id: question.id,
-    text: question.content_default || question.content_lf_tf || question.content_lf_blank || 'Question sans contenu',
-    answers: question.choices?.map(choice => {
-      console.log('🔍 Processing choice:', choice)
-      return {
-        text: choice.text_answer || choice.content || choice.text, // CORRIGER : utiliser text_answer
-        correct: choice.is_correct || choice.correct || false
-      }
-    }) || []
+    
+    // Sélectionner 5 questions aléatoirement
+    const shuffled = allQuestions.sort(() => 0.5 - Math.random())
+    const selectedQuestions = shuffled.slice(0, 5)
+    const questionIds = selectedQuestions.map(q => q.id)
+    
+    console.log('🎲 Questions sélectionnées pour cette bataille:', questionIds)
+    
+    const response = await fetch('http://localhost:8000/api/v1/battles', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        challenger_id: currentUserId.value,
+        challenged_id: selectedUser ? selectedUser.id : Math.floor(Math.random() * 10) + 1,
+        has_challenger_accepted: true,
+        has_challenged_accepted: false,
+        questions_id: questionIds // NOUVEAU : Questions fixes pour cette bataille
+      })
+    })
+    
+    if (response.ok) {
+      const result = await response.json()
+      console.log('✅ Invitation envoyée avec questions fixes:', result)
+      
+      showInvitationModal.value = true
+      
+    } else {
+      const errorText = await response.text()
+      console.error('❌ Erreur lors de l\'envoi:', errorText)
+      alert('Erreur lors de l\'envoi de l\'invitation')
+    }
+  } catch (error) {
+    console.error('❌ Erreur lors de l\'invitation:', error)
+    alert('Erreur lors de l\'envoi de l\'invitation')
   }
+}
+
+// CORRIGER closeInvitationModal() pour bien fermer
+const closeInvitationModal = () => {
+  console.log('❌ Fermeture du modal')
+  showInvitationModal.value = false
+  
+  // Recharger les données maintenant pour voir la nouvelle invitation
+  setTimeout(() => {
+    loadBattlesFromDB()
+  }, 500)
+}
+
+// AJOUTER/CORRIGER la fonction handleAction pour lancer le quiz
+const handleAction = async (challenge) => {
+  console.log('🎮 Handle action for challenge:', challenge)
+  
+  if (challenge.status === 'play') {
+    console.log('🚀 Lancement du battle quiz...')
+    
+    try {
+      // Récupérer les données complètes de la bataille
+      const response = await fetch(`http://localhost:8000/api/v1/battles/${challenge.id}`, {
+        credentials: 'include',
+        headers: { 'Accept': 'application/json' }
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Erreur lors du chargement: ${response.status}`)
+      }
+      
+      const battleDetail = await response.json()
+      const battle = battleDetail.data || battleDetail
+      
+      console.log('📋 Bataille chargée pour le quiz:', battle)
+      
+      // Préparer les données pour BattleQuizView
+      const battleData = {
+        id: battle.id,
+        opponent: {
+          id: challenge.user.id,
+          name: challenge.user.username || challenge.name,
+          avatar: challenge.user.avatar || null,
+          flag: challenge.country || '🇨🇭'
+        },
+        questions: battle.questions_id || null,
+        isFirstPlayer: !battle.challenged_summary, // Si pas de challenged_summary, je suis le premier à jouer
+        existingQuestions: battle.challenged_summary?.questionsData || null // Questions déjà jouées par l'autre
+      }
+      
+      console.log('💾 Données préparées pour le quiz:', battleData)
+      
+      // Sauvegarder pour BattleQuizView
+      localStorage.setItem('currentBattle', JSON.stringify(battleData))
+      
+      // Rediriger vers le quiz
+      await router.push('/battle-quiz')
+      
+    } catch (error) {
+      console.error('❌ Erreur:', error)
+      alert(`Erreur: ${error.message}`)
+    }
+    
+  } else if (challenge.status === 'waiting') {
+    console.log('⏳ En attente de l\'adversaire')
+    alert('En attente que votre adversaire joue son tour')
+    
+  } else if (challenge.status === 'view') {
+    console.log('👀 Voir les résultats')
+    await router.push(`/battle-details/${challenge.id}`)
+  }
+}
+
+// AJOUTER getCountryCode si elle n'existe pas
+const getCountryCode = (user) => {
+  if (!user) return '🇨🇭'
+  
+  // 1. Essayer depuis pos.country_flag
+  if (user.pos && user.pos.country_flag) {
+    return user.pos.country_flag
+  }
+  
+  // 2. Fallback sur pos_id
+  if (user.pos_id) {
+    const countryMapping = {
+      1: '🇨🇭', 2: '🇫🇷', 3: '🇩🇪', 4: '🇮🇹', 5: '🇪🇸', 
+      6: '🇵🇹', 7: '🇷🇴', 8: '🇺🇸', 9: '🇬🇧', 10: '🇧🇪'
+    }
+    return countryMapping[user.pos_id] || '🇨🇭'
+  }
+  
+  return '🇨🇭'
+}
+
+// CORRIGER viewBattle pour finished battles
+const viewBattle = (battleId) => {
+  console.log('🔍 Viewing battle:', battleId)
+  router.push(`/battle-details/${battleId}`)
+}
+
+// Loading initial data
+onMounted(async () => {
+  console.log('🚀 BattleView mounted')
+  
+  // Toujours charger au montage
+  await loadBattlesFromDB()
+  
+  // Écouter les changements de route et de focus
+  window.addEventListener('focus', refreshAfterBattle)
+  
+  // NOUVEAU : Écouter les changements de localStorage (quand bataille terminée)
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'battleCompleted') {
+      console.log('🔄 Bataille terminée détectée, rechargement...')
+      setTimeout(() => {
+        loadBattlesFromDB()
+      }, 1000)
+    }
+  })
 })
+
+onUnmounted(() => {
+  window.removeEventListener('focus', refreshAfterBattle)
+})
+
+// AMÉLIORER refreshAfterBattle
+const refreshAfterBattle = () => {
+  console.log('🔄 Rechargement automatique après bataille terminée...')
+  
+  // Forcer un rechargement complet
+  loadBattlesFromDB()
+}
 </script>
 
 <style scoped>
@@ -641,7 +801,7 @@ const currentQuestion = computed(() => {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 2px;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+ 
 }
 
 /* SECTIONS */
@@ -1074,6 +1234,36 @@ const currentQuestion = computed(() => {
 .btn-ok:hover {
   background: #E6B625;
   transform: translateY(-2px);
+}
+
+/* FINISHED BATTLES - NOUVEAUX STYLES */
+.empty-battles {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  margin-top: 1rem;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  color: #F7C72C;
+  margin-bottom: 1rem;
+}
+
+.real-battle-badge {
+  display: inline-block;
+  background: rgba(76, 175, 80, 0.15);
+  color: #4CAF50;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  white-space: nowrap;
 }
 
 /* RESPONSIVE - CORRECTION POUR 768px */

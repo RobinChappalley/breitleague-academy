@@ -20,7 +20,7 @@ export const routes = [
   { path: '/login', component: LoginView, meta: { hideNavBar: true } },
   { path: '/', component: FormationView, meta: { hideNavBar: false } },
   { path: '/battle', component: BattleView, meta: { hideNavBar: false } },
-  { path: '/battle-quiz', component: BattleQuizView, meta: { hideNavBar: false } },
+  { path: '/battle-quiz', component: BattleQuizView, meta: { hideNavBar: true } },
   { path: '/battle-details/:id?', component: BattleDetailsView, meta: { hideNavBar: false } },
   { path: '/collection', component: CollectionView, meta: { hideNavBar: false } },
   { path: '/ranking', component: RankingView, meta: { hideNavBar: false } },

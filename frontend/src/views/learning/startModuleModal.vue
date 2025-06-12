@@ -71,7 +71,8 @@ export default {
       
       this.closeModal();
       const firstLessonId = this.moduleData.id
-      this.$router.push('/lesson/${firstLessonId}')
+      console.log(firstLessonId)
+      this.$router.push(`/lesson/${firstLessonId}`)
     }
   }
 }

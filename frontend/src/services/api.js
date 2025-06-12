@@ -106,9 +106,6 @@ export const battleService = {
   }
 }
 
-export const fetchQuestions = () => {
-  return fetch(`${API_BASE_URL}/questions`, {})
-}
 
 export const fetchProgression = async (userid) => {
   const progression = await fetch(`${API_BASE_URL}/progression/${userid}`, {})
@@ -126,6 +123,23 @@ return data.data
 export const fetchModules = async () => {
   const modules = await fetch(`${API_BASE_URL}/modules`, {})
   const data = await modules.json()
+  return data.data
+}
+
+
+export const fetchLessons = async () => {
+  const lessons = await fetch(`${API_BASE_URL}/lessons`, {})
+  const data = await lessons.json()
+  return data.data
+}
+
+export const fetchLesson = async (lessonId) => {
+  const lesson = await fetch(`${API_BASE_URL}/lessons/${lessonId}`, {})
+  const data = await lesson.json()
+
+export const fetchQuestions = async () => {
+  const questions = await fetch(`${API_BASE_URL}/questions`, {})
+  const data = await questions.json()
   return data.data
 }
 
