@@ -1,18 +1,21 @@
 <template>
   <div class="formation-image-container" :style="backgroundStyle">
-    <div class="progress-bar" v-if=!showStartModal>
+    <div class="progress-bar" v-if="!showStartModal&&!isCheckpointModalVisible">
       <ProgressBar/>
     </div>
     <div class="top-action-buttons">
 
-      <!-- Bouton temporaire pour tester -->
-      <button class="action-btn" @click="changeModule('next')">Next Module (Test)</button>
-      <button class="action-btn" @click="changeModule('previous')">Previous Module (Test)</button>
+      <div class="ressources-buttons">
+        <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
+        <RouterLink class="action-btn" to="/missions">Missions</RouterLink>
+      </div>
 
-      <RouterLink class="action-btn" to="/ressources">Read Ressources</RouterLink>
-      <RouterLink class="action-btn" to="/missions">Missions</RouterLink>
+
+      <div class="moving-buttons">
+        <button class="action-btn next-module-button" @click="changeModule('next')">←</button>
+        <button class="action-btn previous-module-button" @click="changeModule('previous')">→</button>
+      </div>
     </div>
-
     <div ref="watchContainer" class="formation-watch-container">
 
       <!-- Image de la montre avec transition -->
@@ -28,8 +31,15 @@
         >
       </transition>
       <!-- Bouton spécial checkpoint -->
+
+
       <transition name="fade">
         <div v-if="showLessonPoints">
+          <button
+              class="checkpoint-button special-button"
+              @click="showCheckpointModal"
+          ></button>
+
           <div v-if="isCheckpointModalVisible" class="modal-overlay" @click="closeCheckpointModal">
             <div class="checkpoint-modal" @click.stop>
               <button class="close-btn" @click="closeCheckpointModal">✕</button>
@@ -76,7 +86,7 @@
 
           <!-- Boutons de checkpoint avec progression individuelle -->
           <div
-              v-for="(lesson,index) in lessons"
+              v-for="(lesson,index) in lessonsWithProgress"
               :key="index"
               class="lesson-container"
               :style="getButtonPosition(index)"
@@ -96,7 +106,6 @@
               <!-- Cercle de progression (seulement si en cours) -->
               <!--I don't why it works with 28. but that's it! !-->
               <circle
-                  v-if="lesson.status === 'in-progress'"
                   cx="25"
                   cy="28"
                   r="20"
@@ -122,7 +131,7 @@
               {{ lesson.title }}
             </p>
           </div>
-          <h2 class="module-title">{{moduleTitle}}</h2>
+          <h2 class="module-title">{{ moduleTitle }}</h2>
         </div>
 
 
@@ -185,14 +194,30 @@ export default {
         backgroundDesktop: 'backgrounds/aviators-horizontal.png'
       },
       showLessonPoints: true,
-      spinDirection:'right',
+      spinDirection: 'right',
       showStartModal: false,
       selectedModule: null,
-      selectedLesson:null
+      selectedLesson: null
     }
   },
 
   computed: {
+    lessonsWithProgress() {
+      const answers = this.loadAnswersFromLocalStorage();
+      return this.lessons.map(lesson => {
+        const goodAnswers = answers.filter(
+            a => a.lessonId === lesson.id && a.correct
+        );
+        const totalQuestions = lesson.questions && lesson.questions.length ? lesson.questions.length : 1;
+        const progress = Math.round(100 * goodAnswers.length / totalQuestions);
+
+        return {
+          ...lesson,
+          progress
+        }
+      });
+    },
+
     currentModule() {
       if (!this.modules.length) return null;
       return this.modules[this.currentModuleIndex];
@@ -257,16 +282,35 @@ export default {
     }
 
     // 4. Mapper les lessons avec status/progress
-    this.lessons = loadedModule.lessons.map((lesson, idx) => ({
+    let mappedLessons = loadedModule.lessons.map((lesson, idx) => ({
       ...lesson,
       status: 'not-started',
       progress: 0,
       title: lesson.title || `Lesson ${idx + 1}`
     }));
+
+    if (this.progression && this.progression.last_checkpoint_id === 3) {
+      mappedLessons = this.markAllLessonsCompleted(mappedLessons);
+    }
+
+    this.lessons = mappedLessons;
   }
+
   ,
 
   methods: {
+    loadAnswersFromLocalStorage() {
+      const saved = localStorage.getItem('breitling-lesson-answers');
+      return saved ? JSON.parse(saved) : [];
+    },
+
+    markAllLessonsCompleted(lessons) {
+      return lessons.map(lesson => ({
+        ...lesson,
+        status: 'completed',
+        progress: 100
+      }));
+    },
     updateContainerDimensions() {
       const container = this.$refs.watchContainer
       if (container) {
@@ -349,8 +393,8 @@ export default {
     },
 
     getLessonProgressOffset(progress) {
-      const progressRatio = progress / 100
-      return this.circumference * (1 - progressRatio)
+      console.log(progress)
+      return this.circumference - (progress / 100) * this.circumference;
     },
 
     getLessonClass(status) {
@@ -417,12 +461,12 @@ export default {
 
     async loadModule() {
       const progression = await this.loadProgression()
-      let moduleToDisplayId =0
+      let moduleToDisplayId = 0
       if (progression.last_checkpoint_id == 3) {
-         moduleToDisplayId = 1
+        moduleToDisplayId = 1
 
       } else {
-       moduleToDisplayId = progression.last_checkpoint_id + 1
+        moduleToDisplayId = progression.last_checkpoint_id + 1
       }
       return await fetchModule(moduleToDisplayId)
     },
@@ -471,12 +515,18 @@ export default {
         this.currentModuleIndex = nextIndex;
 
         // Mettre à jour les lessons du nouveau module
-        this.lessons = newModule.lessons.map((lesson, idx) => ({
+        let mappedLessons = newModule.lessons.map((lesson, idx) => ({
           ...lesson,
           status: 'not-started',
           progress: 0,
           title: lesson.title || `Lesson ${idx + 1}`
         }));
+
+        if (this.progression && this.progression.last_checkpoint_id === 3) {
+          mappedLessons = this.markAllLessonsCompleted(mappedLessons);
+        }
+
+        this.lessons = mappedLessons;
 
         this.isWatchTransitioning = false;
         console.log('Module changed to:', newModule.title);
@@ -644,15 +694,26 @@ export default {
   top: 40px;
   right: 30px;
   display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: flex-end;
+  justify-content: flex-end;
+  flex-direction: row;
+  align-items: flex-start;
   @media screen and (width >= 768px) {
     gap: 18px;
   }
   @media screen and (max-width: 767px) {
     gap: 10px;
   }
+}
+
+.ressources-buttons, .moving-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-end;
+
+ button {
+   min-height: 48px;
+}
 }
 
 /* MODAL CHECKPOINT STYLES */
@@ -870,6 +931,7 @@ export default {
 .watch-slide-leave-active.spin-right {
   animation: watch-spin-out-right 0.7s forwards;
 }
+
 .watch-slide-leave-active.spin-left {
   animation: watch-spin-out-left 0.7s forwards;
 }
@@ -878,6 +940,7 @@ export default {
 .watch-slide-enter-active.spin-right {
   animation: watch-spin-in-right 0.7s forwards;
 }
+
 .watch-slide-enter-active.spin-left {
   animation: watch-spin-in-left 0.7s forwards;
 }
@@ -889,6 +952,7 @@ export default {
     transform: rotate(2turn) scale(0.7); /* tourne complet à droite */
   }
 }
+
 @keyframes watch-spin-in-right {
   from {
     opacity: 0;
@@ -899,6 +963,7 @@ export default {
     transform: translateY(0) rotate(0deg) scale(1);
   }
 }
+
 /* ...et idem pour la gauche : */
 @keyframes watch-spin-out-left {
   to {
@@ -906,6 +971,7 @@ export default {
     transform: rotate(-2turn) scale(0.7); /* tourne complet à gauche */
   }
 }
+
 @keyframes watch-spin-in-left {
   from {
     opacity: 0;
@@ -933,7 +999,17 @@ export default {
   position: absolute;
   right: -100px;
   bottom: -50px;
-font-size: 2.5rem;
-  color:whitesmoke
+  font-size: 2.5rem;
+  color: whitesmoke
+}
+
+.next-module-button, .previous-module-button {
+
+  z-index: 2;
+}
+
+.next-module-button {
+
+  top: 10%
 }
 </style>

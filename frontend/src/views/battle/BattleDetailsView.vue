@@ -11,7 +11,15 @@
       <div class="player-section" :class="{ 'winner': isPlayerWinner }">
         <div class="player-info">
           <div class="avatar" :style="getAvatarStyle(currentPlayer)">
-            {{ currentPlayer.avatar }}
+            <!-- AFFICHER L'IMAGE D'AVATAR SI DISPONIBLE -->
+            <img 
+              v-if="currentPlayer.avatar && currentPlayer.avatar !== currentPlayer.name?.charAt(0)" 
+              :src="getAvatarUrl(currentPlayer)" 
+              :alt="currentPlayer.name"
+              class="avatar-image"
+            />
+            <!-- SINON AFFICHER L'INITIALE -->
+            <span v-else class="avatar-initial">{{ currentPlayer.name?.charAt(0) || 'Y' }}</span>
           </div>
           <h3 class="player-name">{{ currentPlayer.name }}</h3>
           <span class="flag">{{ currentPlayer.flag }}</span>
@@ -72,7 +80,15 @@
       <div class="player-section" :class="{ 'winner': !isPlayerWinner && !isTie }">
         <div class="player-info">
           <div class="avatar" :style="getAvatarStyle(opponent)">
-            {{ opponent.avatar }}
+            <!-- AFFICHER L'IMAGE D'AVATAR SI DISPONIBLE -->
+            <img 
+              v-if="opponent.avatar && opponent.avatar !== opponent.name?.charAt(0)" 
+              :src="getAvatarUrl(opponent)" 
+              :alt="opponent.name"
+              class="avatar-image"
+            />
+            <!-- SINON AFFICHER L'INITIALE -->
+            <span v-else class="avatar-initial">{{ opponent.name?.charAt(0) || 'O' }}</span>
           </div>
           <h3 class="player-name">{{ opponent.name }}</h3>
           <span class="flag">{{ opponent.flag }}</span>
@@ -265,39 +281,287 @@ const questionsData = ref([
   }
 ])
 
-// Charger les données depuis localStorage si disponibles
-onMounted(() => {
-  const savedResults = localStorage.getItem('lastBattleResults')
-  if (savedResults) {
-    const results = JSON.parse(savedResults)
-    
-    // Mettre à jour avec les vraies données si elles existent
-    if (results.battleId === parseInt(battleId)) {
-      opponent.value = results.opponent
-      if (results.playerAnswers?.length) {
-        playerAnswers.value = results.playerAnswers
-      }
-      if (results.opponentAnswers?.length) {
-        opponentAnswers.value = results.opponentAnswers
-      }
-      if (results.questionsData?.length) {
-        questionsData.value = results.questionsData
-      }
+// FONCTION POUR RÉCUPÉRER L'URL DE L'AVATAR
+const getAvatarUrl = (user) => {
+  console.log('🖼️ Getting avatar for user:', user)
+  
+  if (!user || !user.avatar) {
+    console.log('❌ No avatar data for user:', user?.name)
+    return null
+  }
+  
+  // Si c'est juste une lettre (fallback), ne pas afficher d'image
+  if (typeof user.avatar === 'string' && user.avatar.length === 1) {
+    console.log('❌ Avatar is just initial:', user.avatar)
+    return null
+  }
+  
+  // Construire l'URL complète
+  const avatarUrl = user.avatar.startsWith('http') ? user.avatar : `http://localhost:8000/${user.avatar}`
+  console.log('✅ Avatar URL for', user.name, ':', avatarUrl)
+  
+  return avatarUrl
+}
+
+// FONCTION POUR MAPPER pos_id EN DRAPEAU (UNIFIÉE)
+const getCountryFlag = (posIdOrCountry) => {
+  // Si c'est un code pays (string)
+  if (typeof posIdOrCountry === 'string') {
+    const flagsByCode = {
+      'DE': '🇩🇪',
+      'FR': '🇫🇷',
+      'RO': '🇷🇴',
+      'PT': '🇵🇹',
+      'US': '🇺🇸',
+      'CH': '🇨🇭',
+      'IT': '🇮🇹',
+      'ES': '🇪🇸',
+      'GB': '🇬🇧',
+      'BE': '🇧🇪'
     }
+    return flagsByCode[posIdOrCountry] || '🌍'
+  }
+  
+  // Si c'est un pos_id (number)
+  const flagMapping = {
+    1: '🇨🇭', // Suisse
+    2: '🇫🇷', // France
+    3: '🇩🇪', // Allemagne
+    4: '🇮🇹', // Italie
+    5: '🇪🇸', // Espagne
+    6: '🇵🇹', // Portugal
+    7: '🇷🇴', // Roumanie
+    8: '🇺🇸', // États-Unis
+    9: '🇬🇧', // Royaume-Uni
+    10: '🇧🇪' // Belgique
+  }
+  
+  console.log('🚩 Converting pos_id to flag:', posIdOrCountry, '->', flagMapping[posIdOrCountry])
+  return flagMapping[posIdOrCountry] || '🇨🇭'
+}
+
+// FONCTION POUR RÉCUPÉRER LE DRAPEAU
+const getUserFlag = (userData) => {
+  // 1. Essayer d'abord depuis pos.country_flag (la vraie source)
+  if (userData.pos && userData.pos.country_flag) {
+    console.log('✅ Flag from pos.country_flag:', userData.pos.country_flag)
+    return userData.pos.country_flag
+  }
+  
+  // 2. Fallback sur le mapping pos_id si pas de country_flag
+  if (userData.pos_id) {
+    const flagFromPosId = getCountryFlag(userData.pos_id)
+    console.log('⚠️ Fallback flag from pos_id mapping:', flagFromPosId)
+    return flagFromPosId
+  }
+  
+  // 3. Fallback final
+  console.log('❌ No flag found, using default')
+  return '🇨🇭'
+}
+
+// FONCTION POUR CHARGER LES DONNÉES UTILISATEUR ACTUEL
+const loadCurrentUserData = async () => {
+  try {
+    console.log('🔄 Loading current user data...')
+    
+    // 1. Récupérer l'utilisateur authentifié
+    const userResponse = await fetch('http://localhost:8000/api/user', {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+    
+    if (!userResponse.ok) {
+      throw new Error('Failed to fetch authenticated user')
+    }
+    
+    const userData = await userResponse.json()
+    console.log('📋 Raw authenticated user data:', userData)
+    
+    // 2. Récupérer les données complètes via ton API (AVEC POS)
+    const fullUserResponse = await fetch(`http://localhost:8000/api/v1/users/${userData.id}`, {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+    
+    let fullUserData = userData // Fallback sur les données de base
+    
+    if (fullUserResponse.ok) {
+      const fullUserResponseData = await fullUserResponse.json()
+      fullUserData = fullUserResponseData.data || fullUserResponseData || userData
+      console.log('📋 Full user data from API:', fullUserData)
+    } else {
+      console.warn('⚠️ Could not fetch full user data, using basic auth data')
+    }
+    
+    // 3. METTRE À JOUR currentPlayer avec les VRAIES données
+    currentPlayer.value = {
+      id: fullUserData.id || userData.id,
+      name: fullUserData.username || userData.username || 'YOU',
+      avatar: fullUserData.avatar || userData.avatar || null,
+      flag: getUserFlag(fullUserData) || '🇨🇭'
+    }
+    
+    console.log('✅ Current player loaded:', currentPlayer.value)
+    console.log('🖼️ Avatar path:', currentPlayer.value.avatar)
+    console.log('🚩 Flag from pos:', fullUserData.pos?.country_flag)
+    
+  } catch (error) {
+    console.warn('⚠️ Error loading current user data:', error)
+    
+    // Fallback en cas d'erreur
+    currentPlayer.value = {
+      id: 1,
+      name: 'YOU',
+      avatar: null,
+      flag: '🇨🇭'
+    }
+  }
+}
+
+// Charger les données depuis l'API UNIQUEMENT
+onMounted(async () => {
+  console.log('🔄 BattleDetailsView mounted with battleId:', battleId)
+  
+  // 1. D'abord charger les données utilisateur
+  await loadCurrentUserData()
+  
+  // 2. NOUVEAU : Charger les données de bataille depuis l'API UNIQUEMENT
+  if (battleId) {
+    await loadBattleFromAPI(battleId)
+  } else {
+    console.error('❌ Aucun ID de bataille fourni')
+    router.push('/battle')
   }
 })
 
-// Fonction helper pour obtenir le drapeau du pays
-function getCountryFlag(country) {
-  const flags = {
-    'DE': '🇩🇪',
-    'FR': '🇫🇷',
-    'RO': '🇷🇴',
-    'PT': '🇵🇹',
-    'US': '🇺🇸',
-    'CH': '🇨🇭'
+// NOUVELLE FONCTION : Charger une bataille depuis l'API
+const loadBattleFromAPI = async (battleId) => {
+  try {
+    console.log('🔄 Chargement de la bataille depuis l\'API:', battleId)
+    
+    const response = await fetch(`http://localhost:8000/api/v1/battles/${battleId}`, {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json' }
+    })
+    
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`)
+    }
+    
+    const battleDetail = await response.json()
+    const battle = battleDetail.data || battleDetail
+    
+    console.log('📋 Bataille récupérée depuis l\'API:', battle)
+    console.log('📋 Challenger summary:', battle.challenger_summary)
+    console.log('📋 Challenged summary:', battle.challenged_summary)
+    
+    // Vérifier qu'on a les données nécessaires
+    if (!battle.challenger_summary || !battle.challenged_summary) {
+      throw new Error('Données de bataille incomplètes')
+    }
+    
+    // DÉTERMINER QUI EST LE JOUEUR ACTUEL
+    const isCurrentUserChallenger = battle.challenger_id === currentPlayer.value.id
+    
+    if (isCurrentUserChallenger) {
+      // L'utilisateur actuel est le challenger
+      console.log('✅ L\'utilisateur actuel est le challenger')
+      
+      // Mettre à jour l'adversaire (challenged)
+      opponent.value = {
+        id: battle.challenged?.id || battle.challenged_id,
+        name: battle.challenged?.username || battle.challenged?.name || 'Adversaire',
+        avatar: battle.challenged?.avatar || null,
+        flag: battle.challenged?.pos?.country_flag || getCountryCodeSafe(battle.challenged) || '🇨🇭'
+      }
+      
+      // Mettre à jour les réponses du joueur (challenger)
+      playerAnswers.value = (battle.challenger_summary?.answers || []).map(answer => ({
+        correct: answer.correct || false,
+        text: answer.selectedAnswer || answer.text || 'Pas de réponse',
+        time: answer.time || 0
+      }))
+      
+      // Mettre à jour les réponses de l'adversaire (challenged)
+      opponentAnswers.value = (battle.challenged_summary?.answers || []).map(answer => ({
+        correct: answer.correct || false,
+        text: answer.selectedAnswer || answer.text || 'Pas de réponse',
+        time: answer.time || 0
+      }))
+      
+    } else {
+      // L'utilisateur actuel est le challenged
+      console.log('✅ L\'utilisateur actuel est le challenged')
+      
+      // Mettre à jour l'adversaire (challenger)
+      opponent.value = {
+        id: battle.challenger?.id || battle.challenger_id,
+        name: battle.challenger?.username || battle.challenger?.name || 'Adversaire',
+        avatar: battle.challenger?.avatar || null,
+        flag: battle.challenger?.pos?.country_flag || getCountryCodeSafe(battle.challenger) || '🇨🇭'
+      }
+      
+      // Mettre à jour les réponses du joueur (challenged)
+      playerAnswers.value = (battle.challenged_summary?.answers || []).map(answer => ({
+        correct: answer.correct || false,
+        text: answer.selectedAnswer || answer.text || 'Pas de réponse',
+        time: answer.time || 0
+      }))
+      
+      // Mettre à jour les réponses de l'adversaire (challenger)
+      opponentAnswers.value = (battle.challenger_summary?.answers || []).map(answer => ({
+        correct: answer.correct || false,
+        text: answer.selectedAnswer || answer.text || 'Pas de réponse',
+        time: answer.time || 0
+      }))
+    }
+    
+    // Mettre à jour les questions (depuis challenger_summary car elles sont identiques)
+    if (battle.challenger_summary?.questionsData?.length) {
+      questionsData.value = battle.challenger_summary.questionsData
+    }
+    
+    console.log('✅ Toutes les données ont été chargées depuis l\'API')
+    console.log('- Adversaire:', opponent.value.name)
+    console.log('- Questions:', questionsData.value.length)
+    console.log('- Réponses joueur:', playerAnswers.value.length)
+    console.log('- Réponses adversaire:', opponentAnswers.value.length)
+    
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement de la bataille:', error)
+    alert(`Erreur lors du chargement de la bataille: ${error.message}`)
+    router.push('/battle')
   }
-  return flags[country] || '🌍'
+}
+
+// FONCTION UTILITAIRE : Version sécurisée de getCountryCode
+const getCountryCodeSafe = (user) => {
+  if (!user) return '🇨🇭'
+  
+  // 1. Essayer depuis pos.country_flag
+  if (user.pos && user.pos.country_flag) {
+    return user.pos.country_flag
+  }
+  
+  // 2. Fallback sur pos_id
+  if (user.pos_id) {
+    const countryMapping = {
+      1: '🇨🇭', 2: '🇫🇷', 3: '🇩🇪', 4: '🇮🇹', 5: '🇪🇸', 
+      6: '🇵🇹', 7: '🇷🇴', 8: '🇺🇸', 9: '🇬🇧', 10: '🇧🇪'
+    }
+    return countryMapping[user.pos_id] || '🇨🇭'
+  }
+  
+  return '🇨🇭'
+}
+
+const closeBattleDetails = () => {
+  router.push('/battle')
+}
+
+const returnToBattles = () => {
+  router.push('/battle')
 }
 
 // Computed Properties
@@ -378,17 +642,6 @@ const getAvatarStyle = (player) => {
   }
 }
 
-const closeBattleDetails = () => {
-  // Nettoyer localStorage
-  localStorage.removeItem('lastBattleResults')
-  router.push('/battle')
-}
-
-const returnToBattles = () => {
-  // Nettoyer localStorage
-  localStorage.removeItem('lastBattleResults')
-  router.push('/battle')
-}
 </script>
 
 <style scoped>
@@ -442,7 +695,6 @@ const returnToBattles = () => {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* PLAYERS COMPARISON */
@@ -526,6 +778,22 @@ const returnToBattles = () => {
   margin: 0 auto 0.6rem auto;
   border: 3px solid #F7C72C;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  overflow: hidden; /* IMPORTANT pour les images */
+}
+
+/* STYLES POUR LES IMAGES D'AVATAR */
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 50%;
+}
+
+.avatar-initial {
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
 }
 
 .player-name {
