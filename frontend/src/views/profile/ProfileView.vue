@@ -37,8 +37,12 @@
           <div class="country-info">
             <h2 class="flag">{{ user.pos?.country_flag || '🌍' }}</h2>
           </div>
-          <p class="store-info text-secondary">Store : {{ user.pos?.address || 'Non renseigné' }}</p>
-          <p class="reseller-since text-secondary">Reseller since {{ user.signup_year || '2020' }}</p>
+          <p class="store-info text-secondary">
+            Store : {{ user.pos?.address || 'Non renseigné' }}
+          </p>
+          <p class="reseller-since text-secondary">
+            Reseller since {{ user.signup_year || '2020' }}
+          </p>
         </div>
       </div>
 
@@ -160,7 +164,6 @@ const loadUserRewards = async (userId) => {
     const user = response.data
 
     userRewards.value = user.rewards || []
-
   } catch (err) {
     console.error('Erreur lors du chargement de l’utilisateur:', err.message)
     userRewards.value = []
@@ -397,8 +400,6 @@ const logout = async () => {
   max-width: 400px;
 }
 
-
-
 .country {
   font-weight: 600;
 }
@@ -502,7 +503,7 @@ const logout = async () => {
 
 .watches-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 1rem;
 }
 
@@ -534,6 +535,12 @@ const logout = async () => {
 .watch-name {
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.8);
+}
+.watch-placeholder img,
+.watch-item img {
+  width: clamp(80px, 20vw, 120px);
+  height: auto;
+  object-fit: contain;
 }
 
 /* USER INFO SECTION */
@@ -635,6 +642,12 @@ const logout = async () => {
   .score-value {
     font-size: 3rem;
   }
+
+  .watch-placeholder img,
+  .watch-item img {
+    max-width: 50%;
+    max-height: 100%;
+  }
 }
 
 @media (max-width: 767px) {
@@ -652,6 +665,12 @@ const logout = async () => {
 
   .stat-item {
     padding: 1rem;
+  }
+
+  .watch-placeholder img,
+  .watch-item img {
+    max-width: 100%;
+    max-height: 100%;
   }
 }
 </style>
