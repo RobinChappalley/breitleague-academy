@@ -21,7 +21,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { getCurrentUser } from '@/services/api'
+import { getCurrentUser, BACKEND_URL } from '@/services/api'
 
 const username = ref('')
 const password = ref('')
@@ -34,7 +34,7 @@ const login = async () => {
 
   try {
     // Récupérer le token CSRF
-    await fetch('http://localhost:8000/sanctum/csrf-cookie', {
+    await fetch(`${BACKEND_URL}/sanctum/csrf-cookie`, {
       credentials: 'include'
     })
 
@@ -47,7 +47,7 @@ const login = async () => {
     )
 
     // Envoyer le login avec le token CSRF
-    const res = await fetch('http://localhost:8000/login', {
+    const res = await fetch(`${BACKEND_URL}/login`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -87,7 +87,7 @@ const fetchUser = async () => {
 }
 
 const logout = async () => {
-  await fetch('http://localhost:8000/logout', {
+  await fetch(`${BACKEND_URL}logout`, {
     method: 'POST',
     credentials: 'include'
   })
