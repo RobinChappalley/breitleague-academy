@@ -419,7 +419,7 @@ const progressPercentage = computed(() => {
 })
 
 
-const loadBattleData = () => {
+const loadBattleData = async () => {
   try {
     const savedBattle = localStorage.getItem('currentBattle')
     if (savedBattle) {
