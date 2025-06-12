@@ -207,7 +207,7 @@ const logout = async () => {
         ?.split('=')[1] ?? ''
     )
 
-    await fetch('http://localhost:8000/logout', {
+    await fetch(`${BACKEND_URL}/logout`, {
       method: 'POST',
       credentials: 'include',
       headers: {
