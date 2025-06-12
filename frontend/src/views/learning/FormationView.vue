@@ -83,7 +83,7 @@
 
           <!-- Boutons de checkpoint avec progression individuelle -->
           <div
-              v-for="(lesson,index) in lessons"
+              v-for="(lesson,index) in lessonsWithProgress"
               :key="index"
               class="lesson-container"
               :style="getButtonPosition(index)"
@@ -103,7 +103,6 @@
               <!-- Cercle de progression (seulement si en cours) -->
               <!--I don't why it works with 28. but that's it! !-->
               <circle
-                  v-if="lesson.status === 'in-progress'"
                   cx="25"
                   cy="28"
                   r="20"
@@ -200,7 +199,21 @@ export default {
   },
 
   computed: {
+    lessonsWithProgress() {
+      const answers = this.loadAnswersFromLocalStorage();
+      return this.lessons.map(lesson => {
+        const goodAnswers = answers.filter(
+            a => a.lessonId === lesson.id && a.correct
+        );
+        const totalQuestions = lesson.questions && lesson.questions.length ? lesson.questions.length : 1;
+        const progress = Math.round(100 * goodAnswers.length / totalQuestions);
 
+        return {
+          ...lesson,
+          progress
+        }
+      });
+    },
 
     currentModule() {
       if (!this.modules.length) return null;
@@ -283,6 +296,10 @@ export default {
   ,
 
   methods: {
+    loadAnswersFromLocalStorage() {
+      const saved = localStorage.getItem('breitling-lesson-answers');
+      return saved ? JSON.parse(saved) : [];
+    },
 
     markAllLessonsCompleted(lessons) {
       return lessons.map(lesson => ({
@@ -373,8 +390,8 @@ export default {
     },
 
     getLessonProgressOffset(progress) {
-      const progressRatio = progress / 100
-      return this.circumference * (1 - progressRatio)
+      console.log(progress)
+      return this.circumference - (progress / 100) * this.circumference;
     },
 
     getLessonClass(status) {

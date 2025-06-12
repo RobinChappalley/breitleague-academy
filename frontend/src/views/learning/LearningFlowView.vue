@@ -76,6 +76,7 @@ import LessonCompletedView from './LessonCompletedView.vue'
 const currentView = ref('theory') // 'theory', 'quiz', 'completed'
 const currentStep = ref(1)
 const lessonIndex = ref(0)
+const lessonID = 1
 
 // Tracking pour la progression
 const lessonAnswers = ref(loadAnswersFromLocalStorage()) // CORRIGÉ: Fermeture de parenthèse manquante
@@ -205,15 +206,17 @@ const nextLesson = () => {
 
 const handleAnswer = (answerData) => {
   console.log('Answer selected:', answerData)
+  console.log(currentLesson.value)
+  console.log(lessonIndex.value)
   
   // Ajouter la réponse au tracking de la leçon
   lessonAnswers.value.push({
+    lessonId:lessonID,
     questionIndex: answerData.questionIndex || lessonIndex.value,
     correct: answerData.correct || answerData.allCorrect || false,
     data: answerData
   })
-  saveAnswersToLocalStorage(lessonAnswers.value);
-
+  saveAnswersToLocalStorage(lessonAnswers.value)
 
 }
 
